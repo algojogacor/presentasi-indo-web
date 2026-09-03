@@ -188,7 +188,7 @@ export default function S4Anatomy({ step }: { step: number }) {
       if (label)
         gsap.to(label, {
           color: isSel ? meta.hex : "#6B6B7A",
-          opacity: part === 0 ? 0.6 : 1,
+          opacity: part === 0 ? 0.75 : 1,
           duration: settled ? 0 : 0.5,
         });
       z.querySelectorAll<HTMLElement>(".z-tag").forEach((t) =>
@@ -286,13 +286,13 @@ export default function S4Anatomy({ step }: { step: number }) {
                   PRELIMINARIES
                 </span>
                 <div className="flex flex-1 flex-col gap-[5px] pt-1">
-                  <div className="z-line h-[7px] w-[58%] self-center bg-ember/50" />
-                  <div className="z-line h-[3px] w-[28%] self-center bg-white/12" />
-                  <div className="z-line h-[3px] w-[72%] self-center bg-white/12" />
-                  <div className="z-block flex flex-col gap-[3px] border border-white/10 p-1">
-                    <div className="z-line h-[2px] w-[88%] bg-white/12" />
-                    <div className="z-line h-[2px] w-[94%] bg-white/12" />
-                    <div className="z-line h-[2px] w-[62%] bg-white/12" />
+                  <div className="z-line h-[7px] w-[58%] self-center bg-ember/55" />
+                  <div className="z-line h-[3px] w-[28%] self-center bg-white/16" />
+                  <div className="z-line h-[3px] w-[72%] self-center bg-white/16" />
+                  <div className="z-block flex flex-col gap-[3px] border border-white/14 p-1">
+                    <div className="z-line h-[2px] w-[88%] bg-white/16" />
+                    <div className="z-line h-[2px] w-[94%] bg-white/16" />
+                    <div className="z-line h-[2px] w-[62%] bg-white/16" />
                     <span className="z-tag font-code text-[7px] tracking-[0.2em] text-ember opacity-0">
                       ABSTRAK
                     </span>

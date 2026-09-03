@@ -78,9 +78,9 @@ export default function S2Latar({ step }: { step: number }) {
             key={f.tag}
             data-step={i + 1}
             data-reveal="clip"
-            className="grid grid-cols-[13vw_1fr] items-baseline gap-[2vw] border-t border-edge pt-[1.1vw]"
+            className="grid grid-cols-[15vw_1fr] items-baseline gap-[2vw] border-t border-edge pt-[1.1vw]"
           >
-            <span className="font-code text-[10px] tracking-[0.22em] text-ember">
+            <span className="font-code text-[10px] tracking-[0.18em] text-ember whitespace-nowrap">
               {f.tag}
             </span>
             <p className="font-body text-[1.35vw] leading-snug text-paper/90">
