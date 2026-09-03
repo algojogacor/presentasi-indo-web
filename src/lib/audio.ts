@@ -81,6 +81,34 @@ class AudioEngine {
     mk(1100, t + 0.045, 0.022, 0.02);
   }
 
+  /** Bel halus dua nada — suara tiba di layar live polling (S5). */
+  chime(): void {
+    const ctx = this.ctx;
+    const master = this.master;
+    if (!ctx || !master) return;
+    const t = ctx.currentTime;
+    const tone = (
+      freq: number,
+      at: number,
+      gain: number,
+      dur: number,
+    ): void => {
+      const osc = ctx.createOscillator();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      const g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, at);
+      g.gain.exponentialRampToValueAtTime(gain, at + 0.012);
+      g.gain.exponentialRampToValueAtTime(0.0001, at + dur);
+      osc.connect(g);
+      g.connect(master);
+      osc.start(at);
+      osc.stop(at + dur + 0.01);
+    };
+    tone(1046.5, t, 0.05, 0.22); // C6 — denting pertama
+    tone(1568.0, t + 0.085, 0.042, 0.28); // G6 — denting kedua
+  }
+
   /** Toggle mute master. Return status mute terbaru. */
   toggleMute(): boolean {
     this._muted = !this._muted;

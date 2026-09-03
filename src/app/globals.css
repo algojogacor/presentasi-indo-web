@@ -532,6 +532,33 @@ html.contrast-boost .score-bar-first {
   page-break-inside: avoid;
 }
 
+/* ---------- Kartu rekap sesi S8 [V] — aksen ember tipis di atas ---------- */
+.rekap-card {
+  position: relative;
+}
+.rekap-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 12px;
+  right: 12px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(232, 160, 32, 0) 0%,
+    rgba(232, 160, 32, 0.55) 50%,
+    rgba(232, 160, 32, 0) 100%
+  );
+}
+html.contrast-boost .rekap-card::before {
+  background: linear-gradient(
+    90deg,
+    rgba(232, 160, 32, 0) 0%,
+    rgba(232, 160, 32, 0.9) 50%,
+    rgba(232, 160, 32, 0) 100%
+  );
+}
+
 /* ---------- Kartu battle (S6) — hover glow amber, transisi hanya
    border/box-shadow (transform & opacity milik GSAP, tak diganggu) ---------- */
 .battle-card {

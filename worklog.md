@@ -653,3 +653,69 @@ Stage Summary:
   otomatis (tombol unduh .pdf selain window.print); (3) grafik agregat
   lintas-pertanyaan di layar penutup S8; (4) papan skor lintas dua
   pertanyaan gabungan di langkah terakhir S5.
+
+---
+Task ID: 17
+Agent: main (Z.ai Code)
+Task: QA baseline + dua fitur dari prioritas Task 16 — rekap sesi S8 [V] & bel suara tiba di S5
+
+Work Log:
+- Baca worklog (Task 16 STABIL). Smoke QA 1080p: server 200, G+8 S8, app
+  load — LOLOS. Dipilih fokus: prioritas #3 (rekap penutup) + penyempurnaan
+  audio (bel suara tiba).
+- FITUR 1 — REKAP SESI S8 [V] (prioritas #3 Task 16, layar tanya jawab):
+  - `S8Closing.tsx`: QaStats dirombak jadi SessionRecap — fetch full
+    ResultsPayload per pertanyaan (bukan total saja), socket + HTTP 5 dtk
+    tetap; [V] toggle detail (useSectionKeys + HUD ember).
+  - Detail: dua kartu grid (PERTANYAAN 0X · N SUARA · angka % ketepatan besar
+    · winner "B — label" / "SERI A / D" / "MENUNGGU SUARA"); garis aksen
+    ember tipis di atas kartu (.rekap-card::before, versi contrast-boost);
+    baris kompak lama tetap (T+ · total suara · perangkat) + hint
+    "[V] RINGKAS/RINCIAN · ARSIP → /#/RESULTS".
+  - Data awal null → parts menyembunyikan angka sampai termuat (tanpa
+    kedip "0 SUARA").
+- FITUR 2 — BEL SUARA TIBA di S5 (audio presenter):
+  - `audio.ts`: metode chime() — dua nada sine C6+G6 (1046.5/1568 Hz),
+    gain rendah (0.05/0.042), decay eksponensial; lewat master gain →
+    ikut MUTE otomatis.
+  - `S5Polling.tsx`: loadResults kini deps [live, fallback] + ref
+    firstLoad — bel berbunyi HANYA saat total naik di layar live (bukan
+    muatan awal, bukan fallback manual, bukan turun/reset). Satu corong
+    (socket vote:new dan polling 3 dtk sama-sama lewat loadResults → tak
+    ada bel ganda).
+  - Ganti pertanyaan (Q1→Q2): total turun dari 14→0 → tanpa bel. Remount
+    section: firstLoad reset → muatan awal tanpa bel.
+- STYLING: .rekap-card (backdrop-blur bg-base/88 senada NotesPanel) + aksen
+  ember ::before; HelpOverlay baris [V] (grup SESI & WAKTU).
+- QA REGRESI (semua LOLOS, 0 error baru):
+  - Rekap: seed 13+10 suara → "23 SUARA TEREKAM"; [V] buka → kartu 92%/90%
+    + winner B benar; toggle tutup bersih; suara baru → 24 dalam ≤6 dtk
+    (socket live); [V] di step awal → HUD feedback, kartu tetap tersembunyi
+    (hanya step ≥ 5); VLM 1080p 3/3 PASS (tanpa overlap, kartu seimbang,
+    aksen ember terlihat).
+  - Bel: S5 live + suara masuk → RESPONDEN 14→15, delta error console = 0
+    (jalur chime berjalan bersih); audio tidak bisa didengar programatik —
+    diverifikasi lewat jalur eksekusi + master gain mute-aware.
+  - Golden path: gerbang → kredit → S1 → Shift+S → S2; catatan [N]; peta
+    [O]; HelpSheet baris [V]. Lint 0 error (1 warning pre-existing).
+  - Demo state reset (votes 0, storage bersih). Screenshot: download/qa17-*
+    (f1 rekap-detail).
+- Catatan QA (berulang): buffer `agent-browser console` menumpuk entri
+  lama lintas reload — selalu ukur DELTA jumlah error, bukan grep mentah.
+
+Stage Summary:
+- Status: STABIL + 2 fitur baru (rekap sesi [V] S8, bel suara tiba S5).
+- Pintasan bertambah: [V] rekap sesi (S8, layar tanya jawab).
+- File berubah: audio.ts (+chime), S5Polling.tsx (bel + import audio),
+  S8Closing.tsx (SessionRecap + [V] + usePres/useSectionKeys/QUESTIONS),
+  HelpOverlay.tsx (baris [V]), globals.css (.rekap-card + aksen). Kontrak
+  API/DB tak tersentuh.
+- Risiko: (a) bel hanya terdengar bila audio sudah di-init (gesture
+  keydown pertama) dan tidak di-mute — perilaku disengaja; (b) VLM sesi
+  lalu sempat "membangkitkan HTML" saat prompt bebas — prompt QA selalu
+  kunci "jangan tulis kode"; (c) rekap detail tumbuh ke atas dari 13vh —
+  aman terhadap headline "Terima kasih" (verifikasi VLM).
+- Prioritas next (opsional): (1) preset tempo latihan yang bisa disetel
+  per-babak (perluasan setRehearsal); (2) tombol unduh PDF otomatis arsip
+  (selain window.print); (3) papan skor gabungan dua pertanyaan di langkah
+  terakhir S5; (4) sweep audio halus pergantian babak (opsi [M]-aware).

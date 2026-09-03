@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { io, type Socket } from "socket.io-client";
 import { gsap } from "@/lib/gsap";
+import { audio } from "@/lib/audio";
 import { QUESTIONS, type ResultsPayload } from "@/lib/questions";
 import { usePres } from "../context";
 import { useIsoLayoutEffect, useSectionKeys } from "../hooks";
@@ -137,6 +138,10 @@ export default function S5Polling({ step }: { step: number }) {
   }, [live, qid, fallback, fetchTimeline]);
 
   // Ambil hasil terkini dari server — dipakai polling 3 detik DAN pemicu socket.
+  // Bel halus berbunyi hanya untuk kenaikan suara pada layar live (bukan
+  // fallback manual, bukan muatan awal) — presenter "mendengar" suara tiba
+  // tanpa harus menatap angka responden.
+  const firstLoad = useRef(true);
   const loadResults = useCallback(
     async (target: number) => {
       try {
@@ -148,13 +153,22 @@ export default function S5Polling({ step }: { step: number }) {
         const map: Counts = {};
         for (const o of j.options) map[o.key] = o.count;
         setCounts(map);
+        if (
+          !firstLoad.current &&
+          j.total > totalRef.current &&
+          live &&
+          !fallback
+        ) {
+          audio.chime();
+        }
+        firstLoad.current = false;
         setTotal(j.total);
         totalRef.current = j.total;
       } catch {
         /* diam — presenter tetap bisa lanjut manual */
       }
     },
-    [],
+    [live, fallback],
   );
 
   // Polling HTTP 3 detik — fallback yang selalu jalan saat layar live aktif.
