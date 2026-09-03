@@ -30,6 +30,31 @@ function QuestionCard({
     }
   }, [qid]);
 
+  // Total suara kelas — pemantauan hidup setelah menjawab
+  const [liveTotal, setLiveTotal] = useState<number | null>(null);
+  useEffect(() => {
+    if (state !== "done") return;
+    let stopped = false;
+    const load = async () => {
+      try {
+        const r = await fetch(`/api/results?question=${qid}`, {
+          cache: "no-store",
+        });
+        if (!r.ok) return;
+        const j = (await r.json()) as { total: number };
+        if (!stopped) setLiveTotal(j.total);
+      } catch {
+        /* diam — angka lama tetap tampil */
+      }
+    };
+    void load();
+    const iv = setInterval(load, 4000);
+    return () => {
+      stopped = true;
+      clearInterval(iv);
+    };
+  }, [state, qid]);
+
   const submit = async (key: OptionKey) => {
     if (chosen || state === "sending") return;
     setChosen(key);
@@ -87,7 +112,7 @@ function QuestionCard({
               onClick={() => void submit(o.key)}
               disabled={locked || state === "sending"}
               aria-pressed={isChosen}
-              className={`flex w-full items-center gap-4 rounded-[8px] border p-4 text-left transition-all duration-200 active:scale-[0.99] ${
+              className={`flex w-full items-center gap-4 rounded-[8px] border p-4 text-left transition-all duration-200 active:scale-[0.99] focus-visible:border-ember ${
                 isChosen
                   ? "border-ember bg-ember/12"
                   : locked
@@ -106,11 +131,11 @@ function QuestionCard({
               >
                 {o.key}
               </span>
-              <span className="font-body text-[16px] leading-snug text-paper/90">
+              <span className="min-w-0 flex-1 font-body text-[16px] leading-snug text-paper/90">
                 {o.label}
               </span>
               {isChosen && state === "done" && (
-                <span className="ml-auto font-code text-[10px] tracking-[0.2em] text-ember">
+                <span className="ml-auto shrink-0 font-code text-[10px] tracking-[0.2em] text-ember">
                   TERCATAT
                 </span>
               )}
@@ -125,9 +150,19 @@ function QuestionCard({
         </p>
       )}
       {state === "done" && (
-        <p className="mt-5 border-l-2 border-ember pl-4 font-display text-[22px] italic text-paper">
-          Suaramu tercatat.
-        </p>
+        <div className="mt-5 border-l-2 border-ember pl-4">
+          <p className="font-display text-[22px] italic text-paper">
+            Suaramu tercatat.
+          </p>
+          {liveTotal !== null && (
+            <p className="mt-1.5 font-code text-[10px] tracking-[0.18em] text-mute">
+              <span key={liveTotal} className="count-flash">
+                {liveTotal}
+              </span>{" "}
+              SUARA MASUK DARI SELURUH KELAS
+            </p>
+          )}
+        </div>
       )}
       {state === "error" && (
         <div className="mt-4 border-l-2 border-wrong pl-4">
@@ -150,24 +185,30 @@ function QuestionCard({
 /** Halaman voting audiens — mobile-first, ringan, satu klik, tanpa login. */
 export default function VotingPage() {
   const [q2Open, setQ2Open] = useState(false);
+  const [answered, setAnswered] = useState({ q1: false, q2: false });
 
-  // Pertanyaan kedua terbuka setelah pertanyaan pertama dijawab
+  // Pertanyaan kedua terbuka setelah pertanyaan pertama dijawab;
+  // kartu penyelesaian muncul saat keduanya terekam.
   useEffect(() => {
-    let opened = false;
     const check = () => {
-      if (opened) return true;
+      let complete = false;
       try {
-        if (window.localStorage.getItem("kti-vote-q1")) {
-          opened = true;
-          setQ2Open(true);
-        }
+        const hasQ1 = !!window.localStorage.getItem("kti-vote-q1");
+        const hasQ2 = !!window.localStorage.getItem("kti-vote-q2");
+        if (hasQ1) setQ2Open(true);
+        setAnswered((a) =>
+          a.q1 === hasQ1 && a.q2 === hasQ2 ? a : { q1: hasQ1, q2: hasQ2 },
+        );
+        complete = hasQ1 && hasQ2;
       } catch {
         /* abaikan */
       }
-      return opened;
+      return complete;
     };
     if (check()) return;
-    const iv = setInterval(check, 1200);
+    const iv = setInterval(() => {
+      if (check()) clearInterval(iv);
+    }, 1500);
     return () => clearInterval(iv);
   }, []);
 
@@ -204,6 +245,18 @@ export default function VotingPage() {
             </p>
           )}
         </div>
+
+        {answered.q1 && answered.q2 && (
+          <div className="fade-slide-in mt-10 border-t border-edge pt-7">
+            <p className="font-display text-[26px] italic text-paper">
+              Dua jawaban. Terekam.
+            </p>
+            <p className="mt-2 font-body text-[14px] leading-relaxed text-mute">
+              Pantau layar presentasi — jawabanmu akan tampil saat pembahasan
+              dibuka.
+            </p>
+          </div>
+        )}
       </main>
 
       <footer className="fixed inset-x-0 bottom-0 border-t border-edge bg-base/90 backdrop-blur-sm">

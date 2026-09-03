@@ -300,8 +300,8 @@ export default function S4Anatomy({ step }: { step: number }) {
                   <div className="flex flex-col gap-[3px]">
                     {[0, 1, 2, 3].map((i) => (
                       <div key={i} className="flex items-center gap-1">
-                        <div className="z-line h-[2px] flex-1 bg-white/12" />
-                        <div className="z-line h-[2px] w-[7px] bg-white/25" />
+                        <div className="z-line h-[2px] flex-1 bg-white/16" />
+                        <div className="z-line h-[2px] w-[7px] bg-white/28" />
                       </div>
                     ))}
                     <span className="z-tag font-code text-[7px] tracking-[0.2em] text-ember opacity-0">
@@ -331,7 +331,7 @@ export default function S4Anatomy({ step }: { step: number }) {
                           {r}
                         </span>
                         <div
-                          className="bab-bar h-[3px] bg-white/12"
+                          className="bab-bar h-[3px] bg-white/16"
                           style={{ width: `${78 - i * 6}%` }}
                         />
                       </div>
@@ -339,9 +339,9 @@ export default function S4Anatomy({ step }: { step: number }) {
                         BAB {r} — {["PENDAHULUAN", "TINJAUAN PUSTAKA", "METODE", "HASIL & PEMBAHASAN", "SIMPULAN & SARAN"][i]}
                       </span>
                       <div className="bab-sub hidden flex-col gap-[2px] overflow-hidden pt-[3px] opacity-0">
-                        <div className="h-[2px] w-[92%] bg-white/18" />
-                        <div className="h-[2px] w-[86%] bg-white/18" />
-                        <div className="h-[2px] w-[90%] bg-white/18" />
+                        <div className="h-[2px] w-[92%] bg-white/22" />
+                        <div className="h-[2px] w-[86%] bg-white/22" />
+                        <div className="h-[2px] w-[90%] bg-white/22" />
                       </div>
                     </div>
                   ))}
@@ -359,16 +359,16 @@ export default function S4Anatomy({ step }: { step: number }) {
                 <div className="flex flex-1 flex-col gap-[5px] pt-1">
                   <div className="flex flex-col gap-[3px] pl-1.5">
                     {[0, 1, 2, 3].map((i) => (
-                      <div key={i} className="z-line h-[2px] bg-white/12" style={{ width: `${88 - i * 8}%` }} />
+                      <div key={i} className="z-line h-[2px] bg-white/16" style={{ width: `${88 - i * 8}%` }} />
                     ))}
                     <span className="z-tag font-code text-[7px] tracking-[0.2em] text-ember opacity-0">
                       DAFTAR PUSTAKA
                     </span>
                   </div>
                   <div className="flex items-center gap-2 pl-1.5">
-                    <div className="z-line h-[10px] w-[10px] border border-white/15" />
-                    <div className="z-line h-[10px] w-[10px] border border-white/15" />
-                    <div className="z-line h-[3px] w-[40%] bg-white/12" />
+                    <div className="z-line h-[10px] w-[10px] border border-white/20" />
+                    <div className="z-line h-[10px] w-[10px] border border-white/20" />
+                    <div className="z-line h-[3px] w-[40%] bg-white/16" />
                     <span className="z-tag font-code text-[7px] tracking-[0.2em] text-ember opacity-0">
                       LAMPIRAN
                     </span>

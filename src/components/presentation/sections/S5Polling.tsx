@@ -246,14 +246,33 @@ export default function S5Polling({ step }: { step: number }) {
           {/* Baris bawah: QR + hasil live */}
           <div className="mt-auto flex items-end justify-between">
             <div className={revealed ? "invisible" : ""}>
-              <img
-                ref={qrImgRef}
-                alt="QR code menuju halaman voting"
-                className="h-[13vh] w-[13vh] border border-edge"
-                width={160}
-                height={160}
-                data-testid="poll-qr"
-              />
+              <div className="relative">
+                <img
+                  ref={qrImgRef}
+                  alt="QR code menuju halaman voting"
+                  className="h-[13vh] w-[13vh]"
+                  width={160}
+                  height={160}
+                  data-testid="poll-qr"
+                />
+                {/* Bingkai bidik — bracket sudut amber */}
+                <span
+                  aria-hidden
+                  className="absolute -top-1 -left-1 h-3 w-3 border-t border-l border-ember/60"
+                />
+                <span
+                  aria-hidden
+                  className="absolute -top-1 -right-1 h-3 w-3 border-t border-r border-ember/60"
+                />
+                <span
+                  aria-hidden
+                  className="absolute -bottom-1 -left-1 h-3 w-3 border-b border-l border-ember/60"
+                />
+                <span
+                  aria-hidden
+                  className="absolute -bottom-1 -right-1 h-3 w-3 border-b border-r border-ember/60"
+                />
+              </div>
               <p className="mt-2 font-code text-[9px] tracking-[0.2em] text-mute">
                 PINDAI → /VOTING
               </p>
@@ -263,7 +282,11 @@ export default function S5Polling({ step }: { step: number }) {
               <div className="mb-3 flex items-center gap-2.5">
                 <LiveDot />
                 <span className="font-code text-[10px] tracking-[0.2em] text-mute">
-                  {live ? "LIVE" : "FINAL"} · {total} RESPONDEN
+                  {live ? "LIVE" : "FINAL"} ·{" "}
+                  <span key={total} className="count-flash">
+                    {total}
+                  </span>{" "}
+                  RESPONDEN
                 </span>
                 {fallback && (
                   <span className="font-code text-[9px] tracking-[0.2em] text-ember">
@@ -283,8 +306,8 @@ export default function S5Polling({ step }: { step: number }) {
                       data-testid={`pollbar-${o.key}`}
                     />
                   </div>
-                  <span className="w-10 text-right font-code text-[10px] text-paper/70">
-                    {counts[o.key] ?? 0}
+                  <span className="w-[4.5vw] text-right font-code text-[10px] text-paper/70">
+                    {counts[o.key] ?? 0} · {pct(o.key)}%
                   </span>
                 </div>
               ))}

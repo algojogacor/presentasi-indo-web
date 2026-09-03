@@ -325,12 +325,40 @@ html.contrast-boost .ambient-word {
   background: transparent;
 }
 
+/* ---------- Vignette sinematik — pinggir layar menggelap perlahan ---------- */
+.vignette {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 82% 72% at 50% 47%,
+    transparent 55%,
+    rgba(0, 0, 0, 0.34) 100%
+  );
+}
+/* Contrast boost: vignette dimatikan demi keterbacaan proyektor redup */
+html.contrast-boost .vignette {
+  background: none;
+}
+
+/* ---------- Flash hitungan live (total responden berubah → amber sekejap) ---------- */
+.count-flash {
+  animation: countFlash 0.7s ease-out;
+}
+@keyframes countFlash {
+  from {
+    color: #e8a020;
+  }
+}
+
 /* ---------- Gerak minimum dihormati ---------- */
 @media (prefers-reduced-motion: reduce) {
   .grain,
   .dot-live,
   .scanline,
-  .ambient-word {
+  .ambient-word,
+  .count-flash {
     animation: none !important;
   }
 }

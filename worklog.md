@@ -148,3 +148,63 @@ Stage Summary:
 - State demo bersih: votes sudah di-reset.
 - Risiko kecil: autoplay YouTube tergantung kebijakan browser (klik play bila
   perlu — fokus keyboard otomatis dikembalikan).
+
+---
+Task ID: 10
+Agent: main (Z.ai Code)
+Task: QA penuh via agent-browser + perbaikan bug visual + fitur presenter (jam, peta navigasi, persistensi posisi) + polish styling + voting live feedback
+
+Work Log:
+- QA agent-browser (golden path ACT.00→08, G-jump, B komparasi 5 hot-rows,
+  voting end-to-end, R reset) → SEMUA LOLOS; dev server & log bersih.
+- VLM review 8 screenshot (2 batch) → 3 temuan nyata:
+  (a) S2 label "FAKTA 03 — KONSEKUENSI" wrap dua baris, (b) wireframe rontgen
+  S4 terlalu redup untuk proyektor, (c) risiko tabrakan label TERCATAT di HP.
+- Fix S2: kolom tag 13vw→15vw + whitespace-nowrap + tracking 0.18em.
+- Fix S4: seluruh garis wireframe white/12→white/16-28, border blok
+  white/10→white/14-20, z-label overview 0.6→0.75 opacity.
+- FITUR BARU — session.ts (store modul + useSyncExternalStore):
+  posisi (kti-pos) + jam (kti-clock) di sessionStorage; bertahan lintas
+  reload DAN lintas pergantian rute presentasi↔voting; visitedActs (Set modul,
+  aman dibaca saat render — lolos react-hooks/refs).
+- FITUR BARU — Jam presenter: HUD kiri-bawah "T+MM:SS / 60:00", mulai saat
+  navigasi pertama melewati gerbang, ≥50 menit → amber; jam tetap berjalan
+  setelah refresh tak sengaja.
+- FITUR BARU — Peta navigasi [O]/[Tab]: overlay "DAFTAR ISI — Peta babak"
+  (MapOverlay.tsx), 9 baris klik-untuk-lompat, angka langsung lompat saat
+  terbuka, [Esc] tutup, HUD menunjukkan "// PETA", tombol lain di-telan
+  saat peta terbuka.
+- FITUR BARU — Persistensi posisi: refresh di tengah → gerbang S0 menampilkan
+  "POSISI TERSIMPAN — [L] LANJUT ACT.XX // STEP.YY"; [L] = resume settle instan
+  tanpa replay animasi (visitedActs ditandai sebelum goto).
+- FITUR BARU — HUD cheat line [H] toggle + rel 9 tick babak kanan-bawah
+  (aktif = amber, pernah dilihat = paper/30, belum = white/12).
+- FITUR BARU — S5 polling: persentase "count · pct%" per baris, total
+  responden flash amber saat berubah (count-flash), QR dengan bracket sudut
+  amber (bingkai bidik).
+- FITUR BARU — Voting: total suara kelas live (poll 4s) setelah menjawab,
+  kartu penyelesaian "Dua jawaban. Terekam." saat Q1+Q2 terekam,
+  focus-visible:border-ember + label flex-1/shrink-0 (anti tabrakan).
+- STYLING — vignette sinematik radial (z-55, mati saat contrast-boost),
+  reduced-motion untuk count-flash.
+- Refactor lint-driven: seenRef→visitedActs (module Set) + savedPos/clock via
+  useSyncExternalStore → 0 error react-hooks/refs & set-state-in-effect.
+- QA ulang agent-browser: gate bersih sesi baru, jam hidup (T+00:05), peta
+  buka/tutup/klik-lompat/angka/Esc, reload→gerbang [L]→resume instan ACT.08,
+  H toggle, polling persentase (1·25%, 3·75%), 4 bracket QR, voting Q1+Q2 →
+  kartu penyelesaian + 2 live total. VLM ulang: map "sangat rapi", 3 micro-fix
+  diterapkan (cheat-line /30, bracket 4px, TERCATAT shrink-0).
+- Demo state di-reset (votes kosong, localStorage/sessionStorage bersih).
+
+Stage Summary:
+- Status: STABIL + diperkaya. Lint 0 error (1 warning font pre-existing).
+- Shortcut penuh: Space/→/←, G+0-8, 1/2/3 (S4), A-E (S4), 1-4+B (S6),
+  C kontras, M bisu, F fallback, R reset, Shift+S skip video,
+  [O]/[Tab] peta, [L] resume, [H] bantuan.
+- Arsitektur baru: src/components/presentation/session.ts (store modul) —
+  pola konsumsi: useSyncExternalStore(subscribeSession, getSnapshot, server).
+  Kunci: kti-pos, kti-clock di sessionStorage.
+- Risiko kecil tersisa: autoplay YouTube tergantung kebijakan browser;
+  getElapsedSeconds berbasis Date.now() (aman, granularitas detik).
+- Prioritas next: (opsional) hit counter responden real-time via WebSocket
+  mini-service, mode rehearsal (auto-advance timer), export hasil polling CSV.
