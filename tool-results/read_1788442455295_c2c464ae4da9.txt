@@ -1,0 +1,509 @@
+     1→# Worklog — "Anatomi Karya Tulis Ilmiah" (Kelompok 6 PDB 93, Universitas Airlangga)
+     2→
+     3→Presentasi web "Academic Theater": dark, sinematik, editorial. Single route `/`
+     4→(Next.js 16 App Router, port 3000). Voting audiens via hash route `/#/voting`.
+     5→Backend polling via Next.js API routes + Prisma SQLite (adaptasi dari rencana
+     6→Hono/Turso pada brief karena batasan sandbox — kontrak endpoint identik).
+     7→
+     8→---
+     9→Task ID: 0
+    10→Agent: main (Z.ai Code)
+    11→Task: Inisialisasi proyek — kontrak data polling bersama, worklog, dependensi
+    12→
+    13→Work Log:
+    14→- Inspeksi scaffold: Next.js 16, React 19, Tailwind 4, Prisma 6 (sqlite via
+    15→  env DATABASE_URL), dev server sudah jalan di :3000 (HTTP 200).
+    16→- Menyusun arsitektur state navigasi `[sectionIndex, stepIndex]` (ACT.00–08)
+    17→  dengan step-map: [2,3,4,9,5,6,6,3,6] (jumlah langkah per section).
+    18→- Mendefinisikan kontrak polling bersama di `src/lib/questions.ts` (2 pertanyaan,
+    19→  opsi A–D, jawaban benar + catatan penjelasan) — dipakai frontend presentasi,
+    20→  halaman voting, dan validasi API backend.
+    21→- Menginstal dependensi: `gsap` (animasi + TextPlugin/ScrambleTextPlugin/Flip),
+    22→  `qrcode` + `@types/qrcode` (QR /api/qr server-side).
+    23→
+    24→Stage Summary:
+    25→- Kontrak polling FINAL (tidak boleh berubah tanpa koordinasi):
+    26→  - POST /api/vote   body {question: 1|2, option: "A"|"B"|"C"|"D"} → {ok:true}
+    27→  - GET  /api/results?question=1|2 → {question, total, options:[{key,label,count}]}
+    28→  - POST /api/reset  → {ok:true} (truncate votes)
+    29→  - GET  /api/qr?data=<url> → SVG QR (amber di atas #0A0A0F)
+    30→- Split kerja: Task 1 (backend) diserahkan ke subagent; frontend dikerjakan main.
+    31→- Section map: 0 Opening, 1 Guest Lecturer (YouTube E6pPlIvlrPs), 2 Latar,
+    32→  3 Hakikat+Karakteristik, 4 Anatomy Theater, 5 Live Polling, 6 Battle Cards,
+    33→  7 Kaidah, 8 Penutup.
+    34→
+    35→---
+    36→Task ID: 1
+    37→Agent: full-stack-developer (backend)
+    38→Task: Backend polling — Prisma Vote model + /api/vote + /api/results + /api/reset + /api/qr
+    39→
+    40→Work Log:
+    41→- Baca worklog.md Task 0: kontrak polling final (POST /api/vote, GET /api/results,
+    42→  POST /api/reset, GET /api/qr) + helper bersama `src/lib/questions.ts`
+    43→  (QUESTIONS, isOptionValid, getQuestion, ResultsPayload) — dipakai apa adanya,
+    44→  tidak diubah.
+    45→- Edit `prisma/schema.prisma`: tambah model `Vote` (id cuid, question Int,
+    46→  option String, createdAt, @@index([question, option])) tanpa menyentuh
+    47→  model User/Post yang sudah ada.
+    48→- `bun run db:push` (sukses, auto-generate Prisma Client v6.19.2) — tabel Vote
+    49→  terbentuk di `db/custom.db`.
+    50→- Probe smoke-test model Vote via skrip bun sementara (create→delete) untuk
+    51→  memastikan Prisma Client mengenali model baru; probe dibersihkan.
+    52→- Buat `src/app/api/vote/route.ts` (POST): parse JSON body, validasi tipe
+    53→  {question: number, option: string} + `isOptionValid(question, option)` →
+    54→  400 `{ok:false,error}` bila invalid (body rusak / question 3 / opsi "Z" /
+    55→  field hilang), `db.vote.create` → 200 `{ok:true}`, db error → 500.
+    56→- Buat `src/app/api/results/route.ts` (GET): query param `?question=` (default 1;
+    57→  selain 1|2 → 400), `db.vote.groupBy({by:['option'], where, _count:{_all:true}})`,
+    58→  susun payload persis `ResultsPayload` — label dari QUESTIONS, count zero-filled
+    59→  untuk opsi tanpa suara, `total` = jumlah semua count.
+    60→- Buat `src/app/api/reset/route.ts` (POST): `db.vote.deleteMany({})` → `{ok:true}`.
+    61→- Buat `src/app/api/qr/route.ts` (GET): param `?data=` (wajib, minimal 8 karakter
+    62→  else 400), `import QRCode from 'qrcode'` (default import bekerja normal di
+    63→  runtime — fallback dynamic import tidak diperlukan), render SVG dengan margin 2,
+    64→  width 320, EC level M, warna dark #E8A020 / light #0A0A0F; response headers
+    65→  `content-type: image/svg+xml` + `cache-control: public, max-age=3600`.
+    66→- `bun run lint` → 0 error 0 warning.
+    67→- Verifikasi curl terhadap dev server :3000 (log dev.log bersih, tidak ada error):
+    68→  - POST /api/vote {q:1,B} & {q:2,C} → 200 {"ok":true}
+    69→  - GET /api/results?question=1|2 → shape kontrak, B=1 / C=1, zero-filled benar
+    70→  - GET /api/results (tanpa param) → question 1; question=3 → 400
+    71→  - POST /api/reset → {"ok":true}; results setelahnya total=0 semua
+    72→  - GET /api/qr?data=http%3A%2F%2Flocalhost%3A3000%2F%23%2Fvoting → SVG 320x320,
+    73→    #E8A020 di atas #0A0A0F, headers benar; data=abc / tanpa data → 400
+    74→  - Vote invalid: question 3, opsi "Z", field hilang, JSON rusak → semua 400
+    75→- Tidak menyentuh page.tsx, layout.tsx, globals.css, questions.ts, components/**,
+    76→  api/route.ts (sesuai batasan Task 1).
+    77→
+    78→Stage Summary:
+    79→- 4 endpoint live-polling FINAL & terverifikasi sesuai kontrak Task 0:
+    80→  - POST /api/vote — validasi ketat (tipe + opsi per pertanyaan), 200/400/500.
+    81→  - GET  /api/results?question=1|2 — {question,total,options:[{key,label,count}]},
+    82→    label dari QUESTIONS, zero-filled, default question=1, non-1/2 → 400.
+    83→  - POST /api/reset — truncate tabel Vote.
+    84→  - GET  /api/qr?data=<url> — SVG QR amber (#E8A020) di atas #0A0A0F, EC-M,
+    85→    cache 1 jam, min 8 karakter else 400.
+    86→- Skema: model Vote ditambahkan (User/Post tak tersentuh), index (question,option)
+    87→  mendukung query groupBy per pertanyaan.
+    88→- Lint bersih; semua verifikasi via curl lolos (termasuk kasus invalid).
+    89→- Deviasi: tidak ada. Fallback dynamic import QRCode tidak dibutuhkan karena
+    90→  default import `qrcode` berjalan normal di route handler Next 16.
+    91→- Catatan untuk task frontend: voting bebas multi-submit (tanpa dedup per device)
+    92→  sesuai kontrak Task 0 — gunakan /api/reset untuk demo bersih.
+    93→
+    94→---
+    95→Task ID: 2-9 (frontend lengkap + QA)
+    96→Agent: main (Z.ai Code)
+    97→Task: Design system, presentation engine, seluruh 9 section, voting page, integrasi, QA agent-browser
+    98→
+    99→Work Log:
+   100→- Task 2 — layout.tsx: Google Fonts <link> (Cormorant Garamond / IBM Plex Sans /
+   101→  IBM Plex Mono), lang="id", metadata. Geist dihapus total. globals.css: token
+   102→  @theme inline (base/surface/paper/mute/ember/edge/wrong + font-display/body/code),
+   103→  contrast-boost via var(--edge)/var(--mute), grain feTurbulence, scanline rontgen,
+   104→  dot-live blink, ambient-word float, [data-step] & [data-char] initial hidden.
+   105→- Task 3 — Experience.tsx: state [section,step] dengan seenRef (jump kembali =
+   106→  settle instan tanpa replay), keyboard global (Space/→/← advance, G+digit jump,
+   107→  C contrast, M mute, Shift+S skip video), HUD kiri-bawah `ACT.0X // STEP.0X`
+   108→  + pesan transient, registerTimeline (Space memotong timeline aktif),
+   109→  registerKeyHandler (shortcut khusus section). audio.ts: thump sub-bass 40-54Hz
+   110→  + tick mekanis via OscillatorNode (tanpa file MP3).
+   111→- Task 4 — S0: gate `[SPACE] — MULAI` (membuka izin AudioContext), scrambleText
+   112→  → jeda 1.2s → judul per karakter (SplitChars + mask) + thump + kredit;
+   113→  kalimat final diangkat ke slot 12% (bebas tumpang tindih judul).
+   114→  S1: tirai dua panel (z-30) + pengantar (z-40), curtain open/close gsap
+   115→  power4.inOut, iframe YouTube E6pPlIvlrPs autoplay, iframe focus reclaimer.
+   116→  S2: statement 3.4vw + 3 fakta clip-path reveal. S3: 3 definisi eksklusif
+   117→  (KBBI/Wulandari/Samal&Ardianto) + 5 karakteristik baris kumulatif.
+   118→- Task 5 — S4 Anatomy Theater: split-screen 45/55. Kiri lembar rontgen A4
+   119→  (1:√2) dengan 3 zone (prelim/body/postlim) + 5 segmen BAB + scanline + tanda
+   120→  pojok. Zone terpilih menyala (border zona: ember/paper/gold), lainnya
+   121→  tergeser & 20% opacity. Drill A–E: segmen BAB flexGrow 2.4 + sub-bar terbuka.
+   122→  Kanan: panel clip-path expand per rongga + detail BAB inline.
+   123→- Task 6 — S5 Polling: intro typewriter, QR (img src di-set via DOM effect
+   124→  [qid] — bug fixed), fetch /api/results tiap 3s, bar CSS .pollbar, threshold
+   125→  15s <10 responden → notice fallback, F fallback (klik opsi → reveal), R reset.
+   126→  VotingPage #/voting: mobile-first (tombol 66-78px), POST /api/vote, localStorage
+   127→  flag anti double-submit, Q2 terbuka setelah Q1, error inline + retry.
+   128→- Task 7 — S6 Battle Cards: 4 kartu absolut (w-20vw) dikoreografi gsap
+   129→  (grid/spotlight 1.42x/compare 0.86x), B toggle komparasi dengan hot-row
+   130→  amber. S7: 3 poin eksklusif + panel sebelum (merah redup) vs sesudah (amber).
+   131→  S8: 4 simpulan → callback "sudah" amber → kredit; kata ambient mengapung.
+   132→- Task 8 — page.tsx: hash router #/voting via useSyncExternalStore (lolos
+   133→  react-hooks/set-state-in-effect). Lint: 0 error.
+   134→- Task 9 — QA agent-browser: golden path penuh (opening→video→…→kredit),
+   135→  G5 jump, ArrowLeft instant-settle, voting end-to-end (klik→TERCATAT→bar 100%),
+   136→  R reset→0, F fallback→klik→reveal, B komparasi, C contrast class, M mute HUD.
+   137→  Diperbaiki: (a) S0 import salah useIsoLayoutEffect dari "react" (penyebab
+   138→  500 — root cause), (b) SSR react-ssr tidak ekspor useLayoutEffect → semua
+   139→  effect pakai useEffect + CSS initial hidden, (c) QR effect deps [qid],
+   140→  (d) tumpang tindih S0, (e) seam tirai memotong teks. VLM review screenshot:
+   141→  voting mobile & opening = bersih. Viewport 375px: tombol 78px, font 19px.
+   142→
+   143→Stage Summary:
+   144→- Presentasi lengkap 9 babak berjalan di / (HTTP 200, lint 0 error, polling
+   145→  API 200). Voting di #/voting terverifikasi end-to-end.
+   146→- Shortcut aktif: Space/→/←, G+0-8, 1/2/3, A-E, B, C, M, F, R, Shift+S.
+   147→- Dev server jalan di background port 3000 (jangan di-restart manual).
+   148→- State demo bersih: votes sudah di-reset.
+   149→- Risiko kecil: autoplay YouTube tergantung kebijakan browser (klik play bila
+   150→  perlu — fokus keyboard otomatis dikembalikan).
+   151→
+   152→---
+   153→Task ID: 10
+   154→Agent: main (Z.ai Code)
+   155→Task: QA penuh via agent-browser + perbaikan bug visual + fitur presenter (jam, peta navigasi, persistensi posisi) + polish styling + voting live feedback
+   156→
+   157→Work Log:
+   158→- QA agent-browser (golden path ACT.00→08, G-jump, B komparasi 5 hot-rows,
+   159→  voting end-to-end, R reset) → SEMUA LOLOS; dev server & log bersih.
+   160→- VLM review 8 screenshot (2 batch) → 3 temuan nyata:
+   161→  (a) S2 label "FAKTA 03 — KONSEKUENSI" wrap dua baris, (b) wireframe rontgen
+   162→  S4 terlalu redup untuk proyektor, (c) risiko tabrakan label TERCATAT di HP.
+   163→- Fix S2: kolom tag 13vw→15vw + whitespace-nowrap + tracking 0.18em.
+   164→- Fix S4: seluruh garis wireframe white/12→white/16-28, border blok
+   165→  white/10→white/14-20, z-label overview 0.6→0.75 opacity.
+   166→- FITUR BARU — session.ts (store modul + useSyncExternalStore):
+   167→  posisi (kti-pos) + jam (kti-clock) di sessionStorage; bertahan lintas
+   168→  reload DAN lintas pergantian rute presentasi↔voting; visitedActs (Set modul,
+   169→  aman dibaca saat render — lolos react-hooks/refs).
+   170→- FITUR BARU — Jam presenter: HUD kiri-bawah "T+MM:SS / 60:00", mulai saat
+   171→  navigasi pertama melewati gerbang, ≥50 menit → amber; jam tetap berjalan
+   172→  setelah refresh tak sengaja.
+   173→- FITUR BARU — Peta navigasi [O]/[Tab]: overlay "DAFTAR ISI — Peta babak"
+   174→  (MapOverlay.tsx), 9 baris klik-untuk-lompat, angka langsung lompat saat
+   175→  terbuka, [Esc] tutup, HUD menunjukkan "// PETA", tombol lain di-telan
+   176→  saat peta terbuka.
+   177→- FITUR BARU — Persistensi posisi: refresh di tengah → gerbang S0 menampilkan
+   178→  "POSISI TERSIMPAN — [L] LANJUT ACT.XX // STEP.YY"; [L] = resume settle instan
+   179→  tanpa replay animasi (visitedActs ditandai sebelum goto).
+   180→- FITUR BARU — HUD cheat line [H] toggle + rel 9 tick babak kanan-bawah
+   181→  (aktif = amber, pernah dilihat = paper/30, belum = white/12).
+   182→- FITUR BARU — S5 polling: persentase "count · pct%" per baris, total
+   183→  responden flash amber saat berubah (count-flash), QR dengan bracket sudut
+   184→  amber (bingkai bidik).
+   185→- FITUR BARU — Voting: total suara kelas live (poll 4s) setelah menjawab,
+   186→  kartu penyelesaian "Dua jawaban. Terekam." saat Q1+Q2 terekam,
+   187→  focus-visible:border-ember + label flex-1/shrink-0 (anti tabrakan).
+   188→- STYLING — vignette sinematik radial (z-55, mati saat contrast-boost),
+   189→  reduced-motion untuk count-flash.
+   190→- Refactor lint-driven: seenRef→visitedActs (module Set) + savedPos/clock via
+   191→  useSyncExternalStore → 0 error react-hooks/refs & set-state-in-effect.
+   192→- QA ulang agent-browser: gate bersih sesi baru, jam hidup (T+00:05), peta
+   193→  buka/tutup/klik-lompat/angka/Esc, reload→gerbang [L]→resume instan ACT.08,
+   194→  H toggle, polling persentase (1·25%, 3·75%), 4 bracket QR, voting Q1+Q2 →
+   195→  kartu penyelesaian + 2 live total. VLM ulang: map "sangat rapi", 3 micro-fix
+   196→  diterapkan (cheat-line /30, bracket 4px, TERCATAT shrink-0).
+   197→- Demo state di-reset (votes kosong, localStorage/sessionStorage bersih).
+   198→
+   199→Stage Summary:
+   200→- Status: STABIL + diperkaya. Lint 0 error (1 warning font pre-existing).
+   201→- Shortcut penuh: Space/→/←, G+0-8, 1/2/3 (S4), A-E (S4), 1-4+B (S6),
+   202→  C kontras, M bisu, F fallback, R reset, Shift+S skip video,
+   203→  [O]/[Tab] peta, [L] resume, [H] bantuan.
+   204→- Arsitektur baru: src/components/presentation/session.ts (store modul) —
+   205→  pola konsumsi: useSyncExternalStore(subscribeSession, getSnapshot, server).
+   206→  Kunci: kti-pos, kti-clock di sessionStorage.
+   207→- Risiko kecil tersisa: autoplay YouTube tergantung kebijakan browser;
+   208→  getElapsedSeconds berbasis Date.now() (aman, granularitas detik).
+   209→- Prioritas next: (opsional) hit counter responden real-time via WebSocket
+   210→  mini-service, mode rehearsal (auto-advance timer), export hasil polling CSV.
+   211→
+   212→---
+   213→Task ID: 11
+   214→Agent: main (Z.ai Code)
+   215→Task: QA stabil + fitur real-time WebSocket (mini-service live-notify) + kartu babak sinematik + polish gerbang S0
+   216→
+   217→Work Log:
+   218→- QA awal: opening, polling, S2 tag (semuanya 15px = satu baris), voting, lint — stabil.
+   219→- FITUR INTI — notifikasi suara real-time via socket.io:
+   220→  - mini-services/live-notify/ (proyek bun mandiri, port 3030, `bun --hot`):
+   221→    server socket.io path "/" (wajib untuk Caddy). Klien terpercaya (auth.role
+   222→    "presenter-server") dari backend Next.js memancarkan notify:vote /
+   223→    notify:reset → di-broadcast ke semua klien (vote:new / votes:reset).
+   224→  - CATATAN ARSITEKTUR: HTTP POST /notify di mini-service TIDAK mungkin —
+   225→    engine.io dengan path "/" mencegat SEMUA request (uji: "Transport
+   226→    unknown"). Solusi: backend terhubung sebagai klien socket.io terpercaya.
+   227→  - src/lib/notify.ts — singleton socket.io-client server-side ke
+   228→    localhost:3030 (server-to-server, tanpa gateway), fire-and-forget,
+   229→    reconnect otomatis, kegagalan ditelan.
+   230→  - src/instrumentation.ts — prewarm tautan saat server Next menyala.
+   231→  - /api/vote: setelah insert → count → notifyVote(question, total).
+   232→  - /api/reset: setelah deleteMany → notifyReset().
+   233→  - S5Polling: loadResults (useCallback bersama) + polling HTTP 3s (fallback
+   234→    tetap) + socket io("/?XTransformPort=3030") → vote:new = refresh instan,
+   235→    votes:reset = zeroing instan; indikator "· SYNC" saat tersambung;
+   236→    "MENUNGGU SUARA PERTAMA…" saat live & total 0.
+   237→  - VotingPage: live total via socket (instan) + polling 8s fallback.
+   238→- QA real-time VIA GATEWAY (:81 — penting: localhost:3000 langsung TIDAK
+   239→  melalui Caddy sehingga XTransformPort tidak diforward):
+   240→  - handshake engine.io melalui gateway OK; SYNC menyala; vote via API →
+   241→    presenter 0→1 dalam 800ms (< polling 3s = bukti instan); 5 suara → bar
+   242→    A·20% C·60% D·20% instan; reset broadcast → 0 + MENUNGGU kembali;
+   243→    voting page → "1 SUARA MASUK" instan.
+   244→- FITUR — kartu babak (ActCard.tsx): flash judul saat memasuki babak baru
+   245→  (numeral romawi I–VIII / "OUVERTURE" + label, Cormorant 11vw paper/12,
+   246→  label ember letterSpacing animasi); GSAP timeline ~1.9s, terdaftar sebagai
+   247→  timeline aktif → [SPACE] memotong; tidak muncul saat kembali ke babak yang
+   248→  pernah dilihat (settled).
+   249→- FITUR — HUD: STEP.XX/YY (total langkah per babak, mis. STEP.01/04).
+   250→- STYLING — gerbang S0: 4 bracket sudut amber bernafas (gate-bracket,
+   251→  2.8s), garis pemudar (gradient rule), cahaya panggung radial amber 0.06
+   252→  dari atas, tombol hover:text-ember; reduced-motion diperbarui.
+   253→- Lint: 0 error (1 warning font pre-existing). Dev log bersih.
+   254→- Keanehan dev-mode (dihadapi): modul notify.ts ter-instantiate dua kali
+   255→  saat hot-reload → dua koneksi "SERVER" — broadcast duplikat idempoten
+   256→  (klien re-fetch angka sama); produksi/prewarm = satu koneksi.
+   257→
+   258→Stage Summary:
+   259→- Status: STABIL + real-time penuh. Arsitektur polling kini dua jalur:
+   260→  socket instan (primary) + HTTP 3s (fallback) — layar presenter, halaman
+   261→  voting, dan backend semuanya tersinkron.
+   262→- Komponen/file baru: mini-services/live-notify/{package.json,index.ts},
+   263→  src/lib/notify.ts, src/instrumentation.ts, ActCard.tsx.
+   264→- QA wajib lewat http://localhost:81/ (gateway) — bukan :3000 — untuk
+   265→  menguji XTransformPort socket.
+   266→- Shortcut lengkap tidak berubah (lihat Task 10) + perilaku baru: [SPACE]
+   267→  memotong kartu babak saat flash berjalan.
+   268→- Risiko: koneksi pertama vote (lazy) mungkin terlewat → polling menutup;
+   269→  produksi prewarm menutup celah. YouTube autoplay tetap kebijakan browser.
+   270→- Prioritas next: (opsional) ekspor hasil polling CSV untuk laporan,
+   271→  mode rehearsal auto-advance, indikator jumlah perangkat tersambung di S5.
+   272→
+   273→---
+   274→Task ID: 12
+   275→Agent: main (Z.ai Code)
+   276→Task: QA stabil + tiga fitur baru (ekspor CSV, presence perangkat, klimaks reveal) + polish styling
+   277→
+   278→Work Log:
+   279→- Baca worklog: Task 10–11 sudah selesai (clock, peta, persistensi, real-time
+   280→  socket, ActCard). Verifikasi awal: dev log bersih, lint 0 error, live-notify
+   281→  handshake OK, gateway :81 OK.
+   282→- QA regresi via agent-browser (lewat gateway :81): gerbang → Space → HUD
+   283→  T+MM:SS aktif → G+5 → S5 live (5 RESPONDEN, SYNC, EKSPOR hint) → vote via
+   284→  API → presenter refresh instan → voting page TERCATAT + live total + Q2
+   285→  unlock. SEMUA LOLOS → lanjut pengembangan fitur baru.
+   286→- FITUR A — Ekspor CSV: src/app/api/export/route.ts (GET). Blok RINGKASAN
+   287→  per pertanyaan (opsi, jumlah, persentase, kunci BENAR, total, "BENAR: X%")
+   288→  + blok DETAIL kronologis. UTF-8 BOM (Excel-safe), koma pemisah, sel
+   289→  di-escape kutip ganda, nama file `polling-kelompok6-YYYY-MM-DD.csv`.
+   290→  Shortcut presenter [E] di S5 (a elemen klik → unduh + HUD transient).
+   291→  Diverifikasi curl: headers + isi CSV benar untuk 5 suara (D 60% mayoritas,
+   292→  B benar 20%).
+   293→- FITUR B — Presence perangkat: mini-services/live-notify/index.ts menandai
+   294→  socket.data.trusted, hitung audienceCount() (non-trusted), broadcast
+   295→  "presence" {count} saat connect/disconnect + emit awal ke socket baru.
+   296→  S5Polling: sock.on("presence") → badge "· N PERANGKAT" (live, >0).
+   297→  VotingPage: socket level-halaman → header "· N TERHUBUNG" + QuestionCard
+   298→  (done) "· N TERHUBUNG" setelah "X SUARA MASUK". CATATAN PENTING: hot-reload
+   299→  bun --hot TIDAK menggantikan modul lama (log format lama) → mini-service
+   300→  harus di-restart manual (kill PID bun --hot + nohup ulang). Setelah
+   301→  restart, presence live terverifikasi (4→6 perangkat saat halaman berganti).
+   302→- FITUR C — Klimaks reveal di S5: hitung saat render (ikut gerak bila suara
+   303→  masuk setelah reveal): maxCount, winners (boleh seri), correctCount/Pct.
+   304→  Opsi: tag "JAWABAN · MAYORITAS" / "JAWABAN" / "MAYORITAS KELAS" (paper
+   305→  style bila mayoritas salah); bar winner = .pollbar-winner (gradasi emas +
+   306→  denyut pollWinnerPulse), kunci tanpa mayoritas = .pollbar-correct (ember +
+   307→  glow statis). Statistik besar: angka "NN%" Cormorant 4vw ember +
+   308→  "KELAS MENJAWAB BENAR · X/Y SUARA" + verdict italik 4 tingkat
+   309→  (≥80% "sejalan", ≥50% "di jalur", >0% "minoritas yang benar", 0%
+   310→  "momen bedah paling bagus"). QA dua skenario: mayoritas salah
+   311→  (20% / D tag / verdict minoritas) DAN mayoritas benar
+   312→  ("JAWABAN · MAYORITAS" / 75% / 3/4 / verdict "di jalur").
+   313→- STYLING — globals.css: .pollbar-winner, .pollbar-correct, .reveal-stat
+   314→  (keyframes revealStat) + ketiganya masuk prefers-reduced-motion.
+   315→  S5 menambah baris hint mini "[F] FALLBACK · [R] RESET · [E] EKSPOR CSV"
+   316→  di bawah bar hasil.
+   317→- VLM review screenshot reveal: "No critical layout issues found. The design
+   318→  is ready for presentation." (nitpick: angka latar 05 sangat redup — sudah
+   319→  disengaja; wrap teks opsi D tetap terbaca).
+   320→- Lint akhir: 0 error (1 warning font pre-existing). Demo state di-reset
+   321→  (votes kosong, storage bersih). Screenshot arsip:
+   322→  download/qa-s5-reveal.png, qa-s5-reveal-majority-correct.png,
+   323→  qa-voting-done.png.
+   324→
+   325→Stage Summary:
+   326→- Status: STABIL + 3 fitur baru terverifikasi end-to-end (semua QA lewat
+   327→  gateway :81 karena XTransformPort socket).
+   328→- Endpoint baru: GET /api/export (CSV attachment, BOM, ringkasan + detail).
+   329→- Event socket baru: "presence" {count} — dikonsumsi presenter S5 + voting
+   330→  (header + kartu selesai). audienceCount mengecualikan koneksi trusted
+   331→  (presenter-server).
+   332→- S5 klimaks reveal: winner glow + statistik %benar + verdict naratif —
+   333→  dua skenario QA lolos; presenter clock/peta/persistensi tetap sehat.
+   334→- Risiko/keanehan: (a) hot-reload mini-service tidak menggantikan modul —
+   335→  WAJIB restart manual bila mengubah index.ts; (b) dev-mode notify.ts dua
+   336→  koneksi SERVER (pre-existing, broadcast idempoten); (c) angka presence di
+   337→  dev bisa menghitung socket sisa navigasi (produksi normal); (d) autoplay
+   338→  YouTube tetap kebijakan browser.
+   339→- Prioritas next: (opsional) mode rehearsal auto-advance per langkah dengan
+   340→  durasi target per babak; grafik tren suara masuk per detik di S5;
+   341→  halaman arsip hasil (tabel semua pertanyaan + tautan CSV) untuk laporan.
+   342→
+   343→---
+   344→Task ID: 13
+   345→Agent: main (Z.ai Code)
+   346→Task: QA stabil + tiga fitur baru (mode rehearsal, kurva tempo suara, halaman arsip hasil) + polish styling + perbaikan robustness G+digit
+   347→
+   348→Work Log:
+   349→- Baca worklog (Task 0–12 selesai) + verifikasi awal: lint 0 error, dev :3000
+   350→  dan mini-service live-notify :3030 hidup, log bersih.
+   351→- QA regresi via agent-browser (gateway :81): gerbang → Space → HUD jam
+   352→  T+MM:SS hidup → G+5 → S5 (SYNC, 5 PERANGKAT, EKSPOR hint) → vote via API
+   353→  → presenter refresh instan → voting page TERCATAT + Q2 unlock + kartu
+   354→  selesai → reload → [L] resume ACT.05. SEMUA LOLOS.
+   355→- TEMUAN QA (bukan bug produksi, tapi perbaikan): dua keydown "g"+"digit"
+   356→  dalam satu tick JS tidak melompat (closure React gArmed belum ter-flush).
+   357→  FIX: gArmed dipindah ke gArmedRef (dibaca sinkron di handler) + gShow
+   358→  state kosmetik untuk HUD — diverifikasi dispatch back-to-back kini LOLOS.
+   359→- FITUR A — Mode Rehearsal [T]:
+   360→  - rehearsal.ts (baru): REHEARSAL_PLAN per-langkah per-babak, total 3180 dtk
+   361→    (± 53 menit + cadang tanya-jawab); stepDuration, plannedElapsed, fmtDelta,
+   362→    cumStepsBefore, TOTAL_STEPS, PLAN_TOTAL.
+   363→  - session.ts: state rehearsal di store eksternal (getRehearsalOn,
+   364→    getRemainingSeconds, setRehearsal, armStep, deferDeadline) — runtime saja,
+   365→    tidak ke sessionStorage; patuh lint react-hooks/refs & set-state-in-effect.
+   366→  - Experience.tsx: [T] toggle (HUD transient), auto-advance 1 dtk/detak via
+   367→    advanceRef (interval bebas stale closure), tenggat ditunda saat peta
+   368→    terbuka / timeline GSAP aktif (tidak memotong animasi), gerbang dikecualikan
+   369→    (jam belum jalan), armStep dipasang di efek persistensi [section,step],
+   370→    cadangan 9999 dtk bila advance mentok di ACT.08 akhir (anti spam HUD).
+   371→  - HUD baru: "REHEARSAL · AUTO NNS" (amber ≤10 dtk) + "RENCANA ±MM:SS ·
+   372→    TERLAMBAT/LEBIH CEPAT/SESUAI JADWAL" (delta = elapsed − plannedElapsed).
+   373→  - QA: T on/off, AUTO 179S→167S menurun, G+1 → AUTO 14S terpasang ulang,
+   374→    auto-advance benar-benar menembak (STEP.00→01 ACT.01 setelah ±15 dtk,
+   375→    re-arm 635S untuk langkah video), delta TERLAMBAT/LEBIH CEPAT benar
+   376→    arahnya di dua posisi berbeda.
+   377→- FITUR B — Kurva tempo suara (S5):
+   378→  - /api/timeline?question=1|2 (baru): kurva kumulatif kedatangan suara
+   379→    (bucket adaptif, maks ±120 titik) — kontrak /api/results tak tersentuh;
+   380→    question=3 → 400 (terverifikasi curl).
+   381→  - S5Polling: fetchTimeline + scheduleSpark (debounce 1,4 dtk), pemicu
+   382→    awal [live,qid] + socket vote:new, votes:reset → spark=null; render SVG
+   383→    polyline + area amber (draw-in .spark-curve) + kaption "TEMPO SUARA ·
+   384→    N DALAM M:SS", hanya saat live & !fallback & total>0.
+   385→  - QA: seed 7 suara berjarak waktu → kurva hidup (7 DALAM 0:13), VLM: terlihat
+   386→    & terbaca, tak bertabrakan dengan QR / hint [F].
+   387→- FITUR C — Halaman arsip hasil #/results (baru, src/components/results/):
+   388→  - Tabel visual per pertanyaan: bar + count·pct + tag (JAWABAN·MAYORITAS /
+   389→    JAWABAN / MAYORITAS KELAS), statistik %benar + verdict + pembahasan —
+   390→    identik logika S5.
+   391→  - Real-time penuh (socket vote:new/votes:reset/presence + fallback HTTP
+   392→    10 dtk), header "N SUARA TOTAL · SYNC · N PERANGKAT · DIPERBARUI HH:MM:SS",
+   393→  empty state "Belum ada suara…".
+   394→  - Footer sticky (mt-auto): UNDUH CSV (/api/export), CETAK/PDF (window.print),
+   395→    tautan #/ presentasi & #/voting — semua no-print + focus-visible ember.
+   396→  - page.tsx: rute hash #/results (routeFromHash startsWith), body overflow
+   397→    auto + scrollTo(0,0).
+   398→  - Print stylesheet (@media print di globals.css): latar putih, teks hitam,
+   399→    tombol disembunyikan, bar amber solid, rcard anti page-break — diverifikasi
+   400→    via agent-browser pdf + pdftoppm + VLM (4/4 lolos).
+   401→  - QA: desktop + viewport 375×720 (VLM: bersih), vote via API → 7→8 SUARA
+   402→    TOTAL instan (socket), reset → empty state.
+   403→- STYLING — pita progres tepi-bawah (3px, z-68, hanya setelah gerbang): track
+   404→  white/7 + tick batas babak + fill amber/65 (.ribbon-fill transition 1,1s) +
+   405→  penanda rencana belah ketupat amber (.plan-dot pulse) hanya saat rehearsal —
+   406→  presenter melihat posisi aktual vs rencana secara visual. Hover glow kartu
+   407→  battle S6 (.battle-card — transition border/box-shadow saja, transform &
+   408→  opacity tetap milik GSAP). Reduced-motion diperbarui (plan-dot, spark-curve,
+   409→  ribbon-fill) + blok print.
+   410→- Lint akhir: 0 error (1 warning font pre-existing). Catatan dev.log: error
+   411→  "gArmed is not defined" HANYA transient saat MultiEdit berjalan (hot-reload
+   412→  antar-edit) — log terkini bersih, semua fungsional terverifikasi setelahnya.
+   413→- Demo state di-reset: votes kosong, localStorage/sessionStorage bersih.
+   414→  Screenshot arsip: download/qa13-rehearsal-ribbon.png, qa13-results-desktop.png,
+   415→  qa13-results-mobile.png, qa13-s5-sparkline.png, qa13-results-print.pdf.
+   416→
+   417→Stage Summary:
+   418→- Status: STABIL + 3 fitur baru terverifikasi end-to-end (rehearsal, kurva
+   419→  tempo, arsip hasil) + 1 perbaikan robustness (G+digit same-tick).
+   420→- Shortcut penuh sekarang: Space/→/←, G+0-8, 1/2/3 (S4), A-E (S4), 1-4+B (S6),
+   421→  C, M, F, R, E, Shift+S, [O]/[Tab] peta, [L] resume, [H] bantuan, [T] BARU
+   422→  mode rehearsal.
+   423→- File baru: rehearsal.ts, src/app/api/timeline/route.ts,
+   424→  src/components/results/ResultsPage.tsx. Edit: session.ts, Experience.tsx,
+   425→  S5Polling.tsx, page.tsx, globals.css.
+   426→- Arsitektur: state rehearsal di store eksternal session.ts (deadline epoch-ms,
+   427→  bukan state React) — auto-advance bebas stale closure & lint-clean.
+   428→- Rencana latihan 53 menit (REHEARSAL_PLAN) — presenter bisa latihan sendiri
+   429→  dengan auto-advance + patokan waktu + pita progres vs rencana.
+   430→- Arsip laporan: #/results (live + cetak/PDF + CSV) — pasca-presentasi angka
+   431→  polling siap dilampirkan ke laporan kelompok.
+   432→- Risiko/keanehan: (a) auto-advance rehearsal memotong nada S0 jika durasi
+   433→  habis tepat saat timeline berjalan — mitigasi deferDeadline saat tl aktif;
+   434→  (b) presence di dev bisa menghitung socket sisa navigasi (pre-existing);
+   435→  (c) autoplay YouTube tetap kebijakan browser; (d) hot-reload mini-service
+   436→  tidak menggantikan modul (pre-existing — restart manual bila mengubah
+   437→  index.ts mini-service).
+   438→- Prioritas next (opsional): mode "papan skor" untuk kuis tambahan;
+   439→  ekspor PDF otomatis pasca-sesi; preset urutan G (playlist latihan);
+   440→  grafik agregat per-babak untuk analisis temporal.
+   441→
+   442→---
+   443→Task ID: 14
+   444→Agent: main (Z.ai Code)
+   445→Task: QA stabil + tiga fitur (lembar bantuan [?], statistik hidup S8, tombol bagikan voting) + sapuan garis pergantian babak + perbaikan bug import
+   446→
+   447→Work Log:
+   448→- Baca worklog (Task 13 selesai) + verifikasi awal: lint 0 error, :3000/:3030
+   449→  hidup, log bersih. QA smoke: gerbang → Space → S4 drill penuh (zone/BAB/
+   450→  postliminaries tampil benar) → S8 → kredit. SEMUA LOLOS.
+   451→- QA menemukan SATU BUG RUNTIME (client-side exception di S8 step 5):
+   452→  root cause — refactor import S8Closing melupakan `useRef` (dipakai komponen
+   453→  utama) → "ReferenceError: useRef is not defined". Ditangkap dengan error
+   454→  listener window + reproduksi; FIX: kembalikan useRef ke import.
+   455→- FITUR A — Lembar bantuan presenter [?] / [F1] (HelpOverlay.tsx, baru):
+   456→  dialog modal 4 kelompok pintas (NAVIGASI / SESI & WAKTU / BABAK TERPILIH /
+   457→  TAMPILAN), 17 baris kunci+deskripsi, grid 2 kolom → 1 kolom di ≤720px,
+   458→  tombol [ESC] TUTUP (focus-visible ember). HUD "// BANTUAN" saat terbuka,
+   459→  baris cheat-line kini menyebut [?] BANTUAN. Tombol lain DITELAN saat
+   460→  terbuka (g+5 diverifikasi tak melompat), [Esc]/[?] menutup, G+6 jalan
+   461→  lagi setelah tutup. Typo "BERJalan" ditemukan via QA → diperbaiki.
+   462→- FITUR B — Statistik hidup layar tanya jawab S8 (QaStats di S8Closing):
+   463→  baris tengah "SESI T+MM:SS · N SUARA TEREKAM · N PERANGKAT TERHUBUNG" +
+   464→  hint "ARSIP LENGKAP → /#/RESULTS". Sumber: session store (jam),
+   465→  /api/results Q1+Q2 (useCallback load — fallback HTTP 5 dtk), socket
+   466→  presence + vote:new/votes:reset (instan). QA: 5 suara seed → tampil
+   467→  "T+05:31 · 5 SUARA TEREKAM · 5 PERANGKAT".
+   468→- FITUR C — Tombol BAGIKAN KE TEMAN di kartu penyelesaian voting
+   469→  (VotingPage ShareButton): Web Share API (title/text/url), fallback
+   470→  clipboard + umpan balik "TAUTAN DISALIN" 2,2 dtk. QA: stub clipboard →
+   471→  teks benar (origin/#/voting), tombol muncul hanya setelah Q1+Q2.
+   472→- STYLING — sapuan garis pergantian babak (act-wipe): garis amber 1px
+   473→  gradasi (top 38%, lebar 84vw, z-56) menyapu kiri→kanan via GSAP timeline
+   474→  (scaleX 0→1 power2.inOut 0,42 dtk → fade) SETIAP masuk babak baru
+   475→  (bukan settle/kembali, bukan ACT.00); contrast-boost versi lebih pekat.
+   476→  QA computed style mid-anim: opacity 1, scaleX 0.94 → opacity 0 setelahnya.
+   477→- VLM review 4 screenshot → temuan nyata SATU: QaStats (bottom 9vh) terlalu
+   478→  dekat dengan blok HUD kiri-bawah → terlihat bertumpukan. FIX: naik ke
+   479→  bottom-[13vh] + lebar w-[64vw] max-w-820px + hint dipendekkan. VLM
+   480→  verifikasi ulang: "No, none of the text elements physically overlap".
+   481→  Temuan lain (logo "N", kutipan "Anonim") = halusinasi VLM — diverifikasi
+   482→  tidak ada di kode/screenshot.
+   483→- Regresi akhir: gerbang bersih (0 posisi tersimpan), G+5, [?] buka/tutup,
+   484→  [T] on/off, voting 2 jawaban + share, reset. Lint 0 error (1 warning font
+   485→  pre-existing), dev log 0 error.
+   486→- Demo state di-reset (votes kosong, storage bersih). Screenshot arsip:
+   487→  download/qa14-{s4-drill, s8-closing, s8-closing-v2, help-overlay,
+   488→  voting-share, s8-qa-stats}.png.
+   489→
+   490→Stage Summary:
+   491→- Status: STABIL + 3 fitur baru + 1 styling sinematik + 1 bug fix.
+   492→- Shortcut penuh sekarang: Space/→/←, G+0-8, 1/2/3, A-E, 1-4+B, C, M, F, R,
+   493→  E, Shift+S, [O]/[Tab] peta, [L] resume, [H] cheat-line, [T] rehearsal,
+   494→  [?]/[F1] BARU lembar bantuan lengkap.
+   495→- File baru: HelpOverlay.tsx. Edit: Experience.tsx (helpSheet state +
+   496→  handler + render + wipe), S8Closing.tsx (QaStats + import fix),
+   497→  VotingPage.tsx (ShareButton), globals.css (.act-wipe, .help-grid
+   498→  responsive, typo-fix coverage).
+   499→- Pola QA penting yang terbukti: error listener window sebelum aksi
+   500→  menangkap ReferenceError yang tak terlihat di dev.log (client-side).
+   501→- Risiko/keanehan: (a) autoplay YouTube kebijakan browser (pre-existing);
+   502→  (b) presence dev-mode bisa menghitung socket sisa (pre-existing);
+   503→  (c) navigator.share di desktop Chrome umumnya undefined → fallback
+   504→  clipboard selalu siap; (d) hot-reload mini-service tak menggantikan modul
+   505→  (pre-existing).
+   506→- Prioritas next (opsional): preset "playlist" latihan per-babak (rehearsal
+   507→  hanya untuk babak tertentu), mode kuis tambahan papan skor, ekspor PDF
+   508→  otomatis arsip, grafik agregat per-babak.
+   509→

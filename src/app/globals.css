@@ -412,6 +412,52 @@ html.contrast-boost .vignette {
   transition: width 1.1s linear;
 }
 
+/* Titik ujung isian — percikan ember kecil di ujung pita, ikut meluncur. */
+.ribbon-tip {
+  position: absolute;
+  top: -2px;
+  width: 7px;
+  height: 7px;
+  transform: translateX(-50%);
+  border-radius: 999px;
+  background: var(--color-ember);
+  box-shadow: 0 0 10px rgba(232, 160, 32, 0.9);
+  transition: left 1.1s linear;
+}
+
+/* ---------- Lampu status HUD — cip kecil bertanda (C+ / MUTE / NOTE) ---------- */
+.hud-lamp {
+  display: inline-block;
+  padding: 0 5px 1px;
+  border: 1px solid rgba(232, 160, 32, 0.45);
+  color: rgba(232, 160, 32, 0.85);
+  font-size: 8px;
+  letter-spacing: 0.18em;
+  line-height: 1.5;
+}
+
+/* ---------- Rel babak — tick aktif menyala lembut ---------- */
+.rail-live {
+  box-shadow: 0 0 8px rgba(232, 160, 32, 0.75);
+}
+
+/* ---------- Panel catatan presenter [N] — masuk geser-halus ---------- */
+.notes-panel {
+  animation: notesIn 0.38s cubic-bezier(0.22, 0.9, 0.3, 1) both;
+}
+@keyframes notesIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+html.contrast-boost .notes-panel .notes-close {
+  border-color: rgba(232, 160, 32, 0.6);
+}
+.notes-close {
+  pointer-events: auto;
+}
+
 /* Penanda posisi rencana (mode latihan) — belah ketupat amber bernafas. */
 .plan-dot {
   position: absolute;
@@ -512,10 +558,12 @@ html.contrast-boost .act-wipe {
   .pollbar-winner,
   .reveal-stat,
   .plan-dot,
-  .spark-curve {
+  .spark-curve,
+  .ribbon-tip {
     animation: none !important;
   }
-  .ribbon-fill {
+  .ribbon-fill,
+  .ribbon-tip {
     transition: none !important;
   }
   .spark-curve {

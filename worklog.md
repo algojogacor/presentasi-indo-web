@@ -506,3 +506,79 @@ Stage Summary:
 - Prioritas next (opsional): preset "playlist" latihan per-babak (rehearsal
   hanya untuk babak tertentu), mode kuis tambahan papan skor, ekspor PDF
   otomatis arsip, grafik agregat per-babak.
+
+---
+Task ID: 15
+Agent: main (Z.ai Code)
+Task: QA verifikasi fix S4 + dua mandat wajib — polish styling sinematik & fitur catatan presenter [N]
+
+Work Log:
+- Baca worklog (Task 14 selesai, status STABIL). Verifikasi warisan sesi sebelumnya:
+  edit kontras S4Anatomy tersimpan (15 okurensi nilai baru), lint 0 error,
+  dev server hidup (:3000 HTTP 200, log bersih). PENTING: seluruh QA sesi ini
+  memakai viewport 1920×1080 (lihat temuan di bawah).
+- QA BASELINE S4 (agent-browser + VLM): screenshot baseline + drill 4 langkah.
+  VLM 1080p: label panel kiri "Good", kontras tengah "Strong", overlap/wrap
+  "None observed" → fix kontras S4 sesi lalu TERVERIFIKASI.
+- FITUR — Panel Catatan Presenter [N] (baru, non-modal):
+  - `src/lib/notes.ts` — NOTE_PLAN 46 langkah (9 babak): judul langkah + cue
+    penyampaian ringkas (pola bicara, momen jeda, jembatan antar-babak).
+  - `NotesPanel.tsx` — panel kanan-bawah: header CATATAN · ACT.XX STEP.YY +
+    RENCANA durasi (dari REHEARSAL_PLAN), judul+cue langkah aktif, konteks
+    ←sebelum/→sesudah, tombol tutup [×] (satu-satunya elemen klik-able).
+  - Keyboard: [N] toggle; [Esc] tutup; NON-MODAL — Space/G+jump tetap hidup,
+    konten panel mengikuti navigasi langsung; disembunyikan saat help/peta
+    terbuka. HUD "// CATATAN" + lamp NOTE; cheat-line + HelpOverlay diperbarui
+    (baris [N] di grup TAMPILAN).
+  - QA: buka di gerbang → ikut ke ACT.04 STEP.00 ("Peta tubuh — overview"),
+    Esc + [×] bekerja, 0 runtime error, VLM 1080p: "No overlap, professional,
+    intentional UI element" (overlap-count programatik = 0).
+- STYLING — polish "cinema chrome":
+  - Pita progres: segmen babak selang-seling (tint white/5), batas babak lebih
+    terang (white/25), isian gradasi ember (ember/40→ember) + TITIK UJUNG
+    MENYALA (.ribbon-tip — 7px glow amber, transisi linear 1.1s).
+  - HUD presenter: hairline vertikal kiri (border-edge/70) + LAMPU STATUS
+    (.hud-lamp cip ember: C+ / MUTE / NOTE) menggantikan teks status polos.
+  - Rel babak kanan: tick aktif + .rail-live (box-shadow glow amber).
+  - MapOverlay: durasi rencana per babak ("N LANGKAH · M′") + rail mini tick
+    per langkah (aktif 9px ember, dilihat 6px paper, belum 6px white/12).
+  - prefers-reduced-motion: ribbon-tip ikut dimatikan.
+- QA REGRESI PENUH (semua LOLOS, 0 error runtime):
+  - Peta [O]: 9 baris, 9 grup tick, 9 label durasi. Esc menutup.
+  - Lampu HUD: [M]→MUTE, [C]→C+, toggle balik bersih.
+  - HelpSheet [?]: baris [N] tampil; [Esc] tutup.
+  - Voting #/voting (viewport 375): Q1 B + Q2 C → 2× TERCATAT + BAGIKAN KE
+    TEMAN + footer; catatan skrip: tombol 0–3 = Q1, 4–7 = Q2.
+  - Arsip #/results: 14 SUARA TOTAL, kartu per pertanyaan, UNDUH CSV.
+  - S5 presenter: seed 12 suara → live "12 RESPONDEN", bar B 58%, reveal 58%
+    + verdict + MENGAPA; VLM 1080p PASS 5/5 kriteria.
+  - Golden path: gerbang → kredit → video → Shift+S → S2 (FAKTA 01 tampil),
+    G+8 → S8. (Catatan: Shift+S hanya bekerja di section 1 — butuh 2× Space
+    dari gerbang; bukan bug.)
+- Temuan PENTING utk QA mendatang: viewport default agent-browser adalah
+  375×720 — Screenshot awal sesi ini (S4 baseline/zones versi kecil) menipu
+  VLM ("overlap", "kontras buruk") padahal layout dirancang utk 1920×1080.
+  SELALU jalankan `agent-browser set viewport 1920 1080` sebelum QA presentasi.
+- Lint final: 0 error (1 warning font pre-existing). Demo state di-reset
+  (votes kosong, localStorage bersih). Screenshot arsip: download/qa15-*
+  (s4-baseline, s4-zones, notes-panel, notes-1080p, s4-zones-1080p, map-1080p,
+  s5-live-1080p, s5-reveal-1080p, voting-done, results).
+
+Stage Summary:
+- Status: STABIL + 1 fitur presenter baru + polish styling menyeluruh.
+- Shortcut penuh kini: Space/→/←, G+0-8, 1/2/3, A-E, 1-4+B, C, M, F, R, E,
+  Shift+S, [O]/[Tab] peta, [L] resume, [H] cheat-line, [T] rehearsal,
+  [?]/[F1] bantuan, [N] BARU catatan presenter.
+- File baru: src/lib/notes.ts, NotesPanel.tsx. Edit: Experience.tsx (state
+  notesOpen + handler + render + ribbon/lamp/rail + cheat-line), MapOverlay.tsx
+  (durasi + micro-ticks), HelpOverlay.tsx (baris [N]), globals.css
+  (.ribbon-tip, .hud-lamp, .rail-live, .notes-panel/.notes-close + reduced-motion).
+- Risiko/keanehan: (a) VLM rawan halusinasi orientasi/konten — selalu
+  konfirmasi lewat eval programatik + dimensi file screenshot; (b) viewport
+  default browser QA sempit (lihat catatan); (c) autoplay YouTube kebijakan
+  browser & presence dev-mode (pre-existing); (d) notes panel sengaja
+  non-modal — presenter bertanggung jawab menutup sebelum Q&A.
+- Prioritas next (opsional): (1) mode "papan skor" kuis tambahan; (2) preset
+  playlist latihan per-babak; (3) ekspor PDF arsip otomatis; (4) grafik
+  agregat per-babak di arsip; (5) catatan [N] kaya — estimasi "sisa waktu
+  bicara" berdasarkan tempo aktual.

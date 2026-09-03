@@ -45,6 +45,7 @@ const GROUPS: Group[] = [
     items: [
       ["C", "Contrast boost — proyektor redup"],
       ["M", "Bisukan audio"],
+      ["N", "Catatan presenter — panduan penyampaian per langkah"],
       ["H", "Sembunyikan baris bantuan HUD"],
       ["? / F1", "Lembar pintas ini"],
     ],

@@ -1,8 +1,14 @@
 "use client";
 
 import { SECTIONS } from "./context";
+import { REHEARSAL_PLAN } from "./rehearsal";
 
 const pad2 = (n: number) => String(n).padStart(2, "0");
+
+const actMinutes = (i: number) =>
+  Math.round(
+    (REHEARSAL_PLAN[i] ?? []).reduce((s, x) => s + x, 0) / 60,
+  );
 
 /**
  * Peta navigasi — "daftar isi" presentasi itu sendiri.
@@ -72,8 +78,25 @@ export default function MapOverlay({
                 >
                   {s.label}
                 </span>
-                <span className="ml-auto font-code text-[9px] tracking-[0.18em] text-mute/70">
-                  {s.steps} LANGKAH
+                <span
+                  className="ml-auto flex items-end gap-[3px]"
+                  aria-hidden="true"
+                >
+                  {Array.from({ length: s.steps }).map((_, k) => (
+                    <span
+                      key={k}
+                      className={
+                        isCurrent
+                          ? "h-[9px] w-[3px] bg-ember/80"
+                          : isSeen
+                            ? "h-[6px] w-[3px] bg-paper/35"
+                            : "h-[6px] w-[3px] bg-white/12"
+                      }
+                    />
+                  ))}
+                </span>
+                <span className="font-code text-[9px] tracking-[0.18em] text-mute/70">
+                  {`${s.steps} LANGKAH · ${actMinutes(i)}′`}
                 </span>
                 {isCurrent && (
                   <span className="font-code text-[9px] tracking-[0.22em] text-ember">

@@ -8,6 +8,7 @@ import { useIsoLayoutEffect } from "./hooks";
 import { Grain } from "./atoms";
 import MapOverlay from "./MapOverlay";
 import HelpOverlay from "./HelpOverlay";
+import NotesPanel from "./NotesPanel";
 import ActCard from "./ActCard";
 import {
   subscribeSession,
@@ -73,6 +74,7 @@ export default function Experience() {
   const [muted, setMuted] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
   const [helpSheet, setHelpSheet] = useState(false);
+  const [notesOpen, setNotesOpen] = useState(false);
   const [helpOn, setHelpOn] = useState(true);
   // Sesi presenter (posisi tersimpan + jam) — store eksternal modul
   const savedPos = useSyncExternalStore(
@@ -337,6 +339,12 @@ export default function Experience() {
         return; // peta terbuka → tombol lain tidak menyentuh babak
       }
 
+      // [Esc] — tutup panel catatan presenter (non-modal, navigasi tetap hidup)
+      if (k === "Escape" && notesOpen) {
+        setNotesOpen(false);
+        return;
+      }
+
       // Shift+S — lewati section video
       if (e.shiftKey && (k === "S" || k === "s")) {
         if (section === 1) {
@@ -382,6 +390,16 @@ export default function Experience() {
         setHelpOn((h) => !h);
         return;
       }
+      // [N] — catatan presenter: panduan penyampaian langkah aktif (non-modal)
+      if (lk === "n") {
+        audio.tick();
+        setNotesOpen((v) => !v);
+        hud(
+          notesOpen ? "CATATAN PRESENTER — DITUTUP [N]" : "CATATAN PRESENTER — AKTIF [N]",
+          "ember",
+        );
+        return;
+      }
       if (lk === "g") {
         gArmedRef.current = true;
         setGShow(true);
@@ -424,6 +442,7 @@ export default function Experience() {
     step,
     mapOpen,
     helpSheet,
+    notesOpen,
     savedPos,
     advance,
     back,
@@ -451,11 +470,6 @@ export default function Experience() {
     }),
     [section, step, settled, setStep, goto, hud],
   );
-
-  const statusParts = [
-    contrast ? "CONTRAST+" : null,
-    muted ? "MUTE" : null,
-  ].filter(Boolean) as string[];
 
   const SectionComp = SECTION_COMPONENTS[section];
 
@@ -500,6 +514,15 @@ export default function Experience() {
         {/* Lembar bantuan presenter — pintas keyboard lengkap */}
         {helpSheet && <HelpOverlay onClose={() => setHelpSheet(false)} />}
 
+        {/* Catatan presenter per langkah — panel non-modal [N] */}
+        {notesOpen && !helpSheet && !mapOpen && (
+          <NotesPanel
+            section={section}
+            step={step}
+            onClose={() => setNotesOpen(false)}
+          />
+        )}
+
         {/* Sapuan garis ember — penanda pergantian babak (bukan replay) */}
         <div ref={wipeRef} className="act-wipe" aria-hidden="true" />
 
@@ -520,7 +543,7 @@ export default function Experience() {
               key={i}
               className={
                 i === section
-                  ? "h-[10px] w-[3px] bg-ember"
+                  ? "rail-live h-[10px] w-[3px] bg-ember"
                   : visitedActs.has(i)
                     ? "h-[6px] w-[3px] bg-paper/30"
                     : "h-[6px] w-[3px] bg-white/12"
@@ -537,18 +560,37 @@ export default function Experience() {
             aria-hidden="true"
           >
             <div className="absolute inset-0 bg-white/7" />
+            {/* Segmen babak — tint selang-seling untuk membedakan teritori */}
+            {SECTIONS.slice(1).map((s, i) => (
+              <span
+                key={`seg-${i}`}
+                className={
+                  i % 2 === 0 ? "absolute inset-y-0 bg-white/[0.05]" : ""
+                }
+                style={{
+                  left: `${(cumStepsBefore(i + 1) / TOTAL_STEPS) * 100}%`,
+                  width: `${(s.steps / TOTAL_STEPS) * 100}%`,
+                }}
+              />
+            ))}
+            {/* Batas antar-babak */}
             {SECTIONS.slice(1).map((_, i) => (
               <span
-                key={i}
-                className="absolute top-0 bottom-0 w-px bg-white/15"
+                key={`tick-${i}`}
+                className="absolute top-0 bottom-0 w-px bg-white/25"
                 style={{
                   left: `${(cumStepsBefore(i + 1) / TOTAL_STEPS) * 100}%`,
                 }}
               />
             ))}
+            {/* Isian posisi — gradasi ember + titik ujung menyala */}
             <div
-              className="ribbon-fill absolute inset-y-0 left-0 bg-ember/65"
+              className="ribbon-fill absolute inset-y-0 left-0 bg-gradient-to-r from-ember/40 to-ember"
               style={{ width: `${posPct}%` }}
+            />
+            <span
+              className="ribbon-tip"
+              style={{ left: `${posPct}%` }}
             />
             {rehearsalOn && (
               <span className="plan-dot" style={{ left: `${planPct}%` }} />
@@ -558,7 +600,7 @@ export default function Experience() {
 
         {/* HUD Presenter — koordinat state, sangat redup, kiri bawah */}
         <div
-          className="pointer-events-none fixed bottom-5 left-6 z-[70] font-code text-[10px] leading-[1.8] tracking-[0.14em]"
+          className="pointer-events-none fixed bottom-5 left-6 z-[70] border-l border-edge/70 pl-3 font-code text-[10px] leading-[1.8] tracking-[0.14em]"
           style={{ color: "var(--hud)" }}
           aria-hidden="true"
         >
@@ -577,6 +619,7 @@ export default function Experience() {
             {gShow ? " // G→_" : ""}
             {mapOpen ? " // PETA" : ""}
             {helpSheet ? " // BANTUAN" : ""}
+            {notesOpen ? " // CATATAN" : ""}
           </div>
           {clockRunning && (
             <div className={elapsed >= 50 * 60 ? "text-ember/75" : undefined}>
@@ -607,10 +650,16 @@ export default function Experience() {
               }`}
             </div>
           )}
-          {statusParts.length > 0 ? <div>{statusParts.join(" · ")}</div> : null}
+          {(contrast || muted) && (
+            <div className="mt-0.5 flex gap-1.5">
+              {contrast && <span className="hud-lamp">C+</span>}
+              {muted && <span className="hud-lamp">MUTE</span>}
+              {notesOpen && <span className="hud-lamp">NOTE</span>}
+            </div>
+          )}
           {helpOn && (
             <div className="text-[9px] tracking-[0.2em] text-paper/30">
-              [SPACE] LANJUT · [G]+# LOMPAT · [O] PETA · [T] LATIHAN · [?] BANTUAN · [H] SEMBUNYI
+              [SPACE] LANJUT · [G]+# LOMPAT · [O] PETA · [N] CATATAN · [T] LATIHAN · [?] BANTUAN · [H] SEMBUNYI
             </div>
           )}
         </div>
