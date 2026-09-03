@@ -438,3 +438,71 @@ Stage Summary:
 - Prioritas next (opsional): mode "papan skor" untuk kuis tambahan;
   ekspor PDF otomatis pasca-sesi; preset urutan G (playlist latihan);
   grafik agregat per-babak untuk analisis temporal.
+
+---
+Task ID: 14
+Agent: main (Z.ai Code)
+Task: QA stabil + tiga fitur (lembar bantuan [?], statistik hidup S8, tombol bagikan voting) + sapuan garis pergantian babak + perbaikan bug import
+
+Work Log:
+- Baca worklog (Task 13 selesai) + verifikasi awal: lint 0 error, :3000/:3030
+  hidup, log bersih. QA smoke: gerbang → Space → S4 drill penuh (zone/BAB/
+  postliminaries tampil benar) → S8 → kredit. SEMUA LOLOS.
+- QA menemukan SATU BUG RUNTIME (client-side exception di S8 step 5):
+  root cause — refactor import S8Closing melupakan `useRef` (dipakai komponen
+  utama) → "ReferenceError: useRef is not defined". Ditangkap dengan error
+  listener window + reproduksi; FIX: kembalikan useRef ke import.
+- FITUR A — Lembar bantuan presenter [?] / [F1] (HelpOverlay.tsx, baru):
+  dialog modal 4 kelompok pintas (NAVIGASI / SESI & WAKTU / BABAK TERPILIH /
+  TAMPILAN), 17 baris kunci+deskripsi, grid 2 kolom → 1 kolom di ≤720px,
+  tombol [ESC] TUTUP (focus-visible ember). HUD "// BANTUAN" saat terbuka,
+  baris cheat-line kini menyebut [?] BANTUAN. Tombol lain DITELAN saat
+  terbuka (g+5 diverifikasi tak melompat), [Esc]/[?] menutup, G+6 jalan
+  lagi setelah tutup. Typo "BERJalan" ditemukan via QA → diperbaiki.
+- FITUR B — Statistik hidup layar tanya jawab S8 (QaStats di S8Closing):
+  baris tengah "SESI T+MM:SS · N SUARA TEREKAM · N PERANGKAT TERHUBUNG" +
+  hint "ARSIP LENGKAP → /#/RESULTS". Sumber: session store (jam),
+  /api/results Q1+Q2 (useCallback load — fallback HTTP 5 dtk), socket
+  presence + vote:new/votes:reset (instan). QA: 5 suara seed → tampil
+  "T+05:31 · 5 SUARA TEREKAM · 5 PERANGKAT".
+- FITUR C — Tombol BAGIKAN KE TEMAN di kartu penyelesaian voting
+  (VotingPage ShareButton): Web Share API (title/text/url), fallback
+  clipboard + umpan balik "TAUTAN DISALIN" 2,2 dtk. QA: stub clipboard →
+  teks benar (origin/#/voting), tombol muncul hanya setelah Q1+Q2.
+- STYLING — sapuan garis pergantian babak (act-wipe): garis amber 1px
+  gradasi (top 38%, lebar 84vw, z-56) menyapu kiri→kanan via GSAP timeline
+  (scaleX 0→1 power2.inOut 0,42 dtk → fade) SETIAP masuk babak baru
+  (bukan settle/kembali, bukan ACT.00); contrast-boost versi lebih pekat.
+  QA computed style mid-anim: opacity 1, scaleX 0.94 → opacity 0 setelahnya.
+- VLM review 4 screenshot → temuan nyata SATU: QaStats (bottom 9vh) terlalu
+  dekat dengan blok HUD kiri-bawah → terlihat bertumpukan. FIX: naik ke
+  bottom-[13vh] + lebar w-[64vw] max-w-820px + hint dipendekkan. VLM
+  verifikasi ulang: "No, none of the text elements physically overlap".
+  Temuan lain (logo "N", kutipan "Anonim") = halusinasi VLM — diverifikasi
+  tidak ada di kode/screenshot.
+- Regresi akhir: gerbang bersih (0 posisi tersimpan), G+5, [?] buka/tutup,
+  [T] on/off, voting 2 jawaban + share, reset. Lint 0 error (1 warning font
+  pre-existing), dev log 0 error.
+- Demo state di-reset (votes kosong, storage bersih). Screenshot arsip:
+  download/qa14-{s4-drill, s8-closing, s8-closing-v2, help-overlay,
+  voting-share, s8-qa-stats}.png.
+
+Stage Summary:
+- Status: STABIL + 3 fitur baru + 1 styling sinematik + 1 bug fix.
+- Shortcut penuh sekarang: Space/→/←, G+0-8, 1/2/3, A-E, 1-4+B, C, M, F, R,
+  E, Shift+S, [O]/[Tab] peta, [L] resume, [H] cheat-line, [T] rehearsal,
+  [?]/[F1] BARU lembar bantuan lengkap.
+- File baru: HelpOverlay.tsx. Edit: Experience.tsx (helpSheet state +
+  handler + render + wipe), S8Closing.tsx (QaStats + import fix),
+  VotingPage.tsx (ShareButton), globals.css (.act-wipe, .help-grid
+  responsive, typo-fix coverage).
+- Pola QA penting yang terbukti: error listener window sebelum aksi
+  menangkap ReferenceError yang tak terlihat di dev.log (client-side).
+- Risiko/keanehan: (a) autoplay YouTube kebijakan browser (pre-existing);
+  (b) presence dev-mode bisa menghitung socket sisa (pre-existing);
+  (c) navigator.share di desktop Chrome umumnya undefined → fallback
+  clipboard selalu siap; (d) hot-reload mini-service tak menggantikan modul
+  (pre-existing).
+- Prioritas next (opsional): preset "playlist" latihan per-babak (rehearsal
+  hanya untuk babak tertentu), mode kuis tambahan papan skor, ekspor PDF
+  otomatis arsip, grafik agregat per-babak.

@@ -1,9 +1,16 @@
 "use client";
 
-import { useRef } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { io } from "socket.io-client";
 import { gsap } from "@/lib/gsap";
 import { useStepReveal, useIsoLayoutEffect } from "../hooks";
 import { Kicker } from "../atoms";
+import {
+  subscribeSession,
+  getElapsedSeconds,
+} from "../session";
+
+const pad2 = (n: number) => String(n).padStart(2, "0");
 
 const SIMPULAN = [
   "KTI adalah tubuh gagasan — struktur adalah fungsi, bukan formalitas.",
@@ -31,10 +38,98 @@ const AMBIENT_WORDS: {
 ];
 
 /**
+ * Statistik hidup di layar tanya jawab — suara terekam (dua pertanyaan),
+ * perangkat tersambung, dan durasi sesi. Tetap sinkron lewat socket +
+ * fallback HTTP 5 dtk. Layak jadi "penutup" yang hidup selama diskusi.
+ */
+function QaStats() {
+  const [votes, setVotes] = useState<number | null>(null);
+  const [devices, setDevices] = useState(0);
+  const elapsed = useSyncExternalStore(
+    subscribeSession,
+    getElapsedSeconds,
+    () => 0,
+  );
+
+  // Muat total suara (Q1+Q2) — dipakai muat awal, fallback HTTP, dan socket.
+  const load = useCallback(async () => {
+    try {
+      const rs = await Promise.all(
+        [1, 2].map(async (q) => {
+          const r = await fetch(`/api/results?question=${q}`, {
+            cache: "no-store",
+          });
+          return r.ok ? (await r.json()).total : 0;
+        }),
+      );
+      setVotes(rs[0] + rs[1]);
+    } catch {
+      /* diam — statistik opsional */
+    }
+  }, []);
+
+  useEffect(() => {
+    const t = setTimeout(() => void load(), 0);
+    const iv = setInterval(() => void load(), 5000);
+    let disposed = false;
+    let sock: ReturnType<typeof io> | null = null;
+    try {
+      sock = io("/?XTransformPort=3030", {
+        path: "/",
+        transports: ["websocket", "polling"],
+        reconnection: true,
+        reconnectionAttempts: 4,
+        reconnectionDelay: 2000,
+        timeout: 4000,
+        forceNew: true,
+      });
+      sock.on("presence", (p: { count: number }) => {
+        if (!disposed) setDevices(p.count);
+      });
+      sock.on("disconnect", () => {
+        if (!disposed) setDevices(0);
+      });
+      sock.on("vote:new", () => {
+        if (!disposed) void load();
+      });
+      sock.on("votes:reset", () => {
+        if (!disposed) void load();
+      });
+    } catch {
+      sock = null;
+    }
+    return () => {
+      disposed = true;
+      clearTimeout(t);
+      clearInterval(iv);
+      sock?.disconnect();
+    };
+  }, [load]);
+
+  const parts = [
+    `SESI T+${pad2(Math.floor(elapsed / 60))}:${pad2(elapsed % 60)}`,
+    votes !== null ? `${votes} SUARA TEREKAM` : null,
+    devices > 0 ? `${devices} PERANGKAT TERHUBUNG` : null,
+  ].filter(Boolean);
+
+  return (
+    <div className="fade-slide-in absolute bottom-[13vh] left-1/2 z-10 w-[64vw] max-w-[820px] -translate-x-1/2 text-center">
+      <div className="flex items-center justify-center gap-3 font-code text-[10px] tracking-[0.24em] text-mute">
+        <span className="dot-live inline-block" aria-hidden />
+        <span>{parts.join(" · ")}</span>
+      </div>
+      <p className="mt-2 font-code text-[9px] tracking-[0.22em] text-mute/50">
+        ARSIP LENGKAP → /#/RESULTS
+      </p>
+    </div>
+  );
+}
+
+/**
  * Section 8 — Penutup.
  * Step 0–3: empat simpulan (besar, eksklusif — simpulan lalu mengecil jadi daftar redup).
  * Step 4: kalimat pembuka kembali — kata "sudah" amber.
- * Step 5: kredit, terima kasih, tanya jawab — latar tetap hidup.
+ * Step 5: kredit, terima kasih, tanya jawab — latar tetap hidup + statistik sesi.
  */
 export default function S8Closing({ step }: { step: number }) {
   const root = useRef<HTMLDivElement>(null);
@@ -136,6 +231,9 @@ export default function S8Closing({ step }: { step: number }) {
           </p>
         </div>
       </div>
+
+      {/* Statistik hidup selama tanya jawab (step 5) */}
+      {step >= 5 && <QaStats />}
     </div>
   );
 }

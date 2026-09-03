@@ -457,6 +457,50 @@ html.contrast-boost .vignette {
   box-shadow: 0 0 28px rgba(232, 160, 32, 0.14);
 }
 
+/* ---------- Sapuan garis pergantian babak (act-wipe) ----------
+   Garis tipis amber menyapu kiri→kanan sedikit di atas pusat layar.
+   Animasi utama (scaleX/fade) digerakkan GSAP; kelas ini hanya wadah. */
+.act-wipe {
+  position: fixed;
+  top: 38%;
+  left: 8vw;
+  width: 84vw;
+  height: 1px;
+  z-index: 56;
+  pointer-events: none;
+  opacity: 0;
+  background-image: linear-gradient(
+    90deg,
+    rgba(232, 160, 32, 0) 0%,
+    rgba(232, 160, 32, 0.65) 18%,
+    #ffb740 50%,
+    rgba(232, 160, 32, 0.65) 82%,
+    rgba(232, 160, 32, 0) 100%
+  );
+  box-shadow: 0 0 16px rgba(232, 160, 32, 0.25);
+}
+html.contrast-boost .act-wipe {
+  background-image: linear-gradient(
+    90deg,
+    rgba(232, 160, 32, 0) 0%,
+    rgba(232, 160, 32, 0.9) 18%,
+    #ffb740 50%,
+    rgba(232, 160, 32, 0.9) 82%,
+    rgba(232, 160, 32, 0) 100%
+  );
+}
+
+/* ---------- Lembar bantuan: layar sempit → satu kolom ---------- */
+@media (max-width: 720px) {
+  .help-grid {
+    grid-template-columns: 1fr !important;
+    max-width: 86vw !important;
+  }
+  .help-grid .help-row span:first-child {
+    width: 30vw !important;
+  }
+}
+
 /* ---------- Gerak minimum dihormati ---------- */
 @media (prefers-reduced-motion: reduce) {
   .grain,

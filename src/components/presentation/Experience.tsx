@@ -7,6 +7,7 @@ import { PresCtx, SECTIONS, type PresApi } from "./context";
 import { useIsoLayoutEffect } from "./hooks";
 import { Grain } from "./atoms";
 import MapOverlay from "./MapOverlay";
+import HelpOverlay from "./HelpOverlay";
 import ActCard from "./ActCard";
 import {
   subscribeSession,
@@ -71,6 +72,7 @@ export default function Experience() {
   const [contrast, setContrast] = useState(false);
   const [muted, setMuted] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
+  const [helpSheet, setHelpSheet] = useState(false);
   const [helpOn, setHelpOn] = useState(true);
   // Sesi presenter (posisi tersimpan + jam) — store eksternal modul
   const savedPos = useSyncExternalStore(
@@ -104,6 +106,7 @@ export default function Experience() {
   >([]);
 
   const sectionRef = useRef<HTMLDivElement>(null);
+  const wipeRef = useRef<HTMLDivElement>(null);
   const keyHandlerRef = useRef<
     ((k: string, e: KeyboardEvent) => boolean | void) | null
   >(null);
@@ -263,8 +266,27 @@ export default function Experience() {
       { autoAlpha: 0 },
       { autoAlpha: 1, duration: 0.55, ease: "power1.out" },
     );
-     
   }, [section]);
+
+  // Sapuan garis ember — penanda pergantian babak sinematik. Garis tipis
+  // menyapu layar saat memasuki babak baru (bukan ketika kembali/settle).
+  useIsoLayoutEffect(() => {
+    const w = wipeRef.current;
+    if (!w || settled || section === 0) return;
+    const tl = gsap.timeline();
+    tl.set(w, { scaleX: 0, autoAlpha: 1, transformOrigin: "left center" });
+    tl.to(w, {
+      scaleX: 1,
+      duration: 0.42,
+      ease: "power2.inOut",
+    });
+    tl.set(w, { transformOrigin: "right center" }, ">0.04");
+    tl.to(w, { autoAlpha: 0, duration: 0.34, ease: "power1.out" });
+    return () => {
+      tl.kill();
+      gsap.set(w, { autoAlpha: 0 });
+    };
+  }, [section, settled]);
 
   // ---- Keyboard: satu-satunya antarmuka kontrol presenter ----
   useEffect(() => {
@@ -282,6 +304,18 @@ export default function Experience() {
       if (k === " " || k === "ArrowRight" || k === "ArrowLeft")
         e.preventDefault();
       audio.init();
+
+      // [?] / [F1] — lembar bantuan lengkap (dialog modal)
+      if (k === "?" || k === "F1") {
+        e.preventDefault();
+        setHelpSheet((h) => !h);
+        audio.tick();
+        return;
+      }
+      if (helpSheet) {
+        if (k === "Escape" || k === "?") setHelpSheet(false);
+        return; // lembar bantuan terbuka → tombol lain ditelan
+      }
 
       // [O] / [Tab] — peta navigasi (daftar isi babak)
       if (k === "Tab" || k.toLowerCase() === "o") {
@@ -389,6 +423,7 @@ export default function Experience() {
     section,
     step,
     mapOpen,
+    helpSheet,
     savedPos,
     advance,
     back,
@@ -461,6 +496,12 @@ export default function Experience() {
             }}
           />
         )}
+
+        {/* Lembar bantuan presenter — pintas keyboard lengkap */}
+        {helpSheet && <HelpOverlay onClose={() => setHelpSheet(false)} />}
+
+        {/* Sapuan garis ember — penanda pergantian babak (bukan replay) */}
+        <div ref={wipeRef} className="act-wipe" aria-hidden="true" />
 
         {/* Gerbang lanjut: posisi tersimpan dari refresh sebelumnya */}
         {savedPos && section === 0 && step === 0 && (
@@ -535,6 +576,7 @@ export default function Experience() {
             )}`}
             {gShow ? " // G→_" : ""}
             {mapOpen ? " // PETA" : ""}
+            {helpSheet ? " // BANTUAN" : ""}
           </div>
           {clockRunning && (
             <div className={elapsed >= 50 * 60 ? "text-ember/75" : undefined}>
@@ -568,7 +610,7 @@ export default function Experience() {
           {statusParts.length > 0 ? <div>{statusParts.join(" · ")}</div> : null}
           {helpOn && (
             <div className="text-[9px] tracking-[0.2em] text-paper/30">
-              [SPACE] LANJUT · [G]+# LOMPAT · [O] PETA · [T] LATIHAN · [C] KONTRAS · [M] BISU · [H] SEMBUNYI
+              [SPACE] LANJUT · [G]+# LOMPAT · [O] PETA · [T] LATIHAN · [?] BANTUAN · [H] SEMBUNYI
             </div>
           )}
         </div>
