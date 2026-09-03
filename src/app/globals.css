@@ -491,6 +491,47 @@ html.contrast-boost .notes-panel .notes-close {
   }
 }
 
+/* ---------- Papan skor S5 [P] — baris peringkat masuk berurutan ---------- */
+.score-row {
+  animation: scoreRowIn 0.5s cubic-bezier(0.22, 0.9, 0.3, 1) both;
+}
+@keyframes scoreRowIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Bar papan skor — isian bergeser halus ketika suara terakhir masuk
+   (peringkat bisa bergeser hidup setelah dibuka). */
+.score-bar {
+  transition: width 0.8s cubic-bezier(0.22, 0.9, 0.3, 1);
+}
+
+/* Bar peringkat pertama — gradasi emas penuh + pancaran lembut. */
+.score-bar-first {
+  background-image: linear-gradient(
+    90deg,
+    rgba(232, 160, 32, 0.35) 0%,
+    #e8a020 68%,
+    #ffb740 100%
+  );
+  box-shadow: 0 0 16px rgba(232, 160, 32, 0.4);
+}
+html.contrast-boost .score-bar-first {
+  box-shadow: 0 0 22px rgba(232, 160, 32, 0.6);
+}
+
+/* ---------- Kartu ringkasan arsip (#/results) ---------- */
+.agg-card {
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
 /* ---------- Kartu battle (S6) — hover glow amber, transisi hanya
    border/box-shadow (transform & opacity milik GSAP, tak diganggu) ---------- */
 .battle-card {
@@ -559,11 +600,13 @@ html.contrast-boost .act-wipe {
   .reveal-stat,
   .plan-dot,
   .spark-curve,
-  .ribbon-tip {
+  .ribbon-tip,
+  .score-row {
     animation: none !important;
   }
   .ribbon-fill,
-  .ribbon-tip {
+  .ribbon-tip,
+  .score-bar {
     transition: none !important;
   }
   .spark-curve {
@@ -607,5 +650,12 @@ html.contrast-boost .act-wipe {
   }
   .rpage .pollbar {
     transition: none !important;
+  }
+  .rpage .agg-card {
+    border-color: #999 !important;
+  }
+  .rpage .spark-curve {
+    stroke-dashoffset: 0 !important;
+    animation: none !important;
   }
 }

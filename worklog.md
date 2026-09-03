@@ -582,3 +582,74 @@ Stage Summary:
   playlist latihan per-babak; (3) ekspor PDF arsip otomatis; (4) grafik
   agregat per-babak di arsip; (5) catatan [N] kaya — estimasi "sisa waktu
   bicara" berdasarkan tempo aktual.
+
+---
+Task ID: 16
+Agent: main (Z.ai Code)
+Task: QA baseline + tiga fitur baru dari prioritas handover — papan skor [P], strip tempo catatan, ringkasan arsip
+
+Work Log:
+- Baca worklog (Task 15 STABIL). Baseline QA 1080p: dev server hidup, gerbang →
+  kredit → G+6 S6 → S5 live→reveal→verdict (seed 14 suara Q1), voting API,
+  arsip #/results, peta [O], catatan [N] — semua LOLOS, 0 error runtime.
+- FITUR 1 — PAPAN SKOR [P] (prioritas #1 handover, S5 reveal):
+  - `S5Polling.tsx`: state `scoreFor {qid, step}` (konteks pembukaan, bukan
+    boolean — kedaluwarsa otomatis saat meninggalkan reveal TANPA useEffect;
+    pola derivatif demi react-hooks/set-state-in-effect).
+  - Tampilan peringkat: baris 01–04 terurun suara; numeral peringkat besar
+    (01 ember 3vw, lainnya paper/30 2.1vw); bar diskalakan ke pemimpin
+    (rel = c/maxCount, bukan persen total); tag KUNCI/MAYORITAS; veredik
+    ketepatan kelas besar + [P] kembali.
+  - Tombol [P]: reveal+suara>0 → buka/tutup; live → HUD "TERSEDIA SAAT
+    PEMBAHASAN"; total 0 → HUD "MENUNGGU SUARA". [R] reset saat terbuka →
+    auto-tutup (total→0). Baris bawah S5 + HelpSheet + hint reveal diperbarui.
+- FITUR 2 — STRIP TEMPO CATATAN [N] (prioritas #5 handover):
+  - `NotesPanel.tsx`: useSyncExternalStore jam sesi (detak 1s dari
+    subscribeSession) + plannedElapsed → baris "T+MM:SS · JADWAL ±MM:SS ·
+    SISA MM′"; ember saat terlambat >60 dtk, redup saat lebih cepat >45 dtk.
+  - Verifikasi live: T+24:51 → 24:54 (tick hidup), JADWAL −13:57 benar
+    (loncat G+5), SISA 14′ cocok rencana 53′.
+- FITUR 3 — RINGKASAN KELAS di arsip #/results (prioritas #4 handover):
+  - `ResultsPage.tsx`: fetch /api/timeline per pertanyaan (tambahan di load(),
+    gagal → diam); dua kartu agregat: % ketepatan besar, pemenang/seri,
+    kurva tempo sparkline (kelas .spark-curve dipakai ulang); header silang
+    "Q1 N SUARA · Q2 N SUARA · RETENSI %" (min/max total).
+- STYLING (globals.css): .score-row (stagger 90ms via animation-delay),
+  .score-bar (transisi 0.8s — peringkat bisa bergeser hidup saat suara
+  telat masuk), .score-bar-first (gradasi emas + glow, versi contrast-boost),
+  .agg-card (break-inside avoid); print: .agg-card border #999, spark-curve
+  tanpa animasi; prefers-reduced-motion: score-row/score-bar ikut mati.
+- QA REGRESI PENUH (semua LOLOS):
+  - Scoreboard Q1: peringkat B(11)→A/C/D(1), KUNCI + 79% · 11/14; Q2:
+    B(8)→A(1)→D(1)→C(0), 80% · 8/10; toggle [P] buka/tutup bersih; [P] di
+    live → HUD benar; [R] saat terbuka → auto-tutup; VLM 1080p 3/3 PASS
+    (tanpa overlap, rank-1 dominan, bar proporsional 8:1:1:0).
+  - Golden path: gerbang → kredit → S1 video → Shift+S → S2; peta [O];
+    lampu HUD [C]/[M]; HelpSheet baris [P] tampil; hint "[P] PAPAN SKOR"
+    muncul hanya di langkah reveal.
+  - Arsip: RINGKASAN 2 kartu + RETENSI 71% (10/14) + TEMPO spark; mobile
+    375px → kartu 340px satu kolom; voting page bersih (Q2 tergembok).
+  - Lint: 0 error (1 warning font pre-existing). Demo state di-reset.
+  - PENTING (keisering): buffer `agent-browser console` MENYIMPAN error
+    lama lintas navigasi — jangan percaya grep error mentah; verifikasi
+  dengan reload + tail segar. Screenshot: download/qa16-* (f1 scoreboard-q1,
+  f2 scoreboard-q2, f3 notes-tempo, f4 agg-results, f5 agg-mobile,
+  f6 reveal-hint, b* baseline).
+
+Stage Summary:
+- Status: STABIL + 3 fitur baru (papan skor [P], strip tempo [N], ringkasan
+  arsip) + styling papan skor sinematik.
+- Pintasan S5 kini: [F] fallback · [R] reset · [E] ekspor CSV · [P] papan skor.
+- File berubah: S5Polling.tsx (scoreFor + papan skor + hint), NotesPanel.tsx
+  (strip tempo + import session/rehearsal), ResultsPage.tsx (timeline +
+  agregat), HelpOverlay.tsx (baris [P]), globals.css (score-*/agg-card +
+  print + reduced-motion). Tidak ada perubahan kontrak API/DB.
+- Risiko: (a) VLM rawan mode "membangkitkan HTML" — selalu kunci instruksi
+  "jangan tulis kode"; (b) buffer console browser QA menumpuk entri lama;
+  (c) papan skor sengaja non-persist — menutup saat meninggalkan reveal
+  (konteks kedaluwarsa), membuka lagi = [P] sekali lagi.
+- Prioritas next (opsional): (1) preset durasi latihan per-babak [T] yang
+  bisa disesuaikan; (2) ekspor ringkasan arsip sebagai PDF print-ready
+  otomatis (tombol unduh .pdf selain window.print); (3) grafik agregat
+  lintas-pertanyaan di layar penutup S8; (4) papan skor lintas dua
+  pertanyaan gabungan di langkah terakhir S5.

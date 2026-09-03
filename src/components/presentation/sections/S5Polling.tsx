@@ -45,6 +45,12 @@ export default function S5Polling({ step }: { step: number }) {
   const [counts, setCounts] = useState<Counts>({});
   const [total, setTotal] = useState(0);
   const [fallback, setFallback] = useState(false);
+  // Papan skor [P] — konteks pembukaan disimpan (qid + langkah), bukan boolean:
+  // tampil hanya selama konteks itu masih berlaku. Menavigasi meninggalkan
+  // reveal → konteks kedaluwarsa sendiri, tanpa efek/reset-state.
+  const [scoreFor, setScoreFor] = useState<{ qid: number; step: number } | null>(
+    null,
+  );
   const [manual, setManual] = useState<{ qid: number; option: string } | null>(
     null,
   );
@@ -57,6 +63,12 @@ export default function S5Polling({ step }: { step: number }) {
   const [synced, setSynced] = useState(false);
   const question = QUESTIONS.find((q) => q.id === qid) ?? QUESTIONS[0];
   const manualChoice = manual && qid > 0 && manual.qid === qid ? manual.option : null;
+  const scoreOpen =
+    !!scoreFor &&
+    revealed &&
+    total > 0 &&
+    scoreFor.qid === qid &&
+    scoreFor.step === step;
 
   // Reveal — mayoritas kelas & statistik jawaban benar (dihitung saat render,
   // otomatis ikut bergerak bila suara masih masuk setelah reveal).
@@ -260,6 +272,20 @@ export default function S5Polling({ step }: { step: number }) {
   };
 
   useSectionKeys((key) => {
+    if (key === "p") {
+      if (!revealed) {
+        hud("PAPAN SKOR — TERSEDIA SAAT PEMBAHASAN TERBUKA");
+      } else if (total === 0) {
+        hud("PAPAN SKOR MENUNGGU — BELUM ADA SUARA");
+      } else if (scoreOpen) {
+        setScoreFor(null);
+        hud("PAPAN SKOR — TERTUTUP [P]", "ember");
+      } else {
+        setScoreFor({ qid, step });
+        hud("PAPAN SKOR — TAMPIL [P]", "ember");
+      }
+      return true;
+    }
     if (key === "f") {
       setFallback((f) => {
         const nf = !f;
@@ -348,8 +374,118 @@ export default function S5Polling({ step }: { step: number }) {
         </div>
       )}
 
-      {/* ---- Pertanyaan live / reveal ---- */}
-      {qid > 0 && (
+      {/* ---- Papan skor [P] — peringkat opsi pada langkah reveal ---- */}
+      {qid > 0 && scoreOpen && (
+        <div
+          className="fade-slide-in absolute inset-0 flex flex-col px-0 pt-[13vh] pb-[10vh]"
+          data-testid="scoreboard"
+          aria-label={`Papan skor pertanyaan ${qid}`}
+        >
+          <div className="flex items-baseline gap-4">
+            <span className="font-code text-[10px] tracking-[0.3em] text-ember">
+              {`PERTANYAAN 0${qid}`}
+            </span>
+            <span className="font-code text-[10px] tracking-[0.2em] text-mute">
+              PAPAN SKOR · FINAL
+            </span>
+          </div>
+          <h2 className="mt-3 max-w-[62vw] font-display text-[2.5vw] leading-[1.15] text-paper">
+            {question.prompt}
+          </h2>
+
+          <div className="mt-[3vh] max-w-[58vw] border-t border-edge">
+            {[...question.options]
+              .sort(
+                (a, b) => (counts[b.key] ?? 0) - (counts[a.key] ?? 0),
+              )
+              .map((o, i) => {
+                const c = counts[o.key] ?? 0;
+                const rel = maxCount > 0 ? (c / maxCount) * 100 : 0;
+                const isFirst = i === 0;
+                return (
+                  <div
+                    key={o.key}
+                    className="score-row flex items-center gap-[1.4vw] border-b border-edge py-[1.35vh]"
+                    style={{ animationDelay: `${i * 90}ms` }}
+                  >
+                    <span
+                      className={`w-[3.6vw] shrink-0 text-right font-display leading-none ${
+                        isFirst ? "text-[3vw] text-ember" : "text-[2.1vw] text-paper/30"
+                      }`}
+                      aria-hidden
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-0.5">
+                        <span
+                          className={`min-w-0 truncate font-body text-[1.25vw] ${
+                            o.correct
+                              ? "text-paper"
+                              : isFirst
+                                ? "text-paper/85"
+                                : "text-paper/55"
+                          }`}
+                        >
+                          <span className="mr-2 font-code text-[11px] text-ember">
+                            {o.key}
+                          </span>
+                          {o.label}
+                        </span>
+                        <span
+                          className={`shrink-0 font-code text-[10px] tracking-[0.18em] ${
+                            o.correct || isFirst ? "text-ember" : "text-paper/55"
+                          }`}
+                        >
+                          {`${c} SUARA · ${pct(o.key)}%${
+                            o.correct ? " · KUNCI" : isFirst ? " · MAYORITAS" : ""
+                          }`}
+                        </span>
+                      </div>
+                      <div className="mt-[0.6vh] h-[12px] max-w-[42vw] bg-white/6">
+                        <div
+                          className={`score-bar h-full ${
+                            isFirst
+                              ? "score-bar-first"
+                              : o.correct
+                                ? "pollbar-correct"
+                                : "bg-ember/40"
+                          }`}
+                          style={{ width: `${rel}%` }}
+                          data-testid={`scorebar-${o.key}`}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+
+          <div className="reveal-stat mt-[2.6vh] flex items-baseline gap-[1.4vw]">
+            <span
+              className="font-display text-[4vw] leading-none text-ember"
+              aria-label={`${correctPct} persen kelas menjawab benar`}
+            >
+              {correctPct}%
+            </span>
+            <div className="flex flex-col gap-1">
+              <span className="font-code text-[10px] tracking-[0.25em] text-mute">
+                {`KETEPATAN KELAS · ${correctCount}/${total} SUARA`}
+              </span>
+              <span className="font-display italic text-[1.25vw] leading-snug text-paper/80">
+                {verdict}
+              </span>
+            </div>
+          </div>
+
+          <p className="mt-auto font-code text-[10px] tracking-[0.4em] text-mute">
+            [P] KEMBALI KE PEMBAHASAN · [SPACE] LANJUT
+          </p>
+        </div>
+      )}
+
+      {/* ---- Pertanyaan live / reveal (tampilan standar) ---- */}
+      {qid > 0 && !scoreOpen && (
         <div className="absolute inset-0 flex flex-col px-0 pt-[13vh] pb-[10vh]">
           <div className="flex items-baseline gap-4">
             <span className="font-code text-[10px] tracking-[0.3em] text-ember">
@@ -599,6 +735,7 @@ export default function S5Polling({ step }: { step: number }) {
                 </div>
               )}
               <p className="mt-[0.8vh] font-code text-[9px] tracking-[0.22em] text-mute/60">
+                {revealed && total > 0 ? "[P] PAPAN SKOR · " : ""}
                 [F] FALLBACK · [R] RESET · [E] EKSPOR CSV
               </p>
             </div>

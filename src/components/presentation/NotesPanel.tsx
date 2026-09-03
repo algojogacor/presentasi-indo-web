@@ -1,7 +1,15 @@
 "use client";
 
+import { useSyncExternalStore } from "react";
 import { stepNote, NOTE_PLAN } from "@/lib/notes";
-import { REHEARSAL_PLAN, stepDuration } from "./rehearsal";
+import {
+  REHEARSAL_PLAN,
+  PLAN_TOTAL,
+  plannedElapsed,
+  stepDuration,
+  fmtDelta,
+} from "./rehearsal";
+import { subscribeSession, getClockRunning, getElapsedSeconds } from "./session";
 
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
@@ -32,6 +40,22 @@ export default function NotesPanel({
   const next = act[step + 1] ?? null;
   const prev = step > 0 ? act[step - 1] : null;
 
+  // Tempo hidup — jam sesi (store eksternal, detak 1 detik) dibandingkan
+  // dengan jadwal rencana langkah ini: terlambat menyala ember.
+  const clockRunning = useSyncExternalStore(
+    subscribeSession,
+    getClockRunning,
+    () => false,
+  );
+  const elapsed = useSyncExternalStore(
+    subscribeSession,
+    getElapsedSeconds,
+    () => 0,
+  );
+  const planned = plannedElapsed(section, step);
+  const delta = elapsed - planned;
+  const planLeft = Math.max(0, PLAN_TOTAL - planned);
+
   return (
     <aside
       className="notes-panel pointer-events-none fixed bottom-[10vh] right-[6vw] z-[72] w-[21vw] min-w-[280px]"
@@ -48,6 +72,30 @@ export default function NotesPanel({
             {`RENCANA ${fmtDur(dur)} / ${fmtDur(actTotal)}`}
           </p>
         </div>
+
+        {/* Strip tempo hidup — T+ aktual · selisih jadwal · sisa rencana */}
+        {clockRunning && (
+          <div
+            className="mt-2 flex items-baseline justify-between gap-2 font-code text-[8.5px] tracking-[0.14em]"
+            aria-label="Tempo sesi"
+          >
+            <span className="text-paper/70">
+              {`T+${pad2(Math.floor(elapsed / 60))}:${pad2(elapsed % 60)}`}
+            </span>
+            <span
+              className={
+                delta > 60
+                  ? "text-ember/85"
+                  : delta < -45
+                    ? "text-paper/45"
+                    : "text-paper/60"
+              }
+            >
+              {`JADWAL ${fmtDelta(delta)}`}
+            </span>
+            <span className="text-mute/80">{`SISA ${fmtDur(planLeft)}`}</span>
+          </div>
+        )}
 
         {/* Isi — judul langkah + cue penyampaian */}
         <p className="mt-3 font-display text-[1.05vw] leading-snug text-paper">

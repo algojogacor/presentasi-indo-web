@@ -25,6 +25,7 @@ const GROUPS: Group[] = [
     title: "SESI & WAKTU",
     items: [
       ["T", "Mode rehearsal — auto-advance + patokan waktu 53′"],
+      ["P", "Papan skor — peringkat opsi saat pembahasan polling"],
       ["E", "Ekspor hasil polling (CSV) — di sesi interaktif"],
       ["R", "Reset suara polling — di sesi interaktif"],
       ["F", "Fallback manual polling — klik opsi di layar"],

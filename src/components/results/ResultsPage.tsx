@@ -7,10 +7,40 @@ import { QUESTIONS, type ResultsPayload } from "@/lib/questions";
 
 type ResultsMap = Record<number, ResultsPayload>;
 
+interface TimelinePoint {
+  t: number;
+  c: number;
+}
+
+interface TimelinePayload {
+  question: number;
+  total: number;
+  firstAt: string | null;
+  lastAt: string | null;
+  span: number;
+  points: TimelinePoint[];
+}
+
+type TimelineMap = Record<number, TimelinePayload | null>;
+
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
 const fmtClock = (d: Date) =>
   `${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+
+const fmtSpan = (sec: number) =>
+  `${Math.floor(sec / 60)}:${pad2(Math.round(sec % 60))}`;
+
+/** Kurva tempo mini — polyline dari titik kumulatif (diskalakan ke viewBox). */
+function sparkPoints(tl: TimelinePayload, w: number, h: number): string {
+  const span = Math.max(1, tl.span);
+  const tot = Math.max(1, tl.total);
+  const xy = [{ t: 0, c: 0 }, ...tl.points].map((p) => [
+    Math.min(w, (p.t / span) * w),
+    h - Math.min(h - 2, (p.c / tot) * (h - 4)) - 2,
+  ]);
+  return xy.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
+}
 
 /**
  * Halaman arsip hasil polling (#/results) — dibuka SETELAH presentasi untuk
@@ -20,6 +50,7 @@ const fmtClock = (d: Date) =>
  */
 export default function ResultsPage() {
   const [results, setResults] = useState<ResultsMap>({});
+  const [timelines, setTimelines] = useState<TimelineMap>({});
   const [updatedAt, setUpdatedAt] = useState<Date | null>(null);
   const [devices, setDevices] = useState(0);
   const [synced, setSynced] = useState(false);
@@ -40,6 +71,27 @@ export default function ResultsPage() {
         if (r) map[QUESTIONS[i].id] = r;
       });
       setResults(map);
+
+      // Kurva tempo per pertanyaan — untuk kartu ringkasan (opsional,
+      // kegagalan tidak mengganggu tabel utama).
+      const tls = await Promise.all(
+        QUESTIONS.map(async (q) => {
+          try {
+            const r = await fetch(`/api/timeline?question=${q.id}`, {
+              cache: "no-store",
+            });
+            return r.ok ? ((await r.json()) as TimelinePayload) : null;
+          } catch {
+            return null;
+          }
+        }),
+      );
+      const tmap: TimelineMap = {};
+      tls.forEach((t, i) => {
+        tmap[QUESTIONS[i].id] = t;
+      });
+      setTimelines(tmap);
+
       setUpdatedAt(new Date());
       setLoaded(true);
     } catch {
@@ -136,6 +188,108 @@ export default function ResultsPage() {
 
       {/* ---------- Isi: satu kartu per pertanyaan ---------- */}
       <main className="mx-auto w-full max-w-4xl flex-1 px-6 pb-10 sm:px-10">
+        {/* ---------- Ringkasan kelas — kilasan silang dua pertanyaan ---------- */}
+        <section className="mb-8" aria-label="Ringkasan kelas">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+            <p className="font-code text-[10px] tracking-[0.35em] text-ember">
+              RINGKASAN KELAS
+            </p>
+            <p className="font-code text-[9px] tracking-[0.2em] text-mute/70">
+              {`Q1 ${results[1]?.total ?? 0} SUARA · Q2 ${
+                results[2]?.total ?? 0
+              } SUARA`}
+              {(() => {
+                const t1 = results[1]?.total ?? 0;
+                const t2 = results[2]?.total ?? 0;
+                if (t1 > 0 && t2 > 0) {
+                  const ret = Math.round((Math.min(t1, t2) / Math.max(t1, t2)) * 100);
+                  return ` · RETENSI ${ret}%`;
+                }
+                return "";
+              })()}
+            </p>
+          </div>
+          <div className="mt-3 grid gap-4 sm:grid-cols-2">
+            {QUESTIONS.map((q) => {
+              const r = results[q.id];
+              const total = r?.total ?? 0;
+              const correctKey = q.options.find((o) => o.correct)?.key;
+              const correctCount =
+                r?.options.find((o) => o.key === correctKey)?.count ?? 0;
+              const correctPct =
+                total > 0 ? Math.round((correctCount / total) * 100) : 0;
+              const maxCount =
+                r && total > 0 ? Math.max(0, ...r.options.map((o) => o.count)) : 0;
+              const winners =
+                maxCount > 0
+                  ? q.options.filter(
+                      (o) => (r?.options.find((x) => x.key === o.key)?.count ?? 0) === maxCount,
+                    )
+                  : [];
+              const tl = timelines[q.id];
+              const pts = tl && tl.points.length > 0 ? sparkPoints(tl, 200, 30) : null;
+              return (
+                <div
+                  key={q.id}
+                  className="agg-card border border-edge bg-surface/60 p-5"
+                  aria-label={`Ringkasan pertanyaan ${q.id}`}
+                >
+                  <div className="flex items-baseline justify-between gap-3">
+                    <span className="font-code text-[9px] tracking-[0.25em] text-ember">
+                      {`PERTANYAAN 0${q.id}`}
+                    </span>
+                    <span className="font-code text-[9px] tracking-[0.15em] text-mute/70">
+                      {`${total} SUARA`}
+                    </span>
+                  </div>
+                  <div className="mt-3 flex items-baseline gap-4">
+                    <span className="font-display text-4xl leading-none text-ember">
+                      {total > 0 ? `${correctPct}%` : "—"}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="font-code text-[8.5px] tracking-[0.22em] text-mute">
+                        KETEPATAN KELAS
+                      </p>
+                      <p className="truncate font-body text-sm text-paper/75">
+                        {total === 0
+                          ? "Belum ada suara"
+                          : winners.length > 1
+                            ? `SERI — ${winners.map((w) => w.key).join(" / ")}`
+                            : winners[0]
+                              ? `${winners[0].key} — ${winners[0].label}`
+                              : "Belum ada suara"}
+                      </p>
+                    </div>
+                  </div>
+                  {pts && tl && (
+                    <div className="mt-4 border-t border-edge pt-3">
+                      <svg
+                        viewBox="0 0 200 30"
+                        className="h-[30px] w-full"
+                        preserveAspectRatio="none"
+                        aria-hidden="true"
+                      >
+                        <polyline
+                          points={pts}
+                          fill="none"
+                          stroke="#E8A020"
+                          strokeWidth="1.5"
+                          strokeLinejoin="round"
+                          strokeLinecap="round"
+                          className="spark-curve"
+                        />
+                      </svg>
+                      <p className="mt-1 font-code text-[8.5px] tracking-[0.2em] text-mute/70">
+                        {`TEMPO — ${tl.total} SUARA DALAM ${fmtSpan(tl.span)}`}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+
         <div className="flex flex-col gap-8">
           {QUESTIONS.map((q) => {
             const r = results[q.id];
