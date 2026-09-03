@@ -342,6 +342,20 @@ html.contrast-boost .vignette {
   background: none;
 }
 
+/* ---------- Bingkai panggung S0 — bracket sudut bernafas ---------- */
+.gate-bracket {
+  animation: bracketBreath 2.8s ease-in-out infinite;
+}
+@keyframes bracketBreath {
+  0%,
+  100% {
+    opacity: 0.45;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 /* ---------- Flash hitungan live (total responden berubah → amber sekejap) ---------- */
 .count-flash {
   animation: countFlash 0.7s ease-out;
@@ -358,7 +372,8 @@ html.contrast-boost .vignette {
   .dot-live,
   .scanline,
   .ambient-word,
-  .count-flash {
+  .count-flash,
+  .gate-bracket {
     animation: none !important;
   }
 }

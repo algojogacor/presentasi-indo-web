@@ -7,6 +7,7 @@ import { PresCtx, SECTIONS, type PresApi } from "./context";
 import { useIsoLayoutEffect } from "./hooks";
 import { Grain } from "./atoms";
 import MapOverlay from "./MapOverlay";
+import ActCard from "./ActCard";
 import {
   subscribeSession,
   getPosSnapshot,
@@ -354,6 +355,9 @@ export default function Experience() {
           <SectionComp step={step} />
         </div>
 
+        {/* Kartu babak — kilasan judul saat memasuki babak yang belum pernah dilihat */}
+        {!settled && <ActCard key={`ac-${section}`} section={section} />}
+
         <Grain />
 
         {/* Vignette sinematik — pinggir layar menggelap perlahan */}
@@ -412,7 +416,9 @@ export default function Experience() {
             </div>
           ))}
           <div>
-            {`ACT.${pad2(section)} // STEP.${pad2(step)}`}
+            {`ACT.${pad2(section)} // STEP.${pad2(step)}/${pad2(
+              SECTIONS[section].steps - 1,
+            )}`}
             {gArmed ? " // G→_" : ""}
             {mapOpen ? " // PETA" : ""}
           </div>

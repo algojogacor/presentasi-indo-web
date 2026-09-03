@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { io, type Socket } from "socket.io-client";
 import { gsap } from "@/lib/gsap";
 import { QUESTIONS, type ResultsPayload } from "@/lib/questions";
 import { usePres } from "../context";
@@ -36,6 +37,7 @@ export default function S5Polling({ step }: { step: number }) {
   const [notice, setNotice] = useState<string | null>(null);
 
   const totalRef = useRef(0);
+  const [synced, setSynced] = useState(false);
   const question = QUESTIONS.find((q) => q.id === qid) ?? QUESTIONS[0];
   const manualChoice = manual && qid > 0 && manual.qid === qid ? manual.option : null;
 
@@ -48,18 +50,15 @@ export default function S5Polling({ step }: { step: number }) {
       qrImgRef.current.src = `/api/qr?data=${encodeURIComponent(url)}`;
   }, [qid]);
 
-  // Polling: auto-fetch tiap 3 detik selama layar live aktif
-  useEffect(() => {
-    if (!live || !qid || fallback) return;
-    let stopped = false;
-    const load = async () => {
+  // Ambil hasil terkini dari server — dipakai polling 3 detik DAN pemicu socket.
+  const loadResults = useCallback(
+    async (target: number) => {
       try {
-        const r = await fetch(`/api/results?question=${qid}`, {
+        const r = await fetch(`/api/results?question=${target}`, {
           cache: "no-store",
         });
         if (!r.ok) return;
         const j = (await r.json()) as ResultsPayload;
-        if (stopped) return;
         const map: Counts = {};
         for (const o of j.options) map[o.key] = o.count;
         setCounts(map);
@@ -68,14 +67,68 @@ export default function S5Polling({ step }: { step: number }) {
       } catch {
         /* diam — presenter tetap bisa lanjut manual */
       }
-    };
-    void load();
-    const iv = setInterval(load, 3000);
+    },
+    [],
+  );
+
+  // Polling HTTP 3 detik — fallback yang selalu jalan saat layar live aktif.
+  useEffect(() => {
+    if (!live || !qid || fallback) return;
+    // Muat awal ditunda satu microtask — pemisah async yang disukai React.
+    const t = setTimeout(() => void loadResults(qid), 0);
+    const iv = setInterval(() => void loadResults(qid), 3000);
     return () => {
-      stopped = true;
+      clearTimeout(t);
       clearInterval(iv);
     };
-  }, [live, qid, fallback]);
+  }, [live, qid, fallback, loadResults]);
+
+  // Socket real-time: suara baru → refresh instan (tanpa menunggu polling).
+  // Progressive enhancement — jika mini-service tidak terjangkau, indikator
+  // SYNC tidak menyala dan polling 3 detik tetap bekerja seperti biasa.
+  useEffect(() => {
+    if (!live || !qid || fallback) return;
+    let disposed = false;
+    let sock: Socket;
+    try {
+      sock = io("/?XTransformPort=3030", {
+        path: "/",
+        transports: ["websocket", "polling"],
+        reconnection: true,
+        reconnectionAttempts: 4,
+        reconnectionDelay: 2000,
+        timeout: 4000,
+        forceNew: true,
+      });
+    } catch {
+      return;
+    }
+    sock.on("connect", () => {
+      if (!disposed) setSynced(true);
+    });
+    sock.on("disconnect", () => {
+      if (!disposed) setSynced(false);
+    });
+    sock.on(
+      "vote:new",
+      (p: { question: number; total: number | null }) => {
+        if (disposed || p.question !== qid) return;
+        void loadResults(qid); // tarik angka final dari sumber kebenaran
+      },
+    );
+    sock.on("votes:reset", () => {
+      if (disposed) return;
+      setCounts({});
+      setTotal(0);
+      totalRef.current = 0;
+      setNotice(null);
+    });
+    return () => {
+      disposed = true;
+      setSynced(false);
+      sock.disconnect();
+    };
+  }, [live, qid, fallback, loadResults]);
 
   // Threshold: responden < 10 dalam 15 detik pertama → notifikasi fallback.
   // Notice disimpan dengan kunci liveKey agar otomatis "kedaluwarsa" saat ganti pertanyaan.
@@ -288,12 +341,22 @@ export default function S5Polling({ step }: { step: number }) {
                   </span>{" "}
                   RESPONDEN
                 </span>
+                {synced && live && (
+                  <span className="font-code text-[9px] tracking-[0.25em] text-ember/80">
+                    · SYNC
+                  </span>
+                )}
                 {fallback && (
                   <span className="font-code text-[9px] tracking-[0.2em] text-ember">
                     FALLBACK MANUAL
                   </span>
                 )}
               </div>
+              {live && total === 0 && !fallback && (
+                <p className="mb-3 font-code text-[10px] tracking-[0.22em] text-mute/70 animate-pulse">
+                  MENUNGGU SUARA PERTAMA…
+                </p>
+              )}
               {question.options.map((o) => (
                 <div key={o.key} className="mb-[0.9vh] flex items-center gap-3">
                   <span className="w-4 font-code text-[10px] text-mute">

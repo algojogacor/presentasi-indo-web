@@ -208,3 +208,64 @@ Stage Summary:
   getElapsedSeconds berbasis Date.now() (aman, granularitas detik).
 - Prioritas next: (opsional) hit counter responden real-time via WebSocket
   mini-service, mode rehearsal (auto-advance timer), export hasil polling CSV.
+
+---
+Task ID: 11
+Agent: main (Z.ai Code)
+Task: QA stabil + fitur real-time WebSocket (mini-service live-notify) + kartu babak sinematik + polish gerbang S0
+
+Work Log:
+- QA awal: opening, polling, S2 tag (semuanya 15px = satu baris), voting, lint — stabil.
+- FITUR INTI — notifikasi suara real-time via socket.io:
+  - mini-services/live-notify/ (proyek bun mandiri, port 3030, `bun --hot`):
+    server socket.io path "/" (wajib untuk Caddy). Klien terpercaya (auth.role
+    "presenter-server") dari backend Next.js memancarkan notify:vote /
+    notify:reset → di-broadcast ke semua klien (vote:new / votes:reset).
+  - CATATAN ARSITEKTUR: HTTP POST /notify di mini-service TIDAK mungkin —
+    engine.io dengan path "/" mencegat SEMUA request (uji: "Transport
+    unknown"). Solusi: backend terhubung sebagai klien socket.io terpercaya.
+  - src/lib/notify.ts — singleton socket.io-client server-side ke
+    localhost:3030 (server-to-server, tanpa gateway), fire-and-forget,
+    reconnect otomatis, kegagalan ditelan.
+  - src/instrumentation.ts — prewarm tautan saat server Next menyala.
+  - /api/vote: setelah insert → count → notifyVote(question, total).
+  - /api/reset: setelah deleteMany → notifyReset().
+  - S5Polling: loadResults (useCallback bersama) + polling HTTP 3s (fallback
+    tetap) + socket io("/?XTransformPort=3030") → vote:new = refresh instan,
+    votes:reset = zeroing instan; indikator "· SYNC" saat tersambung;
+    "MENUNGGU SUARA PERTAMA…" saat live & total 0.
+  - VotingPage: live total via socket (instan) + polling 8s fallback.
+- QA real-time VIA GATEWAY (:81 — penting: localhost:3000 langsung TIDAK
+  melalui Caddy sehingga XTransformPort tidak diforward):
+  - handshake engine.io melalui gateway OK; SYNC menyala; vote via API →
+    presenter 0→1 dalam 800ms (< polling 3s = bukti instan); 5 suara → bar
+    A·20% C·60% D·20% instan; reset broadcast → 0 + MENUNGGU kembali;
+    voting page → "1 SUARA MASUK" instan.
+- FITUR — kartu babak (ActCard.tsx): flash judul saat memasuki babak baru
+  (numeral romawi I–VIII / "OUVERTURE" + label, Cormorant 11vw paper/12,
+  label ember letterSpacing animasi); GSAP timeline ~1.9s, terdaftar sebagai
+  timeline aktif → [SPACE] memotong; tidak muncul saat kembali ke babak yang
+  pernah dilihat (settled).
+- FITUR — HUD: STEP.XX/YY (total langkah per babak, mis. STEP.01/04).
+- STYLING — gerbang S0: 4 bracket sudut amber bernafas (gate-bracket,
+  2.8s), garis pemudar (gradient rule), cahaya panggung radial amber 0.06
+  dari atas, tombol hover:text-ember; reduced-motion diperbarui.
+- Lint: 0 error (1 warning font pre-existing). Dev log bersih.
+- Keanehan dev-mode (dihadapi): modul notify.ts ter-instantiate dua kali
+  saat hot-reload → dua koneksi "SERVER" — broadcast duplikat idempoten
+  (klien re-fetch angka sama); produksi/prewarm = satu koneksi.
+
+Stage Summary:
+- Status: STABIL + real-time penuh. Arsitektur polling kini dua jalur:
+  socket instan (primary) + HTTP 3s (fallback) — layar presenter, halaman
+  voting, dan backend semuanya tersinkron.
+- Komponen/file baru: mini-services/live-notify/{package.json,index.ts},
+  src/lib/notify.ts, src/instrumentation.ts, ActCard.tsx.
+- QA wajib lewat http://localhost:81/ (gateway) — bukan :3000 — untuk
+  menguji XTransformPort socket.
+- Shortcut lengkap tidak berubah (lihat Task 10) + perilaku baru: [SPACE]
+  memotong kartu babak saat flash berjalan.
+- Risiko: koneksi pertama vote (lazy) mungkin terlewat → polling menutup;
+  produksi prewarm menutup celah. YouTube autoplay tetap kebijakan browser.
+- Prioritas next: (opsional) ekspor hasil polling CSV untuk laporan,
+  mode rehearsal auto-advance, indikator jumlah perangkat tersambung di S5.

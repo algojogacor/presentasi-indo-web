@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { db } from "@/lib/db";
 import { isOptionValid } from "@/lib/questions";
+import { notifyVote } from "@/lib/notify";
 
 // POST /api/vote — body { question: 1|2, option: "A"|"B"|"C"|"D" } → { ok: true }
 export async function POST(request: Request) {
@@ -43,6 +44,13 @@ export async function POST(request: Request) {
 
   try {
     await db.vote.create({ data: { question, option } });
+    // Siarkan instan ke mini-service (fire-and-forget; polling tetap fallback).
+    try {
+      const total = await db.vote.count({ where: { question } });
+      notifyVote(question, total);
+    } catch {
+      /* notifikasi gagal — tidak mempengaruhi suara yang tersimpan */
+    }
     return NextResponse.json({ ok: true });
   } catch (error) {
     console.error("[api/vote] gagal menyimpan suara:", error);

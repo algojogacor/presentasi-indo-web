@@ -99,11 +99,45 @@ export default function S0Opening({ step }: { step: number }) {
       ref={root}
       className="absolute inset-0 flex flex-col items-center justify-center px-[8vw]"
     >
+      {/* Cahaya panggung samar — hanya di gerbang awal */}
       {step === 0 && (
-        <div className="flex flex-col items-center gap-6">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 55% 38% at 50% -12%, rgba(232,160,32,0.06), transparent 70%)",
+          }}
+        />
+      )}
+
+      {step === 0 && (
+        <div className="relative flex flex-col items-center gap-[2vw] px-[5vw] py-[3.2vw]">
+          {/* Bingkai panggung — bracket sudut bernafas */}
+          <span
+            aria-hidden
+            className="gate-bracket absolute -top-3 -left-3 h-4 w-4 border-t border-l border-ember/50"
+          />
+          <span
+            aria-hidden
+            className="gate-bracket absolute -top-3 -right-3 h-4 w-4 border-t border-r border-ember/50"
+          />
+          <span
+            aria-hidden
+            className="gate-bracket absolute -bottom-3 -left-3 h-4 w-4 border-b border-l border-ember/50"
+          />
+          <span
+            aria-hidden
+            className="gate-bracket absolute -bottom-3 -right-3 h-4 w-4 border-b border-r border-ember/50"
+          />
+
           <p className="font-code text-[10px] tracking-[0.5em] text-mute">
             ANATOMI KARYA TULIS ILMIAH
           </p>
+          <span
+            aria-hidden
+            className="h-px w-[16vw] bg-gradient-to-r from-transparent via-edge to-transparent"
+          />
           <button
             type="button"
             onClick={() => {
@@ -114,7 +148,7 @@ export default function S0Opening({ step }: { step: number }) {
               // Space pada tombol jangan dobel-trigger dengan handler global
               if (e.key === " ") e.stopPropagation();
             }}
-            className="font-code text-[11px] tracking-[0.4em] text-ember/70 animate-pulse"
+            className="font-code text-[11px] tracking-[0.4em] text-ember/70 animate-pulse transition-colors duration-300 hover:text-ember"
             aria-label="Tekan Space untuk memulai"
           >
             [ SPACE ] — MULAI

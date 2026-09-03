@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { io } from "socket.io-client";
 import { QUESTIONS, type OptionKey } from "@/lib/questions";
 import { LiveDot } from "@/components/presentation/atoms";
 
@@ -30,7 +31,8 @@ function QuestionCard({
     }
   }, [qid]);
 
-  // Total suara kelas — pemantauan hidup setelah menjawab
+  // Total suara kelas — pemantauan hidup setelah menjawab:
+  // socket real-time (instan) + polling lambat 8 detik sebagai fallback.
   const [liveTotal, setLiveTotal] = useState<number | null>(null);
   useEffect(() => {
     if (state !== "done") return;
@@ -48,10 +50,39 @@ function QuestionCard({
       }
     };
     void load();
-    const iv = setInterval(load, 4000);
+    const iv = setInterval(() => void load(), 8000);
+
+    // Socket real-time melalui gateway — jika gagal, polling tetap jalan.
+    let sock: ReturnType<typeof io> | null = null;
+    try {
+      sock = io("/?XTransformPort=3030", {
+        path: "/",
+        transports: ["websocket", "polling"],
+        reconnection: true,
+        reconnectionAttempts: 5,
+        reconnectionDelay: 3000,
+        timeout: 5000,
+        forceNew: true,
+      });
+      sock.on(
+        "vote:new",
+        (p: { question: number; total: number | null }) => {
+          if (stopped || p.question !== qid) return;
+          if (typeof p.total === "number") setLiveTotal(p.total);
+          else void load();
+        },
+      );
+      sock.on("votes:reset", () => {
+        if (!stopped) setLiveTotal(0);
+      });
+    } catch {
+      sock = null;
+    }
+
     return () => {
       stopped = true;
       clearInterval(iv);
+      sock?.disconnect();
     };
   }, [state, qid]);
 
