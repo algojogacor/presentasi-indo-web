@@ -10,6 +10,20 @@ import { Kicker, BigNumeral, LiveDot } from "../atoms";
 
 type Counts = Record<string, number>;
 
+interface TimelinePoint {
+  t: number; // detik sejak suara pertama
+  c: number; // jumlah suara kumulatif
+}
+
+interface TimelinePayload {
+  question: number;
+  total: number;
+  firstAt: string | null;
+  lastAt: string | null;
+  span: number;
+  points: TimelinePoint[];
+}
+
 const INTRO_LINE = "Sekarang kita test instingnya…";
 
 /**
@@ -36,6 +50,8 @@ export default function S5Polling({ step }: { step: number }) {
   );
   const [notice, setNotice] = useState<string | null>(null);
   const [devices, setDevices] = useState(0);
+  const [spark, setSpark] = useState<TimelinePayload | null>(null);
+  const sparkTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const totalRef = useRef(0);
   const [synced, setSynced] = useState(false);
@@ -74,6 +90,39 @@ export default function S5Polling({ step }: { step: number }) {
     if (qrImgRef.current)
       qrImgRef.current.src = `/api/qr?data=${encodeURIComponent(url)}`;
   }, [qid]);
+
+  // Kurva tempo kedatangan suara — endpoint terpisah, kontrak results tak tersentuh.
+  const fetchTimeline = useCallback(async (target: number) => {
+    try {
+      const r = await fetch(`/api/timeline?question=${target}`, {
+        cache: "no-store",
+      });
+      if (!r.ok) return;
+      setSpark((await r.json()) as TimelinePayload);
+    } catch {
+      /* diam — grafik tempo opsional */
+    }
+  }, []);
+
+  // Debounce: suara beruntun dalam hitungan ratus milidetik hanya menarik
+  // satu refresh kurva (angka responden tetap instan lewat loadResults).
+  const scheduleSpark = useCallback(
+    (target: number, delay = 1400) => {
+      if (sparkTimer.current) clearTimeout(sparkTimer.current);
+      sparkTimer.current = setTimeout(() => void fetchTimeline(target), delay);
+    },
+    [fetchTimeline],
+  );
+
+  // Muat kurva saat layar live aktif + bersihkan timer saat berganti.
+  useEffect(() => {
+    if (!live || !qid || fallback) return;
+    const t = setTimeout(() => void fetchTimeline(qid), 0);
+    return () => {
+      clearTimeout(t);
+      if (sparkTimer.current) clearTimeout(sparkTimer.current);
+    };
+  }, [live, qid, fallback, fetchTimeline]);
 
   // Ambil hasil terkini dari server — dipakai polling 3 detik DAN pemicu socket.
   const loadResults = useCallback(
@@ -145,6 +194,7 @@ export default function S5Polling({ step }: { step: number }) {
       (p: { question: number; total: number | null }) => {
         if (disposed || p.question !== qid) return;
         void loadResults(qid); // tarik angka final dari sumber kebenaran
+        scheduleSpark(qid); // kurva tempo — debounced
       },
     );
     sock.on("votes:reset", () => {
@@ -153,6 +203,7 @@ export default function S5Polling({ step }: { step: number }) {
       setTotal(0);
       totalRef.current = 0;
       setNotice(null);
+      setSpark(null);
     });
     return () => {
       disposed = true;
@@ -160,7 +211,7 @@ export default function S5Polling({ step }: { step: number }) {
       setDevices(0);
       sock.disconnect();
     };
-  }, [live, qid, fallback, loadResults]);
+  }, [live, qid, fallback, loadResults, scheduleSpark]);
 
   // Threshold: responden < 10 dalam 15 detik pertama → notifikasi fallback.
   // Notice disimpan dengan kunci liveKey agar otomatis "kedaluwarsa" saat ganti pertanyaan.
@@ -251,6 +302,32 @@ export default function S5Polling({ step }: { step: number }) {
     const c = counts[key] ?? 0;
     return total > 0 ? Math.round((c / total) * 100) : 0;
   };
+
+  // Kurva tempo kedatangan suara — dihitung ringan saat render (≤ 120 titik).
+  let sparkLine: string | null = null;
+  let sparkArea = "";
+  let sparkLast: { x: number; y: number } = { x: 0, y: 38 };
+  let sparkSpanLabel = "";
+  if (live && !fallback && spark && spark.points.length > 0) {
+    const span = Math.max(1, spark.span);
+    const tot = Math.max(1, spark.total);
+    const xy: [number, number][] = [
+      { t: 0, c: 0 },
+      ...spark.points,
+    ].map((p) => [
+      Math.min(320, (p.t / span) * 320),
+      40 - Math.min(38, (p.c / tot) * 36) - 2,
+    ]);
+    sparkLine = xy.map(([x, y]) => `${x.toFixed(1)},${y.toFixed(1)}`).join(" ");
+    const [lx, ly] = xy[xy.length - 1];
+    sparkLast = { x: lx, y: ly };
+    sparkArea = `M0,40 ${xy
+      .map(([x, y]) => `L${x.toFixed(1)},${y.toFixed(1)}`)
+      .join(" ")} L${lx.toFixed(1)},40 Z`;
+    sparkSpanLabel = `${Math.floor(span / 60)}:${String(
+      Math.round(span % 60),
+    ).padStart(2, "0")}`;
+  }
 
   return (
     <div ref={root} className="absolute inset-0 px-[7vw]">
@@ -491,6 +568,36 @@ export default function S5Polling({ step }: { step: number }) {
                   </div>
                 );
               })}
+              {sparkLine && (
+                <div className="mt-[1.1vh]" data-testid="poll-spark">
+                  <svg
+                    viewBox="0 0 320 40"
+                    className="h-[40px] w-full"
+                    preserveAspectRatio="none"
+                    aria-hidden="true"
+                  >
+                    <path d={sparkArea} fill="rgba(232,160,32,0.10)" />
+                    <polyline
+                      points={sparkLine}
+                      fill="none"
+                      stroke="#E8A020"
+                      strokeWidth="1.5"
+                      strokeLinejoin="round"
+                      strokeLinecap="round"
+                      className="spark-curve"
+                    />
+                    <circle
+                      cx={sparkLast.x}
+                      cy={sparkLast.y}
+                      r="2.5"
+                      fill="#E8A020"
+                    />
+                  </svg>
+                  <p className="mt-1 font-code text-[9px] tracking-[0.22em] text-mute/70">
+                    {`TEMPO SUARA · ${spark?.total ?? 0} DALAM ${sparkSpanLabel}`}
+                  </p>
+                </div>
+              )}
               <p className="mt-[0.8vh] font-code text-[9px] tracking-[0.22em] text-mute/60">
                 [F] FALLBACK · [R] RESET · [E] EKSPOR CSV
               </p>

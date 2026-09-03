@@ -17,6 +17,11 @@ let posCache: SavedPos | null | undefined; // undefined = belum dibaca dari stor
 let clockStart: number | null = null;
 let storeRead = false;
 
+// Mode latihan (rehearsal) — runtime saja, tidak dipertahankan antar reload.
+// autoDeadline = epoch-ms ketika langkah saat ini seharusnya berganti otomatis.
+let reArmed = false;
+let autoDeadline: number | null = null;
+
 /** Himpunan babak yang pernah tampil — dibaca aman saat render. */
 export const visitedActs = new Set<number>();
 
@@ -103,4 +108,36 @@ export function startClock(): void {
     /* abaikan */
   }
   notify();
+}
+
+/* ---------- Mode latihan (rehearsal) ---------- */
+
+/** Apakah mode latihan aktif (auto-advance + patokan waktu). */
+export function getRehearsalOn(): boolean {
+  return reArmed;
+}
+
+/** Sisa detik langkah saat ini sebelum auto-advance (0 bila mati). */
+export function getRemainingSeconds(): number {
+  if (autoDeadline === null) return 0;
+  return Math.max(0, Math.ceil((autoDeadline - Date.now()) / 1000));
+}
+
+/** Nyalakan/matikan mode latihan; seconds = durasi langkah saat ini. */
+export function setRehearsal(on: boolean, seconds: number): void {
+  reArmed = on;
+  autoDeadline = on ? Date.now() + Math.max(0, seconds) * 1000 : null;
+  notify();
+}
+
+/** Pasang ulang tenggat untuk langkah baru (no-op bila mode latihan mati). */
+export function armStep(seconds: number): void {
+  if (!reArmed) return;
+  autoDeadline = Date.now() + Math.max(0, seconds) * 1000;
+  notify();
+}
+
+/** Tunda tenggat (mis. peta terbuka / animasi masih berjalan). */
+export function deferDeadline(ms: number): void {
+  if (autoDeadline !== null) autoDeadline += ms;
 }

@@ -16,7 +16,20 @@ import {
   savePos,
   startClock,
   visitedActs,
+  getRehearsalOn,
+  getRemainingSeconds,
+  setRehearsal,
+  armStep,
+  deferDeadline,
 } from "./session";
+import {
+  stepDuration,
+  plannedElapsed,
+  PLAN_TOTAL,
+  TOTAL_STEPS,
+  cumStepsBefore,
+  fmtDelta,
+} from "./rehearsal";
 import S0Opening from "./sections/S0Opening";
 import S1Video from "./sections/S1Video";
 import S2Latar from "./sections/S2Latar";
@@ -54,7 +67,7 @@ export default function Experience() {
     step: 0,
     settled: false,
   });
-  const [gArmed, setGArmed] = useState(false);
+  const [gShow, setGShow] = useState(false); // kosmetik HUD "// G→_" saja
   const [contrast, setContrast] = useState(false);
   const [muted, setMuted] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
@@ -75,6 +88,17 @@ export default function Experience() {
     getElapsedSeconds,
     () => 0,
   );
+  // Mode latihan — auto-advance + patokan waktu (store eksternal, runtime saja)
+  const rehearsalOn = useSyncExternalStore(
+    subscribeSession,
+    getRehearsalOn,
+    () => false,
+  );
+  const remaining = useSyncExternalStore(
+    subscribeSession,
+    getRemainingSeconds,
+    () => 0,
+  );
   const [huds, setHuds] = useState<
     { id: number; msg: string; tone: "info" | "ember" }[]
   >([]);
@@ -86,6 +110,11 @@ export default function Experience() {
   const activeTlRef = useRef<gsap.core.Timeline | null>(null);
   const hudSeq = useRef(0);
   const gTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // G+digit dibaca dari ref — kebal terhadap staleness closure bila kedua
+  // tombol datang hampir bersamaan (state belum ter-flush antar keydown).
+  const gArmedRef = useRef(false);
+  // advance terbaru untuk interval auto-advance (bebas stale closure)
+  const advanceRef = useRef<() => void>(() => {});
 
   const { section, step, settled } = nav;
 
@@ -185,11 +214,41 @@ export default function Experience() {
   }, [hud]);
 
   // Persistensi posisi + mulai jam — menulis ke store eksternal (bukan setState)
+  // + pasang tenggat auto-advance untuk langkah baru (no-op bila latihan mati).
   useEffect(() => {
     if (section === 0 && step === 0) return; // gerbang awal tidak disimpan
     startClock();
     savePos({ section, step });
+    armStep(stepDuration(section, step));
   }, [section, step]);
+
+  // Advance terbaru selalu tersedia bagi interval auto-advance (ref diperbarui
+  // di efek, bukan saat render — patuh aturan react-hooks/refs).
+  useEffect(() => {
+    advanceRef.current = advance;
+  }, [advance]);
+
+  // Auto-advance mode latihan: satu detak per detik, tenggat disimpan di store
+  // sesi. Peta terbuka / animasi aktif → tenggat ditunda, tidak dipotong.
+  useEffect(() => {
+    if (!rehearsalOn) return;
+    const iv = setInterval(() => {
+      if (mapOpen) {
+        deferDeadline(1000);
+        return;
+      }
+      if (!getClockRunning()) return; // belum melewati gerbang
+      if (getRemainingSeconds() > 0) return;
+      const tl = activeTlRef.current;
+      if (tl && tl.isActive()) {
+        deferDeadline(1000);
+        return;
+      }
+      armStep(9999); // cadangan bila advance mentok di posisi akhir
+      advanceRef.current(); // → efek [section,step] memasang durasi baru
+    }, 1000);
+    return () => clearInterval(iv);
+  }, [rehearsalOn, mapOpen]);
 
   // Fade masuk saat ganti babak (remount karena key)
   useIsoLayoutEffect(() => {
@@ -254,8 +313,8 @@ export default function Experience() {
         return;
       }
 
-      // Mode jump G + angka
-      if (gArmed) {
+      // Mode jump G + angka — ref agar kekal dua keydown berurutan cepat
+      if (gArmedRef.current) {
         if (/^[0-9]$/.test(k)) {
           const n = Number(k);
           if (n < SECTIONS.length) {
@@ -266,7 +325,8 @@ export default function Experience() {
             hud("BABAK DI LUAR JANGKAUAN");
           }
         }
-        setGArmed(false);
+        gArmedRef.current = false;
+        setGShow(false);
         if (gTimer.current) clearTimeout(gTimer.current);
         return;
       }
@@ -289,10 +349,27 @@ export default function Experience() {
         return;
       }
       if (lk === "g") {
-        setGArmed(true);
+        gArmedRef.current = true;
+        setGShow(true);
         hud("G → [0–8] PILIH BABAK", "ember");
         if (gTimer.current) clearTimeout(gTimer.current);
-        gTimer.current = setTimeout(() => setGArmed(false), 1400);
+        gTimer.current = setTimeout(() => {
+          gArmedRef.current = false;
+          setGShow(false);
+        }, 1400);
+        return;
+      }
+      // [T] — mode latihan: auto-advance + patokan waktu per babak
+      if (lk === "t") {
+        const next = !getRehearsalOn();
+        setRehearsal(next, stepDuration(section, step));
+        audio.tick();
+        hud(
+          next
+            ? "REHEARSAL ON — AUTO-ACTIVE · RENCANA 53 MENIT [T]"
+            : "REHEARSAL OFF — KONTROL MANUAL [T]",
+          next ? "ember" : "info",
+        );
         return;
       }
       if (lk === "c") {
@@ -311,7 +388,6 @@ export default function Experience() {
   }, [
     section,
     step,
-    gArmed,
     mapOpen,
     savedPos,
     advance,
@@ -347,6 +423,17 @@ export default function Experience() {
   ].filter(Boolean) as string[];
 
   const SectionComp = SECTION_COMPONENTS[section];
+
+  // Pita progres: posisi aktual (langkah) vs posisi rencana (waktu latihan)
+  const posPct = Math.min(
+    100,
+    ((cumStepsBefore(section) + step) / TOTAL_STEPS) * 100,
+  );
+  const planDelta = elapsed - plannedElapsed(section, step);
+  const planPct = Math.min(
+    100,
+    (plannedElapsed(section, step) / PLAN_TOTAL) * 100,
+  );
 
   return (
     <PresCtx.Provider value={api}>
@@ -401,6 +488,33 @@ export default function Experience() {
           ))}
         </div>
 
+        {/* Pita progres tepi-bawah — posisi aktual (amber) + penanda rencana
+            (belah ketupat) saat mode latihan. Hanya tampil setelah gerbang. */}
+        {clockRunning && (
+          <div
+            className="pointer-events-none fixed inset-x-0 bottom-0 z-[68] h-[3px]"
+            aria-hidden="true"
+          >
+            <div className="absolute inset-0 bg-white/7" />
+            {SECTIONS.slice(1).map((_, i) => (
+              <span
+                key={i}
+                className="absolute top-0 bottom-0 w-px bg-white/15"
+                style={{
+                  left: `${(cumStepsBefore(i + 1) / TOTAL_STEPS) * 100}%`,
+                }}
+              />
+            ))}
+            <div
+              className="ribbon-fill absolute inset-y-0 left-0 bg-ember/65"
+              style={{ width: `${posPct}%` }}
+            />
+            {rehearsalOn && (
+              <span className="plan-dot" style={{ left: `${planPct}%` }} />
+            )}
+          </div>
+        )}
+
         {/* HUD Presenter — koordinat state, sangat redup, kiri bawah */}
         <div
           className="pointer-events-none fixed bottom-5 left-6 z-[70] font-code text-[10px] leading-[1.8] tracking-[0.14em]"
@@ -419,7 +533,7 @@ export default function Experience() {
             {`ACT.${pad2(section)} // STEP.${pad2(step)}/${pad2(
               SECTIONS[section].steps - 1,
             )}`}
-            {gArmed ? " // G→_" : ""}
+            {gShow ? " // G→_" : ""}
             {mapOpen ? " // PETA" : ""}
           </div>
           {clockRunning && (
@@ -427,10 +541,34 @@ export default function Experience() {
               {`T+${pad2(Math.floor(elapsed / 60))}:${pad2(elapsed % 60)} / 60:00`}
             </div>
           )}
+          {rehearsalOn && clockRunning && (
+            <div className={remaining <= 10 ? "text-ember/85" : undefined}>
+              {`REHEARSAL · AUTO ${pad2(remaining)}S`}
+            </div>
+          )}
+          {rehearsalOn && clockRunning && (
+            <div
+              className={
+                planDelta > 60
+                  ? "text-ember/85"
+                  : planDelta < -45
+                    ? "text-paper/55"
+                    : "text-paper/45"
+              }
+            >
+              {`RENCANA ${fmtDelta(planDelta)} · ${
+                planDelta > 60
+                  ? "TERLAMBAT"
+                  : planDelta < -45
+                    ? "LEBIH CEPAT"
+                    : "SESUAI JADWAL"
+              }`}
+            </div>
+          )}
           {statusParts.length > 0 ? <div>{statusParts.join(" · ")}</div> : null}
           {helpOn && (
             <div className="text-[9px] tracking-[0.2em] text-paper/30">
-              [SPACE] LANJUT · [G]+# LOMPAT · [O] PETA · [C] KONTRAS · [M] BISU · [H] SEMBUNYI
+              [SPACE] LANJUT · [G]+# LOMPAT · [O] PETA · [T] LATIHAN · [C] KONTRAS · [M] BISU · [H] SEMBUNYI
             </div>
           )}
         </div>

@@ -3,11 +3,15 @@
 import { useEffect, useSyncExternalStore } from "react";
 import Experience from "@/components/presentation/Experience";
 import VotingPage from "@/components/voting/VotingPage";
+import ResultsPage from "@/components/results/ResultsPage";
 
-type Route = "present" | "vote";
+type Route = "present" | "vote" | "results";
 
 function routeFromHash(): Route {
-  return window.location.hash.startsWith("#/voting") ? "vote" : "present";
+  const h = window.location.hash;
+  if (h.startsWith("#/voting")) return "vote";
+  if (h.startsWith("#/results")) return "results";
+  return "present";
 }
 
 function subscribeHash(cb: () => void): () => void {
@@ -25,11 +29,13 @@ export default function Page() {
 
   useEffect(() => {
     document.body.style.overflow = route === "present" ? "hidden" : "";
-    if (route === "vote") window.scrollTo(0, 0);
+    if (route !== "present") window.scrollTo(0, 0);
     return () => {
       document.body.style.overflow = "";
     };
   }, [route]);
 
-  return route === "vote" ? <VotingPage /> : <Experience />;
+  if (route === "vote") return <VotingPage />;
+  if (route === "results") return <ResultsPage />;
+  return <Experience />;
 }

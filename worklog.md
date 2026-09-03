@@ -339,3 +339,102 @@ Stage Summary:
 - Prioritas next: (opsional) mode rehearsal auto-advance per langkah dengan
   durasi target per babak; grafik tren suara masuk per detik di S5;
   halaman arsip hasil (tabel semua pertanyaan + tautan CSV) untuk laporan.
+
+---
+Task ID: 13
+Agent: main (Z.ai Code)
+Task: QA stabil + tiga fitur baru (mode rehearsal, kurva tempo suara, halaman arsip hasil) + polish styling + perbaikan robustness G+digit
+
+Work Log:
+- Baca worklog (Task 0–12 selesai) + verifikasi awal: lint 0 error, dev :3000
+  dan mini-service live-notify :3030 hidup, log bersih.
+- QA regresi via agent-browser (gateway :81): gerbang → Space → HUD jam
+  T+MM:SS hidup → G+5 → S5 (SYNC, 5 PERANGKAT, EKSPOR hint) → vote via API
+  → presenter refresh instan → voting page TERCATAT + Q2 unlock + kartu
+  selesai → reload → [L] resume ACT.05. SEMUA LOLOS.
+- TEMUAN QA (bukan bug produksi, tapi perbaikan): dua keydown "g"+"digit"
+  dalam satu tick JS tidak melompat (closure React gArmed belum ter-flush).
+  FIX: gArmed dipindah ke gArmedRef (dibaca sinkron di handler) + gShow
+  state kosmetik untuk HUD — diverifikasi dispatch back-to-back kini LOLOS.
+- FITUR A — Mode Rehearsal [T]:
+  - rehearsal.ts (baru): REHEARSAL_PLAN per-langkah per-babak, total 3180 dtk
+    (± 53 menit + cadang tanya-jawab); stepDuration, plannedElapsed, fmtDelta,
+    cumStepsBefore, TOTAL_STEPS, PLAN_TOTAL.
+  - session.ts: state rehearsal di store eksternal (getRehearsalOn,
+    getRemainingSeconds, setRehearsal, armStep, deferDeadline) — runtime saja,
+    tidak ke sessionStorage; patuh lint react-hooks/refs & set-state-in-effect.
+  - Experience.tsx: [T] toggle (HUD transient), auto-advance 1 dtk/detak via
+    advanceRef (interval bebas stale closure), tenggat ditunda saat peta
+    terbuka / timeline GSAP aktif (tidak memotong animasi), gerbang dikecualikan
+    (jam belum jalan), armStep dipasang di efek persistensi [section,step],
+    cadangan 9999 dtk bila advance mentok di ACT.08 akhir (anti spam HUD).
+  - HUD baru: "REHEARSAL · AUTO NNS" (amber ≤10 dtk) + "RENCANA ±MM:SS ·
+    TERLAMBAT/LEBIH CEPAT/SESUAI JADWAL" (delta = elapsed − plannedElapsed).
+  - QA: T on/off, AUTO 179S→167S menurun, G+1 → AUTO 14S terpasang ulang,
+    auto-advance benar-benar menembak (STEP.00→01 ACT.01 setelah ±15 dtk,
+    re-arm 635S untuk langkah video), delta TERLAMBAT/LEBIH CEPAT benar
+    arahnya di dua posisi berbeda.
+- FITUR B — Kurva tempo suara (S5):
+  - /api/timeline?question=1|2 (baru): kurva kumulatif kedatangan suara
+    (bucket adaptif, maks ±120 titik) — kontrak /api/results tak tersentuh;
+    question=3 → 400 (terverifikasi curl).
+  - S5Polling: fetchTimeline + scheduleSpark (debounce 1,4 dtk), pemicu
+    awal [live,qid] + socket vote:new, votes:reset → spark=null; render SVG
+    polyline + area amber (draw-in .spark-curve) + kaption "TEMPO SUARA ·
+    N DALAM M:SS", hanya saat live & !fallback & total>0.
+  - QA: seed 7 suara berjarak waktu → kurva hidup (7 DALAM 0:13), VLM: terlihat
+    & terbaca, tak bertabrakan dengan QR / hint [F].
+- FITUR C — Halaman arsip hasil #/results (baru, src/components/results/):
+  - Tabel visual per pertanyaan: bar + count·pct + tag (JAWABAN·MAYORITAS /
+    JAWABAN / MAYORITAS KELAS), statistik %benar + verdict + pembahasan —
+    identik logika S5.
+  - Real-time penuh (socket vote:new/votes:reset/presence + fallback HTTP
+    10 dtk), header "N SUARA TOTAL · SYNC · N PERANGKAT · DIPERBARUI HH:MM:SS",
+  empty state "Belum ada suara…".
+  - Footer sticky (mt-auto): UNDUH CSV (/api/export), CETAK/PDF (window.print),
+    tautan #/ presentasi & #/voting — semua no-print + focus-visible ember.
+  - page.tsx: rute hash #/results (routeFromHash startsWith), body overflow
+    auto + scrollTo(0,0).
+  - Print stylesheet (@media print di globals.css): latar putih, teks hitam,
+    tombol disembunyikan, bar amber solid, rcard anti page-break — diverifikasi
+    via agent-browser pdf + pdftoppm + VLM (4/4 lolos).
+  - QA: desktop + viewport 375×720 (VLM: bersih), vote via API → 7→8 SUARA
+    TOTAL instan (socket), reset → empty state.
+- STYLING — pita progres tepi-bawah (3px, z-68, hanya setelah gerbang): track
+  white/7 + tick batas babak + fill amber/65 (.ribbon-fill transition 1,1s) +
+  penanda rencana belah ketupat amber (.plan-dot pulse) hanya saat rehearsal —
+  presenter melihat posisi aktual vs rencana secara visual. Hover glow kartu
+  battle S6 (.battle-card — transition border/box-shadow saja, transform &
+  opacity tetap milik GSAP). Reduced-motion diperbarui (plan-dot, spark-curve,
+  ribbon-fill) + blok print.
+- Lint akhir: 0 error (1 warning font pre-existing). Catatan dev.log: error
+  "gArmed is not defined" HANYA transient saat MultiEdit berjalan (hot-reload
+  antar-edit) — log terkini bersih, semua fungsional terverifikasi setelahnya.
+- Demo state di-reset: votes kosong, localStorage/sessionStorage bersih.
+  Screenshot arsip: download/qa13-rehearsal-ribbon.png, qa13-results-desktop.png,
+  qa13-results-mobile.png, qa13-s5-sparkline.png, qa13-results-print.pdf.
+
+Stage Summary:
+- Status: STABIL + 3 fitur baru terverifikasi end-to-end (rehearsal, kurva
+  tempo, arsip hasil) + 1 perbaikan robustness (G+digit same-tick).
+- Shortcut penuh sekarang: Space/→/←, G+0-8, 1/2/3 (S4), A-E (S4), 1-4+B (S6),
+  C, M, F, R, E, Shift+S, [O]/[Tab] peta, [L] resume, [H] bantuan, [T] BARU
+  mode rehearsal.
+- File baru: rehearsal.ts, src/app/api/timeline/route.ts,
+  src/components/results/ResultsPage.tsx. Edit: session.ts, Experience.tsx,
+  S5Polling.tsx, page.tsx, globals.css.
+- Arsitektur: state rehearsal di store eksternal session.ts (deadline epoch-ms,
+  bukan state React) — auto-advance bebas stale closure & lint-clean.
+- Rencana latihan 53 menit (REHEARSAL_PLAN) — presenter bisa latihan sendiri
+  dengan auto-advance + patokan waktu + pita progres vs rencana.
+- Arsip laporan: #/results (live + cetak/PDF + CSV) — pasca-presentasi angka
+  polling siap dilampirkan ke laporan kelompok.
+- Risiko/keanehan: (a) auto-advance rehearsal memotong nada S0 jika durasi
+  habis tepat saat timeline berjalan — mitigasi deferDeadline saat tl aktif;
+  (b) presence di dev bisa menghitung socket sisa navigasi (pre-existing);
+  (c) autoplay YouTube tetap kebijakan browser; (d) hot-reload mini-service
+  tidak menggantikan modul (pre-existing — restart manual bila mengubah
+  index.ts mini-service).
+- Prioritas next (opsional): mode "papan skor" untuk kuis tambahan;
+  ekspor PDF otomatis pasca-sesi; preset urutan G (playlist latihan);
+  grafik agregat per-babak untuk analisis temporal.

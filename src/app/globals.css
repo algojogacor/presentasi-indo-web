@@ -407,6 +407,56 @@ html.contrast-boost .vignette {
   }
 }
 
+/* ---------- Pita progres tepi-bawah (posisi babak aktual) ---------- */
+.ribbon-fill {
+  transition: width 1.1s linear;
+}
+
+/* Penanda posisi rencana (mode latihan) — belah ketupat amber bernafas. */
+.plan-dot {
+  position: absolute;
+  top: -1px;
+  width: 5px;
+  height: 5px;
+  transform: translateX(-50%) rotate(45deg);
+  background: #ffb740;
+  box-shadow: 0 0 8px rgba(255, 183, 64, 0.75);
+  animation: planPulse 1.6s ease-in-out infinite;
+}
+@keyframes planPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 4px rgba(255, 183, 64, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 10px rgba(255, 183, 64, 0.9);
+  }
+}
+
+/* ---------- Kurva tempo suara (S5) — garis tergambar masuk ---------- */
+.spark-curve {
+  stroke-dasharray: 360;
+  stroke-dashoffset: 360;
+  animation: sparkDraw 1.1s ease-out forwards;
+}
+@keyframes sparkDraw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ---------- Kartu battle (S6) — hover glow amber, transisi hanya
+   border/box-shadow (transform & opacity milik GSAP, tak diganggu) ---------- */
+.battle-card {
+  transition:
+    border-color 0.35s ease,
+    box-shadow 0.35s ease;
+}
+.battle-card:hover {
+  border-color: rgba(232, 160, 32, 0.55);
+  box-shadow: 0 0 28px rgba(232, 160, 32, 0.14);
+}
+
 /* ---------- Gerak minimum dihormati ---------- */
 @media (prefers-reduced-motion: reduce) {
   .grain,
@@ -416,7 +466,54 @@ html.contrast-boost .vignette {
   .count-flash,
   .gate-bracket,
   .pollbar-winner,
-  .reveal-stat {
+  .reveal-stat,
+  .plan-dot,
+  .spark-curve {
     animation: none !important;
+  }
+  .ribbon-fill {
+    transition: none !important;
+  }
+  .spark-curve {
+    stroke-dashoffset: 0 !important;
+  }
+}
+
+/* ---------- Cetak halaman arsip (#/results) ---------- */
+@media print {
+  html,
+  body {
+    background: #fff !important;
+    overscroll-behavior: auto;
+  }
+  .rpage {
+    color: #111 !important;
+  }
+  .rpage * {
+    color: #111 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+  .rpage .no-print {
+    display: none !important;
+  }
+  .rpage .rcard {
+    border-color: #999 !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .rpage .rbar-track {
+    background: #e6e6e6 !important;
+  }
+  .rpage .rbar-fill {
+    background: #c99a2e !important;
+  }
+  .rpage .dot-live {
+    background: #b0524a !important;
+    animation: none !important;
+  }
+  .rpage .pollbar {
+    transition: none !important;
   }
 }
