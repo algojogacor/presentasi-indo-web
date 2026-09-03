@@ -269,3 +269,73 @@ Stage Summary:
   produksi prewarm menutup celah. YouTube autoplay tetap kebijakan browser.
 - Prioritas next: (opsional) ekspor hasil polling CSV untuk laporan,
   mode rehearsal auto-advance, indikator jumlah perangkat tersambung di S5.
+
+---
+Task ID: 12
+Agent: main (Z.ai Code)
+Task: QA stabil + tiga fitur baru (ekspor CSV, presence perangkat, klimaks reveal) + polish styling
+
+Work Log:
+- Baca worklog: Task 10–11 sudah selesai (clock, peta, persistensi, real-time
+  socket, ActCard). Verifikasi awal: dev log bersih, lint 0 error, live-notify
+  handshake OK, gateway :81 OK.
+- QA regresi via agent-browser (lewat gateway :81): gerbang → Space → HUD
+  T+MM:SS aktif → G+5 → S5 live (5 RESPONDEN, SYNC, EKSPOR hint) → vote via
+  API → presenter refresh instan → voting page TERCATAT + live total + Q2
+  unlock. SEMUA LOLOS → lanjut pengembangan fitur baru.
+- FITUR A — Ekspor CSV: src/app/api/export/route.ts (GET). Blok RINGKASAN
+  per pertanyaan (opsi, jumlah, persentase, kunci BENAR, total, "BENAR: X%")
+  + blok DETAIL kronologis. UTF-8 BOM (Excel-safe), koma pemisah, sel
+  di-escape kutip ganda, nama file `polling-kelompok6-YYYY-MM-DD.csv`.
+  Shortcut presenter [E] di S5 (a elemen klik → unduh + HUD transient).
+  Diverifikasi curl: headers + isi CSV benar untuk 5 suara (D 60% mayoritas,
+  B benar 20%).
+- FITUR B — Presence perangkat: mini-services/live-notify/index.ts menandai
+  socket.data.trusted, hitung audienceCount() (non-trusted), broadcast
+  "presence" {count} saat connect/disconnect + emit awal ke socket baru.
+  S5Polling: sock.on("presence") → badge "· N PERANGKAT" (live, >0).
+  VotingPage: socket level-halaman → header "· N TERHUBUNG" + QuestionCard
+  (done) "· N TERHUBUNG" setelah "X SUARA MASUK". CATATAN PENTING: hot-reload
+  bun --hot TIDAK menggantikan modul lama (log format lama) → mini-service
+  harus di-restart manual (kill PID bun --hot + nohup ulang). Setelah
+  restart, presence live terverifikasi (4→6 perangkat saat halaman berganti).
+- FITUR C — Klimaks reveal di S5: hitung saat render (ikut gerak bila suara
+  masuk setelah reveal): maxCount, winners (boleh seri), correctCount/Pct.
+  Opsi: tag "JAWABAN · MAYORITAS" / "JAWABAN" / "MAYORITAS KELAS" (paper
+  style bila mayoritas salah); bar winner = .pollbar-winner (gradasi emas +
+  denyut pollWinnerPulse), kunci tanpa mayoritas = .pollbar-correct (ember +
+  glow statis). Statistik besar: angka "NN%" Cormorant 4vw ember +
+  "KELAS MENJAWAB BENAR · X/Y SUARA" + verdict italik 4 tingkat
+  (≥80% "sejalan", ≥50% "di jalur", >0% "minoritas yang benar", 0%
+  "momen bedah paling bagus"). QA dua skenario: mayoritas salah
+  (20% / D tag / verdict minoritas) DAN mayoritas benar
+  ("JAWABAN · MAYORITAS" / 75% / 3/4 / verdict "di jalur").
+- STYLING — globals.css: .pollbar-winner, .pollbar-correct, .reveal-stat
+  (keyframes revealStat) + ketiganya masuk prefers-reduced-motion.
+  S5 menambah baris hint mini "[F] FALLBACK · [R] RESET · [E] EKSPOR CSV"
+  di bawah bar hasil.
+- VLM review screenshot reveal: "No critical layout issues found. The design
+  is ready for presentation." (nitpick: angka latar 05 sangat redup — sudah
+  disengaja; wrap teks opsi D tetap terbaca).
+- Lint akhir: 0 error (1 warning font pre-existing). Demo state di-reset
+  (votes kosong, storage bersih). Screenshot arsip:
+  download/qa-s5-reveal.png, qa-s5-reveal-majority-correct.png,
+  qa-voting-done.png.
+
+Stage Summary:
+- Status: STABIL + 3 fitur baru terverifikasi end-to-end (semua QA lewat
+  gateway :81 karena XTransformPort socket).
+- Endpoint baru: GET /api/export (CSV attachment, BOM, ringkasan + detail).
+- Event socket baru: "presence" {count} — dikonsumsi presenter S5 + voting
+  (header + kartu selesai). audienceCount mengecualikan koneksi trusted
+  (presenter-server).
+- S5 klimaks reveal: winner glow + statistik %benar + verdict naratif —
+  dua skenario QA lolos; presenter clock/peta/persistensi tetap sehat.
+- Risiko/keanehan: (a) hot-reload mini-service tidak menggantikan modul —
+  WAJIB restart manual bila mengubah index.ts; (b) dev-mode notify.ts dua
+  koneksi SERVER (pre-existing, broadcast idempoten); (c) angka presence di
+  dev bisa menghitung socket sisa navigasi (produksi normal); (d) autoplay
+  YouTube tetap kebijakan browser.
+- Prioritas next: (opsional) mode rehearsal auto-advance per langkah dengan
+  durasi target per babak; grafik tren suara masuk per detik di S5;
+  halaman arsip hasil (tabel semua pertanyaan + tautan CSV) untuk laporan.

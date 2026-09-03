@@ -35,11 +35,36 @@ export default function S5Polling({ step }: { step: number }) {
     null,
   );
   const [notice, setNotice] = useState<string | null>(null);
+  const [devices, setDevices] = useState(0);
 
   const totalRef = useRef(0);
   const [synced, setSynced] = useState(false);
   const question = QUESTIONS.find((q) => q.id === qid) ?? QUESTIONS[0];
   const manualChoice = manual && qid > 0 && manual.qid === qid ? manual.option : null;
+
+  // Reveal — mayoritas kelas & statistik jawaban benar (dihitung saat render,
+  // otomatis ikut bergerak bila suara masih masuk setelah reveal).
+  const maxCount =
+    qid > 0 ? Math.max(0, ...question.options.map((o) => counts[o.key] ?? 0)) : 0;
+  const winners =
+    maxCount > 0
+      ? question.options
+          .filter((o) => (counts[o.key] ?? 0) === maxCount)
+          .map((o) => o.key)
+      : [];
+  const correctKey = question.options.find((o) => o.correct)?.key;
+  const correctCount = correctKey ? (counts[correctKey] ?? 0) : 0;
+  const correctPct = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+  const verdict =
+    total === 0
+      ? null
+      : correctPct >= 80
+        ? "Hampir seluruh ruangan sudah sejalan dengan teorinya."
+        : correctPct >= 50
+          ? "Mayoritas di jalur — sisanya bagian menarik untuk dibedah."
+          : correctPct > 0
+            ? "Yang benar justru minoritas — mari lihat kenapa."
+            : "Seluruh kelas terpesona jebakan — momen bedah paling bagus.";
 
   // QR menuju halaman voting — set src lewat DOM agar bebas hydration mismatch.
   // Bergantung pada qid karena elemen img hanya ada saat pertanyaan tampil.
@@ -107,7 +132,13 @@ export default function S5Polling({ step }: { step: number }) {
       if (!disposed) setSynced(true);
     });
     sock.on("disconnect", () => {
-      if (!disposed) setSynced(false);
+      if (!disposed) {
+        setSynced(false);
+        setDevices(0);
+      }
+    });
+    sock.on("presence", (p: { count: number }) => {
+      if (!disposed) setDevices(p.count);
     });
     sock.on(
       "vote:new",
@@ -126,6 +157,7 @@ export default function S5Polling({ step }: { step: number }) {
     return () => {
       disposed = true;
       setSynced(false);
+      setDevices(0);
       sock.disconnect();
     };
   }, [live, qid, fallback, loadResults]);
@@ -194,6 +226,18 @@ export default function S5Polling({ step }: { step: number }) {
       void resetPoll();
       return true;
     }
+    if (key === "e") {
+      // Unduh hasil polling sebagai CSV — lampiran siap untuk laporan.
+      const a = document.createElement("a");
+      a.href = "/api/export";
+      a.rel = "noopener";
+      a.download = "";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      hud("EKSPOR CSV — HASIL POLLING DIUNDUH", "ember");
+      return true;
+    }
     return false;
   });
 
@@ -245,7 +289,16 @@ export default function S5Polling({ step }: { step: number }) {
           <div className="mt-[3.2vh] grid max-w-[56vw] grid-cols-2 gap-[1.1vw]">
             {question.options.map((o) => {
               const isCorrect = revealed && o.correct;
+              const isWinner = revealed && winners.includes(o.key);
               const isManual = manualChoice === o.key;
+              const tag =
+                isCorrect && isWinner
+                  ? "JAWABAN · MAYORITAS"
+                  : isCorrect
+                    ? "JAWABAN"
+                    : isWinner
+                      ? "MAYORITAS KELAS"
+                      : null;
               return (
                 <button
                   key={o.key}
@@ -255,9 +308,11 @@ export default function S5Polling({ step }: { step: number }) {
                   className={`group flex items-start gap-[0.9vw] border p-[1.1vw] text-left transition-all duration-300 ${
                     isCorrect
                       ? "border-ember bg-ember/10"
-                      : revealed
-                        ? "border-edge opacity-35"
-                        : "border-edge hover:border-ember/50"
+                      : isWinner
+                        ? "border-paper/55 bg-paper/8"
+                        : revealed
+                          ? "border-edge opacity-35"
+                          : "border-edge hover:border-ember/50"
                   } ${isManual ? "ring-1 ring-ember" : ""} ${
                     live && fallback && !manualChoice
                       ? "cursor-pointer"
@@ -265,21 +320,60 @@ export default function S5Polling({ step }: { step: number }) {
                   }`}
                   aria-label={`Opsi ${o.key}: ${o.label}`}
                 >
-                  <span className="pt-[0.35vw] font-code text-[11px] text-ember">
+                  <span
+                    className={`pt-[0.35vw] font-code text-[11px] ${
+                      isWinner && !isCorrect ? "text-paper/80" : "text-ember"
+                    }`}
+                  >
                     {o.key}
                   </span>
-                  <span className="font-body text-[1.25vw] leading-snug text-paper/90">
+                  <span
+                    className={`font-body text-[1.25vw] leading-snug ${
+                      isWinner && !isCorrect
+                        ? "text-paper/85"
+                        : "text-paper/90"
+                    }`}
+                  >
                     {o.label}
                   </span>
-                  {isCorrect && (
-                    <span className="ml-auto font-code text-[9px] tracking-[0.25em] text-ember">
-                      JAWABAN
+                  {tag && (
+                    <span
+                      className={`ml-auto font-code text-[9px] tracking-[0.25em] ${
+                        isWinner && !isCorrect
+                          ? "text-paper/70"
+                          : "text-ember"
+                      }`}
+                    >
+                      {tag}
                     </span>
                   )}
                 </button>
               );
             })}
           </div>
+
+          {/* Statistik benar — angka besar momen reveal */}
+          {revealed && total > 0 && (
+            <div
+              key={`stat-${qid}-${total}`}
+              className="reveal-stat mt-[2.4vh] flex items-baseline gap-[1.4vw]"
+            >
+              <span
+                className="font-display text-[4vw] leading-none text-ember"
+                aria-label={`${correctPct} persen kelas menjawab benar`}
+              >
+                {correctPct}%
+              </span>
+              <div className="flex flex-col gap-1">
+                <span className="font-code text-[10px] tracking-[0.25em] text-mute">
+                  KELAS MENJAWAB BENAR · {correctCount}/{total} SUARA
+                </span>
+                <span className="font-display italic text-[1.25vw] leading-snug text-paper/80">
+                  {verdict}
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* Pembahasan saat reveal */}
           {revealed && (
@@ -341,6 +435,11 @@ export default function S5Polling({ step }: { step: number }) {
                   </span>{" "}
                   RESPONDEN
                 </span>
+                {live && devices > 0 && (
+                  <span className="font-code text-[9px] tracking-[0.25em] text-paper/60">
+                    · {devices} PERANGKAT
+                  </span>
+                )}
                 {synced && live && (
                   <span className="font-code text-[9px] tracking-[0.25em] text-ember/80">
                     · SYNC
@@ -357,23 +456,44 @@ export default function S5Polling({ step }: { step: number }) {
                   MENUNGGU SUARA PERTAMA…
                 </p>
               )}
-              {question.options.map((o) => (
-                <div key={o.key} className="mb-[0.9vh] flex items-center gap-3">
-                  <span className="w-4 font-code text-[10px] text-mute">
-                    {o.key}
-                  </span>
-                  <div className="h-[10px] flex-1 bg-white/6">
-                    <div
-                      className={`pollbar h-full ${revealed && o.correct ? "bg-ember" : "bg-ember/45"}`}
-                      style={{ width: `${pct(o.key)}%` }}
-                      data-testid={`pollbar-${o.key}`}
-                    />
+              {question.options.map((o) => {
+                const isWinner = revealed && winners.includes(o.key);
+                const isCorrect = revealed && o.correct;
+                return (
+                  <div key={o.key} className="mb-[0.9vh] flex items-center gap-3">
+                    <span
+                      className={`w-4 font-code text-[10px] ${
+                        isWinner && !isCorrect ? "text-paper/75" : "text-mute"
+                      }`}
+                    >
+                      {o.key}
+                    </span>
+                    <div className="h-[10px] flex-1 bg-white/6">
+                      <div
+                        className={`pollbar h-full ${
+                          isWinner
+                            ? "pollbar-winner"
+                            : isCorrect
+                              ? "pollbar-correct"
+                              : "bg-ember/45"
+                        }`}
+                        style={{ width: `${pct(o.key)}%` }}
+                        data-testid={`pollbar-${o.key}`}
+                      />
+                    </div>
+                    <span
+                      className={`w-[4.5vw] text-right font-code text-[10px] ${
+                        isWinner ? "text-paper/85" : "text-paper/70"
+                      }`}
+                    >
+                      {counts[o.key] ?? 0} · {pct(o.key)}%
+                    </span>
                   </div>
-                  <span className="w-[4.5vw] text-right font-code text-[10px] text-paper/70">
-                    {counts[o.key] ?? 0} · {pct(o.key)}%
-                  </span>
-                </div>
-              ))}
+                );
+              })}
+              <p className="mt-[0.8vh] font-code text-[9px] tracking-[0.22em] text-mute/60">
+                [F] FALLBACK · [R] RESET · [E] EKSPOR CSV
+              </p>
             </div>
           </div>
         </div>

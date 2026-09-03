@@ -30,11 +30,32 @@ interface VotePayload {
   total?: unknown;
 }
 
+// Jumlah perangkat audiens terhubung (klien browser, bukan backend terpercaya).
+// Dipakai layar presenter & halaman voting sebagai indikator presence.
+function audienceCount(): number {
+  let n = 0;
+  for (const s of io.sockets.sockets) {
+    if (s.data?.trusted !== true) n += 1;
+  }
+  return n;
+}
+
+function broadcastPresence(): void {
+  const count = audienceCount();
+  io.emit("presence", { count, at: Date.now() });
+  console.log(`[presence] ${count} perangkat audiens tersambung`);
+}
+
 io.on("connection", (socket) => {
   const trusted = socket.handshake.auth?.role === "presenter-server";
+  socket.data.trusted = trusted;
   console.log(
-    `[socket] ${trusted ? "SERVER" : "klien"} terhubung: ${socket.id} (total ${io.engine.clientsCount})`,
+    `[socket] ${trusted ? "SERVER" : "klien"} terhubung: ${socket.id} (audiens ${audienceCount()})`,
   );
+
+  // Sinkron awal untuk socket ini + siaran ke semua (jumlah berubah).
+  socket.emit("presence", { count: audienceCount(), at: Date.now() });
+  broadcastPresence();
 
   if (trusted) {
     // Hanya backend Next.js yang boleh memicu siaran.
@@ -64,6 +85,8 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", (reason) => {
     console.log(`[socket] putus: ${socket.id} (${reason})`);
+    // Hitung ulang setelah socket keluar dari daftar — sedikit delay agar aman.
+    setTimeout(broadcastPresence, 50);
   });
 });
 

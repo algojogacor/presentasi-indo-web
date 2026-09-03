@@ -278,6 +278,47 @@ html.contrast-boost .ambient-word {
   transition: width 0.7s cubic-bezier(0.22, 0.9, 0.3, 1);
 }
 
+/* Bar suara mayoritas saat reveal — gradasi emas + denyut pelan. */
+.pollbar-winner {
+  background-image: linear-gradient(
+    90deg,
+    var(--color-ember) 0%,
+    #d9b45a 100%
+  );
+  box-shadow: 0 0 14px rgba(232, 160, 32, 0.35);
+  animation: pollWinnerPulse 1.6s ease-in-out infinite;
+}
+@keyframes pollWinnerPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba(232, 160, 32, 0.25);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(232, 160, 32, 0.5);
+  }
+}
+
+/* Bar kunci jawaban saat reveal — emas penuh tanpa denyut (tanpa mayoritas). */
+.pollbar-correct {
+  background-color: var(--color-ember);
+  box-shadow: 0 0 10px rgba(232, 160, 32, 0.3);
+}
+
+/* Statistik benar besar saat reveal — angka mengecil masuk + garis bawah. */
+.reveal-stat {
+  animation: revealStat 0.6s cubic-bezier(0.2, 0.9, 0.25, 1);
+}
+@keyframes revealStat {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.94);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 /* ---------- HUD ---------- */
 .hud-msg {
   animation: hudIn 0.22s ease-out;
@@ -373,7 +414,9 @@ html.contrast-boost .vignette {
   .scanline,
   .ambient-word,
   .count-flash,
-  .gate-bracket {
+  .gate-bracket,
+  .pollbar-winner,
+  .reveal-stat {
     animation: none !important;
   }
 }

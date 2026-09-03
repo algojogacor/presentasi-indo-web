@@ -34,6 +34,7 @@ function QuestionCard({
   // Total suara kelas — pemantauan hidup setelah menjawab:
   // socket real-time (instan) + polling lambat 8 detik sebagai fallback.
   const [liveTotal, setLiveTotal] = useState<number | null>(null);
+  const [peers, setPeers] = useState(0);
   useEffect(() => {
     if (state !== "done") return;
     let stopped = false;
@@ -74,6 +75,9 @@ function QuestionCard({
       );
       sock.on("votes:reset", () => {
         if (!stopped) setLiveTotal(0);
+      });
+      sock.on("presence", (p: { count: number }) => {
+        if (!stopped) setPeers(p.count);
       });
     } catch {
       sock = null;
@@ -191,6 +195,9 @@ function QuestionCard({
                 {liveTotal}
               </span>{" "}
               SUARA MASUK DARI SELURUH KELAS
+              {peers > 0 && (
+                <span className="text-paper/55"> · {peers} TERHUBUNG</span>
+              )}
             </p>
           )}
         </div>
@@ -217,6 +224,36 @@ function QuestionCard({
 export default function VotingPage() {
   const [q2Open, setQ2Open] = useState(false);
   const [answered, setAnswered] = useState({ q1: false, q2: false });
+  // Presence — berapa perangkat kelas tersambung (socket, instan).
+  const [online, setOnline] = useState(0);
+
+  useEffect(() => {
+    let disposed = false;
+    let sock: ReturnType<typeof io> | null = null;
+    try {
+      sock = io("/?XTransformPort=3030", {
+        path: "/",
+        transports: ["websocket", "polling"],
+        reconnection: true,
+        reconnectionAttempts: 8,
+        reconnectionDelay: 2500,
+        timeout: 5000,
+        forceNew: true,
+      });
+      sock.on("presence", (p: { count: number }) => {
+        if (!disposed) setOnline(p.count);
+      });
+      sock.on("disconnect", () => {
+        if (!disposed) setOnline(0);
+      });
+    } catch {
+      sock = null;
+    }
+    return () => {
+      disposed = true;
+      sock?.disconnect();
+    };
+  }, []);
 
   // Pertanyaan kedua terbuka setelah pertanyaan pertama dijawab;
   // kartu penyelesaian muncul saat keduanya terekam.
@@ -250,6 +287,11 @@ export default function VotingPage() {
           <span className="flex items-center gap-2.5 font-code text-[10px] tracking-[0.25em] text-mute">
             <LiveDot />
             LIVE POLLING — ANATOMI KTI
+            {online > 0 && (
+              <span className="font-code text-[9px] tracking-[0.2em] text-paper/55">
+                · {online} TERHUBUNG
+              </span>
+            )}
           </span>
           <span className="font-code text-[9px] tracking-[0.15em] text-mute">
             KELOMPOK 6 · PDB 93
