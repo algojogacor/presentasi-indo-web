@@ -7,16 +7,20 @@ import { usePres } from "../context";
 import { Kicker } from "../atoms";
 import AmbientWords from "./s8/AmbientWords";
 import ConclusionStepper from "./s8/ConclusionStepper";
+import VerdictCards from "./s8/VerdictCards";
 import ClosingCallback from "./s8/ClosingCallback";
 import ThankYouCard from "./s8/ThankYouCard";
 import SessionRecap from "./s8/SessionRecap";
 
 /**
- * Section 8 — Penutup.
- * Step 0–3: empat simpulan (eksekutif, terpusat elegan dengan stepper 4 poin).
- * Step 4: kalimat pembuka kembali — kata "sudah" bernasib ember di tengah layar.
- * Step 5: kredit, terima kasih, tanya jawab — kalimat pembuka mengecil naik ke atas,
- *         disertai kartu terima kasih dan rekapitulasi sesi hidup di bawah.
+ * Section 8 — Penutup (BAB III Makalah).
+ *
+ * Alur Pacing Teatrikal (7 Langkah):
+ * - Step 0–3: Empat simpulan eksekutif (Sub-bab 3.1 Makalah).
+ * - Step 4: The Verdict — Dua Kartu Rekomendasi/Saran (Sub-bab 3.2 Makalah)
+ *           untuk Mahasiswa Peneliti & Institusi/Pengampu MKWU.
+ * - Step 5: Callback kalimat pembuka — kata "sudah" bernasib ember di tengah layar.
+ * - Step 6: Kredit, terima kasih, tanya jawab & rekapitulasi interaktif live.
  */
 export default function S8Closing({ step }: { step: number }) {
   const root = useRef<HTMLDivElement>(null);
@@ -24,9 +28,9 @@ export default function S8Closing({ step }: { step: number }) {
   const { hud } = usePres();
   const [recapDetail, setRecapDetail] = useState(false);
 
-  // [V] — rekap sesi: rincian per pertanyaan di layar tanya jawab (step 5).
+  // [V] — rekap sesi: rincian per pertanyaan di layar tanya jawab (step 6).
   useSectionKeys((key) => {
-    if (key === "v") {
+    if (key === "v" && step >= 6) {
       setRecapDetail((d) => {
         hud(
           d ? "REKAP SESI — RINGKAS [V]" : "REKAP SESI — RINCIAN [V]",
@@ -39,11 +43,11 @@ export default function S8Closing({ step }: { step: number }) {
     return false;
   });
 
-  // Kalimat callback (Hanya aktif eksklusif di Step 4):
+  // Kalimat callback (Hanya aktif eksklusif di Step 5):
   useIsoLayoutEffect(() => {
     const el = callbackRef.current;
     if (!el) return;
-    if (step === 4) {
+    if (step === 5) {
       gsap.to(el, {
         y: 0,
         scale: 1,
@@ -55,7 +59,7 @@ export default function S8Closing({ step }: { step: number }) {
     } else {
       gsap.to(el, {
         autoAlpha: 0,
-        y: step < 4 ? 24 : -24,
+        y: step < 5 ? 24 : -24,
         scale: 0.95,
         duration: 0.35,
         ease: "power2.in",
@@ -64,24 +68,34 @@ export default function S8Closing({ step }: { step: number }) {
     }
   }, [step]);
 
+  const kickerText =
+    step < 4
+      ? "PENUTUP · SIMPULAN"
+      : step === 4
+        ? "PENUTUP · REKOMENDASI"
+        : "PENUTUP";
+
   return (
     <div ref={root} className="absolute inset-0" data-testid="penutup">
       {/* Latar hidup — kata-kata anatomis mengapung nyaris tak terlihat */}
       <AmbientWords />
 
-      <Kicker act="08">PENUTUP</Kicker>
+      <Kicker act="08">{kickerText}</Kicker>
 
       {/* Simpulan — 4 poin dari Bab 3.1 Makalah (Step 0–3) */}
       <ConclusionStepper step={step} />
 
-      {/* Callback kalimat pembuka — "sudah" bernasib ember (Step 4 & 5) */}
+      {/* Putusan Saran — 2 kartu rekomendasi Sub-bab 3.2 Makalah (Step 4) */}
+      <VerdictCards active={step === 4} />
+
+      {/* Callback kalimat pembuka — "sudah" bernasib ember (Step 5) */}
       <ClosingCallback callbackRef={callbackRef} />
 
-      {/* Kredit & tanya jawab (Step 5) */}
-      {step >= 5 && <ThankYouCard />}
+      {/* Kredit & tanya jawab (Step 6) */}
+      {step >= 6 && <ThankYouCard />}
 
-      {/* Rekap sesi hidup selama tanya jawab (step 5) — [V] buka rincian */}
-      {step >= 5 && <SessionRecap detail={recapDetail} />}
+      {/* Rekap sesi hidup selama tanya jawab (step 6) — [V] buka rincian */}
+      {step >= 6 && <SessionRecap detail={recapDetail} />}
     </div>
   );
 }

@@ -216,30 +216,13 @@ export const NOTE_PLAN: StepNote[][] = [
     },
   ],
   [
-    // 08 PENUTUP — 6 langkah
-    {
-      t: "Simpulan 1 — Hakikat KTI",
-      c: "Pemecahan masalah dengan metode ilmiah yang dapat dipertanggungjawabkan.",
-    },
-    {
-      t: "Simpulan 2 — Tiga Rongga Anatomi",
-      c: "Bagian awal (preliminaries), inti (body text 5 bab), dan akhir (postliminaries).",
-    },
-    {
-      t: "Simpulan 3 — Fleksibilitas Wadah",
-      c: "Adaptasi struktur pada makalah, artikel jurnal IMRaD, hingga proposal PKM.",
-    },
-    {
-      t: "Simpulan 4 — Bahasa & Etika",
-      c: "Keharmonisan logika antarbab, EYD V, kalimat efektif, dan integritas sitasi.",
-    },
-    {
-      t: "Callback kalimat pembuka",
-      c: "'Hari ini kita SUDAH bedah anatominya' — beri penekanan pada kata SUDAH.",
-    },
-    {
-      t: "Terima kasih & tanya jawab",
-      c: "Buka sesi diskusi kelas PDB 93; rekap statistik sesi tampil di layar.",
-    },
+    // 08 PENUTUP — 7 langkah (4 Simpulan + 2 Saran + Callback + Tanya Jawab)
+    { t: "Simpulan 1 — Hakikat KTI", c: "Pemecahan masalah dengan metode ilmiah yang dapat dipertanggungjawabkan." },
+    { t: "Simpulan 2 — Tiga Rongga Anatomi", c: "Bagian awal (preliminaries), inti (body text 5 bab), dan akhir (postliminaries)." },
+    { t: "Simpulan 3 — Fleksibilitas Wadah", c: "Adaptasi struktur pada makalah, artikel jurnal IMRaD, hingga proposal PKM." },
+    { t: "Simpulan 4 — Bahasa & Etika", c: "Keharmonisan logika antarbab, EYD V, kalimat efektif, dan integritas sitasi." },
+    { t: "Putusan Saran & Rekomendasi", c: "Dua preskripsi: koherensi segitiga emas mahasiswa & praktikum penulisan jurnal MKWU." },
+    { t: "Callback Kalimat Pembuka", c: "'Hari ini kita SUDAH bedah anatominya' — beri penekanan pada kata SUDAH." },
+    { t: "Terima Kasih & Tanya Jawab", c: "Buka sesi diskusi kelas PDB 93; [V] untuk buka rincian statistik voting live." },
   ],
 ];

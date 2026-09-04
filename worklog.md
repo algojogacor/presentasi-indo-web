@@ -1463,6 +1463,41 @@ Work Log:
 Stage Summary:
 - Status: SELESAI & TERVERIFIKASI LIVE.
 
+---
+Task ID: 37
+Agent: main (Antigravity — Gemini 3.8 Flash High)
+Task: Implementasi The Verdict (Dua Kartu Rekomendasi/Saran Sub-bab 3.2) di Section 8
+
+Work Log:
+1. Konsep & Arsitektur:
+   - Mengintegrasikan Sub-bab 3.2 Saran dari makalah ke dalam Section 8 (PENUTUP) sebagai "Putusan Akhir / Rekomendasi Ilmiah" (The Verdict) bergaya vonis persidangan akademik.
+   - Menambah jumlah langkah Section 8 dari 6 menjadi 7 langkah:
+     * Step 0–3: Empat Simpulan Eksekutif (Sub-bab 3.1)
+     * Step 4 (BARU): The Verdict — Dua Kartu Rekomendasi (Sub-bab 3.2)
+     * Step 5: Callback Premis Pembuka ("...SUDAH bedah anatominya")
+     * Step 6: Terima Kasih & Rekap Sesi Live Interaktif
+2. Komponen & Visual VerdictCards:
+   - Membuat `src/components/presentation/sections/s8/VerdictCards.tsx` (214 baris):
+     * Kartu 1: Preskripsi I untuk Mahasiswa Peneliti — "Kawal Koherensi Segitiga Emas: Masalah, Pembahasan, dan Simpulan" disertai ikon geometris Segitiga Emas & aksen emas sudut.
+     * Kartu 2: Preskripsi II untuk Institusi & Pengampu MKWU — "Perluas Praktikum Penulisan Jurnal IMRaD dan Proposal Riset Baku" disertai ikon geometris Blueprint Pilar & aksen sudut.
+     * Animasi GSAP staggered entrance (root -> header -> kartu 1 -> kartu 2) dengan easing power3.out.
+     * Audio feedback: trigger `audio.thump()` (palu sidang) saat putusan terbuka.
+3. Penyesuaian Komponen & Catatan Presenter:
+   - `src/components/presentation/sections/S8Closing.tsx` (96 baris): mengintegrasikan `VerdictCards`, menggeser Step Callback ke step 5 dan ThankYou ke step 6.
+   - `src/components/presentation/context.ts`: Mengubah `SECTIONS[8].steps` dari 6 menjadi 7.
+   - `src/components/presentation/rehearsal.ts`: Mengubah `REHEARSAL_PLAN[8]` menjadi `[30, 30, 30, 30, 45, 40, 50]`.
+   - `src/lib/notesData.ts`: Menambahkan panduan penyampaian untuk Step 4 di `NOTE_PLAN[8]` (230 baris).
+4. Verifikasi Lokal:
+   - `bun x tsc --noEmit`: 0 error.
+   - `npm run lint`: 0 error, 1 pre-existing warning.
+   - `bun run build`: Berhasil 100% lokal (4.8s).
+   - Server dev lokal (`localhost:3000`) aktif dan merespons HTTP 200 OK.
+   - Audit baris: Semua file terkait tetap di bawah 250 baris.
+
+Stage Summary:
+- Status: SELESAI & TERVERIFIKASI LOKAL.
+
+
 
 
 
