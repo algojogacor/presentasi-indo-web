@@ -1534,6 +1534,48 @@ Work Log:
 Stage Summary:
 - Status: SELESAI & TERVERIFIKASI LOKAL (Browser subagent, tsc, lint, build).
 
+---
+Task ID: 39
+Agent: main (Antigravity — Gemini 3.8 Flash High)
+Task: Implementasi Lampiran Resmi KTI (Halaman Web Reader /makalah & Slide Appendix Section 8 Step 8)
+
+Work Log:
+1. Penyediaan Dokumen Asli:
+   - Menyalin berkas naskah asli `MAKALAH STRUKTUR KARYA ILMIAH KELOMPOK 6 PDB 93.docx` ke `public/documents/Makalah_Kelompok_6_PDB_93.docx` (243 KB) untuk unduhan langsung tanpa hambatan perizinan Google Drive.
+2. Pembuatan Halaman Publik Web Reader (/makalah):
+   - Membuat `src/data/paperContent.ts` untuk metadata terstruktur (Judul, Dosen, NIM, Pengantar, TOC).
+   - Membuat modular reader components:
+     * `src/components/paper/PaperHeader.tsx` (96 baris): Header, identitas lengkap, tombol unduh `.docx`, tombol kembali.
+     * `src/components/paper/BabOne.tsx` (73 baris): Naskah BAB I Pendahuluan (1.1–1.4).
+     * `src/components/paper/BabTwo.tsx` (165 baris): Naskah BAB II Pembahasan (2.1–2.4, Tabel 1 & 2).
+     * `src/components/paper/BabThree.tsx` (114 baris): Naskah BAB III Penutup (3.1, 3.2, 13 Pustaka lengkap).
+   - Membuat `src/app/makalah/page.tsx` (122 baris): Halaman e-reader responsif dengan sticky navigation bar antar-bab.
+3. Slide Presentasi Lampiran (Section 8 Step 8):
+   - Membuat `src/components/presentation/sections/s8/AppendixSlide.tsx` (128 baris):
+     * Header `POSTLIMINARIES · LAMPIRAN & DOKUMEN RESMI`.
+     * Kotak QR Code Emas beresolusi tinggi via `/api/qr?data=${origin}/makalah`.
+     * Kartu informasi berkas terverifikasi dan tombol aksi langsung (Buka Web Reader & Unduh .docx).
+4. Penyesuaian State & Arsitektur:
+   - `src/components/presentation/sections/S8Closing.tsx`: Mendukung 9 langkah (Step 8: AppendixSlide).
+   - `src/components/presentation/context.ts`: `SECTIONS[8].steps` diset ke 9.
+   - `src/components/presentation/rehearsal.ts`: `REHEARSAL_PLAN[8]` diset ke 9 langkah `[30, 30, 30, 30, 45, 40, 45, 60, 45]`.
+   - `src/lib/notesData.ts`: Menambahkan catatan cue card presenter untuk Step 8 Lampiran.
+   - `src/components/presentation/experience/useExperienceKeyboard.ts`: Menambahkan pintasan `[L]` untuk melompat langsung ke Section 8 Step 8.
+   - `src/components/presentation/experience/PresenterHud.tsx`: Menambahkan petunjuk `[L] LAMPIRAN` di bilah kontrol.
+5. Verifikasi & Pengujian:
+   - `bun x tsc --noEmit`: 0 error.
+   - `npm run lint`: 0 error.
+   - `bun run build`: Berhasil 100% (halaman `/makalah` prerendered static).
+   - Pengujian browser subagent:
+     * `http://localhost:3000/makalah` berhasil memuat seluruh teks naskah dan navigasi bab.
+     * Tombol `L` di presentasi langsung melompat ke slide Lampiran Step 8.
+     * QR Code emas dan tautan berkas tampil dengan resolusi tajam.
+   - Audit baris kode: Seluruh file baru dan yang dimodifikasi tetap < 250 baris.
+
+Stage Summary:
+- Status: SELESAI & TERVERIFIKASI LOKAL (Browser subagent, tsc, lint, build).
+
+
 
 
 

@@ -12,16 +12,18 @@ import ClosingCallback from "./s8/ClosingCallback";
 import ThankYouCard from "./s8/ThankYouCard";
 import SessionRecap from "./s8/SessionRecap";
 import PostliminariesSlide from "./s8/PostliminariesSlide";
+import AppendixSlide from "./s8/AppendixSlide";
 
 /**
  * Section 8 — Penutup (BAB III Makalah).
  *
- * Alur Pacing Teatrikal (8 Langkah):
+ * Alur Pacing Teatrikal (9 Langkah):
  * - Step 0–3: Empat simpulan eksekutif (Sub-bab 3.1 Makalah).
  * - Step 4: The Verdict — Dua Kartu Rekomendasi/Saran (Sub-bab 3.2 Makalah).
  * - Step 5: Callback kalimat pembuka — kata "sudah" bernasib ember di tengah layar.
  * - Step 6: Kredit, terima kasih, tanya jawab & rekapitulasi interaktif live.
  * - Step 7: Postliminaries — Lembaran Daftar Pustaka Lengkap (13 Rujukan Baku).
+ * - Step 8: Postliminaries — Lampiran & Naskah Lengkap (QR Code + Dokumen Asli).
  */
 export default function S8Closing({ step }: { step: number }) {
   const root = useRef<HTMLDivElement>(null);
@@ -76,7 +78,9 @@ export default function S8Closing({ step }: { step: number }) {
         ? "PENUTUP · REKOMENDASI"
         : step === 7
           ? "PENUTUP · POSTLIMINARIES"
-          : "PENUTUP";
+          : step === 8
+            ? "PENUTUP · LAMPIRAN"
+            : "PENUTUP";
 
   return (
     <div ref={root} className="absolute inset-0" data-testid="penutup">
@@ -102,6 +106,9 @@ export default function S8Closing({ step }: { step: number }) {
 
       {/* Postliminaries — Daftar Pustaka Lengkap 13 Rujukan (Step 7) */}
       <PostliminariesSlide active={step === 7} />
+
+      {/* Postliminaries — Lampiran Resmi & Dokumen Asli (Step 8) */}
+      {step === 8 && <AppendixSlide />}
     </div>
   );
 }

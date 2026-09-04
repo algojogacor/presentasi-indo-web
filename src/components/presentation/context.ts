@@ -35,5 +35,5 @@ export const SECTIONS: { label: string; steps: number }[] = [
   { label: "SESI INTERAKTIF", steps: 5 },
   { label: "VARIASI KTI", steps: 6 },
   { label: "KAIDAH & ETIKA", steps: 3 },
-  { label: "PENUTUP", steps: 8 },
+  { label: "PENUTUP", steps: 9 },
 ];

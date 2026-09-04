@@ -14,7 +14,7 @@ export const REHEARSAL_PLAN: number[][] = [
   [20, 240, 80, 180, 80], // 05 SESI INTERAKTIF — polling live
   [40, 50, 50, 55, 50, 55], // 06 VARIASI KTI
   [70, 85, 85], // 07 KAIDAH & ETIKA
-  [30, 30, 30, 30, 45, 40, 45, 60], // 08 PENUTUP (8 langkah: 4 simpulan + 2 saran + callback + tanya jawab + postliminaries)
+  [30, 30, 30, 30, 45, 40, 45, 60, 45], // 08 PENUTUP (9 langkah: 4 simpulan + 2 saran + callback + tanya jawab + pustaka + lampiran)
 ];
 
 const actSum = (a: number[]) => a.reduce((s, x) => s + x, 0);

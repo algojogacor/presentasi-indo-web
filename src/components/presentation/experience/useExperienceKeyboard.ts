@@ -161,8 +161,14 @@ export function useExperienceKeyboard({
         return;
       }
       const lk = k.toLowerCase();
-      if (lk === "l" && savedPos && section === 0 && step === 0) {
-        resume();
+      if (lk === "l") {
+        if (savedPos && section === 0 && step === 0) {
+          resume();
+          return;
+        }
+        audio.tick();
+        hud("POSTLIMINARIES — LAMPIRAN & BERKAS [L]", "ember");
+        goto(8, 8);
         return;
       }
       if (lk === "h") {

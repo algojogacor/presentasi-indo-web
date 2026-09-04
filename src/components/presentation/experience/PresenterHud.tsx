@@ -109,7 +109,7 @@ export default function PresenterHud({
       )}
       {helpOn && (
         <div className="text-[9px] tracking-[0.2em] text-paper/30">
-          [SPACE] LANJUT · [P] PUSTAKA · [G]+# LOMPAT · [O] PETA · [N] CATATAN · [T] LATIHAN · [?] BANTUAN · [H] SEMBUNYI
+          [SPACE] LANJUT · [P] PUSTAKA · [L] LAMPIRAN · [G]+# LOMPAT · [O] PETA · [N] CATATAN · [T] LATIHAN · [?] BANTUAN
         </div>
       )}
     </div>
