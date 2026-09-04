@@ -1351,5 +1351,78 @@ Work Log:
 Stage Summary:
 - Status: SELESAI & TERVERIFIKASI.
 
+---
+Task ID: 34
+Agent: main (Antigravity — Gemini 3.8 Flash High)
+Task: Setup & Deployment ke Azure VM (20.214.143.187) & Domain presentasi.aryariap.my.id
+
+Work Log:
+1. Analisis & Koneksi:
+   - Verifikasi akses SSH ke Azure VM `azureuser@20.214.143.187` dengan SSH key.
+   - Periksa spesifikasi server: 2 vCPU AMD EPYC 7763, 1 GB RAM fisik, 8 GB swap, 12 GB disk bebas.
+2. Setup Lingkungan & Aplikasi:
+   - Mengklon repositori ke `/home/azureuser/presentasi-indo-web`.
+   - Menginstal Bun v1.4.1 dan symlink `/usr/local/bin/bun`.
+   - Menginstal dependensi (`bun install`), inisialisasi `.env` dengan SQLite database `DATABASE_URL="file:./dev.db"`, generate Prisma Client v6.19.2 (`bun run db:push`).
+   - Melakukan production build Next.js (`bun run build`).
+   - Menjalankan server aplikasi di port 3002 via PM2 process `presentasi` dan service real-time socket `live-notify` di port 3030 via PM2 process `presentasi-notify`.
+3. Konfigurasi Nginx & Let's Encrypt SSL:
+   - Membuat reverse proxy Nginx di `/etc/nginx/sites-available/presentasi` symlink ke `sites-enabled`.
+   - Konfigurasi HTTP redirect ke HTTPS dan WebSocket upgrade headers.
+   - Penanganan routing: 302 redirect untuk `/voting` ke `/#/voting` dan `/results` ke `/#/results`.
+   - Konfigurasi map untuk parameter `?XTransformPort=3030` agar request WebSocket audiens dan presenter langsung diteruskan ke mini-service `live-notify` port 3030.
+   - Mengambil dan menginstal sertifikat SSL otomatis Let's Encrypt melalui Certbot untuk domain `presentasi.aryariap.my.id`.
+4. Verifikasi:
+   - `curl.exe -I https://presentasi.aryariap.my.id` -> HTTP 200 OK.
+   - `curl.exe -IL https://presentasi.aryariap.my.id/voting` -> 302 -> `/#/voting` -> HTTP 200 OK.
+   - Validasi API Voting: Test submit vote opsi B pada pertanyaan 1, verifikasi total bertambah 1 di `/api/results?question=1`, lalu reset via `/api/reset`.
+   - Verifikasi user: User berhasil mengakses langsung dari perangkat eksternal.
+
+Stage Summary:
+- Status: SELESAI & TERVERIFIKASI.
+
+---
+Task ID: 35
+Agent: main (Antigravity — Gemini 3.8 Flash High)
+Task: Implementasi Film Credit Roll Sinematik pada Section 0 Opening (Dosen Pengampu & Tim Penyusun)
+
+Work Log:
+1. Perancangan & Arsitektur:
+   - Mengintegrasikan step baru di Section 0 (menjadi 3 langkah: Step 0 Ouverture, Step 1 Judul Utama & Scramble, Step 2 Film Credit Roll).
+   - Menghapus kredit teks statis lama ("KELOMPOK 6 — PDB 93" & "UNIVERSITAS AIRLANGGA · 2026") dari Step 1.
+   - Memposisikan Film Credit Roll di bawah subtitle "Karya Tulis Ilmiah", dengan elevasi judul utama (`y: -24px`) saat masuk Step 2 agar tata letak tetap proporsional dan tidak cramped.
+2. Data & Komponen Modular:
+   - Membuat `src/components/presentation/sections/s0/creditData.ts` memuat data dosen pengampu (Drs. Eddy Sugiri, M.Hum. & NIP), 6 anggota kelompok terbagi dalam 2 kolom (Akbar Arya Maulana, Arya Rizky Ardhi Pratama, Dinda Naura Firdausy di kiri; Izzatul Hayati, Muhammad Adyan Faqih Huddin, Salma Nur Khasanah di kanan) beserta NIM, dan label program studi PDB 93 UNAIR 2026.
+   - Membuat komponen `src/components/presentation/sections/s0/FilmCreditRoll.tsx` yang menangani render dan timeline GSAP.
+3. Efek Visual & Animasi GSAP:
+   - Menambahkan CSS classes di `src/app/globals.css` untuk background-clip text shimmer gradient:
+     * Dosen: Gold shimmer sweep dari `#8B6914` ke `#E8A020` ke `#FFB740` ke `#E8A020`.
+     * Anggota: Silver-white shimmer sweep dari `#6B6B7A` ke `#F0EDE8` ke `#6B6B7A`.
+     * Clean-up style `credit-settled-dosen` dan `credit-settled-member` saat animasi tuntas atau dalam state `settled`.
+   - Timeline GSAP berurutan:
+     * 0.15s: Label "DIBAWAH BIMBINGAN"
+     * 0.30s: Nama Dosen + NIP (gold shimmer sweep)
+     * 0.48s: Separator line horizontal amber tipis
+     * 0.62s: Label "DISUSUN OLEH"
+     * 0.76s - 1.51s: 6 Nama anggota muncul satu per satu dengan interval 0.15s disertai text shimmer
+     * 1.75s: Program studi footer di bagian paling bawah
+   - Mendaftarkan timeline ke `registerTimeline(tl)` agar tombol Space dapat mempercepat sekuens jika diperlukan.
+4. Penyesuaian State & Catatan:
+   - `src/components/presentation/context.ts`: Mengubah `SECTIONS[0].steps` dari 2 menjadi 3.
+   - `src/lib/notes.ts`: Memperbarui `NOTE_PLAN[0]` menjadi 3 langkah presentasi.
+   - `src/components/presentation/rehearsal.ts`: Mengatur durasi latihan Section 0 menjadi `[0, 30, 45]`.
+   - `src/components/presentation/sections/S0Opening.tsx`: Mengintegrasikan `FilmCreditRoll`, mengisolasi Step 1 dan Step 2.
+5. Verifikasi & Deployment:
+   - `bun x tsc --noEmit`: 0 error.
+   - `npm run lint`: 0 error, 1 pre-existing warning (font layout).
+   - `bun run build`: Berhasil 100% lokal (3.9s).
+   - Commit & push ke GitHub (`69283c4`).
+   - Git pull, build, dan PM2 restart pada server Azure VM `presentasi.aryariap.my.id` berhasil.
+   - Audit baris: Semua file < 250 baris (`FilmCreditRoll.tsx`: 214 baris, `S0Opening.tsx`: 199 baris, `notes.ts`: 247 baris, `creditData.ts`: 32 baris).
+
+Stage Summary:
+- Status: SELESAI & TERVERIFIKASI LIVE.
+
+
 
 
