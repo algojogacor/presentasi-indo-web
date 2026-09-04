@@ -8,7 +8,7 @@ import { SECTIONS } from "./context";
 export const REHEARSAL_PLAN: number[][] = [
   [0, 30, 45], // 00 OUVERTURE — pembuka + judul + kredit roll
   [30, 15, 645, 60], // 01 GUEST LECTURER — intro gelap + spotlight, tirai tampak, video, penutup
-  [40, 40, 50, 50], // 02 LATAR BELAKANG
+  [35, 35, 35, 35, 45, 45, 45, 55], // 02 LATAR BELAKANG & RUMUSAN MASALAH (8 langkah)
   [45, 45, 45, 45, 45, 45, 45, 45], // 03 HAKIKAT & KARAKTERISTIK
   [35, 45, 50, 55, 55, 60, 60, 65, 55], // 04 ANATOMY THEATER
   [20, 240, 80, 180, 80], // 05 SESI INTERAKTIF — polling live

@@ -29,7 +29,7 @@ export function usePres(): PresApi {
 export const SECTIONS: { label: string; steps: number }[] = [
   { label: "OUVERTURE", steps: 3 },
   { label: "GUEST LECTURER", steps: 4 },
-  { label: "LATAR BELAKANG", steps: 4 },
+  { label: "LATAR BELAKANG", steps: 8 },
   { label: "HAKIKAT & KARAKTERISTIK", steps: 8 },
   { label: "ANATOMY THEATER", steps: 9 },
   { label: "SESI INTERAKTIF", steps: 5 },

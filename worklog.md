@@ -1423,6 +1423,47 @@ Work Log:
 Stage Summary:
 - Status: SELESAI & TERVERIFIKASI LIVE.
 
+---
+Task ID: 36
+Agent: main (Antigravity — Gemini 3.8 Flash High)
+Task: Implementasi The Docket (Rumusan Masalah, Tujuan & Manfaat) di Section 2 dengan Pacing Teatrikal & Stack Dimming
+
+Work Log:
+1. Konsep & Arsitektur Teatrikal:
+   - Mengubah Section 2 (LATAR BELAKANG) menjadi 8 langkah teatrikal:
+     * Step 0: Pernyataan kunci kerangka logis KTI (Sub-bab 1.1)
+     * Step 1–3: Tiga Fakta Urgensi (Komunikasi Akademik, Hambatan Mahasiswa, Kerangka Logis)
+     * Step 4–7: The Docket — 4 Rumusan Masalah & Mandat Tujuan (Sub-bab 1.2 & 1.3) bergaya dakwaan hukum akademis:
+       - Romawi I (Hakikat & Karakteristik) -> Roadmap: ACT.03
+       - Romawi II (Struktur Anatomi Umum Prelim/Body/Post) -> Roadmap: ACT.04
+       - Romawi III (Variasi Sistematika Makalah/Jurnal/Skripsi/PKM) -> Roadmap: ACT.06
+       - Romawi IV (Kaidah Kebahasaan & Etika) -> Roadmap: ACT.07
+       - Step 7 juga mengekspos sintesis Sub-bab 1.4 Manfaat Penulisan (Teoritis & Praktis).
+2. Koreografi Visual (Opsi A — The Cumulative Docket / Stack Dimming):
+   - Masing-masing pertanyaan muncul satu per satu dengan nomor Romawi berbingkai emas, pertanyaan besar dalam Cormorant Garamond italic dengan tanda tanya beraksen emas.
+   - Mandat Tujuan (Research Mandate) melekat langsung di bawah pertanyaan sebagai target pembuktian ilmiah (`TARGET MANDAT: ...`).
+   - Saat melangkah ke pertanyaan berikutnya, pertanyaan sebelumnya meredup (opacity: 0.24, scale: 0.985, grayscale) memusatkan sorotan tunggal pada dakwaan yang sedang dibacakan.
+   - Audio feedback: integrasi `audio.thump()` (dentum sub-bass gavel sidang) pada tiap transisi langkah 4..7.
+3. Modularisasi & Pemecahan File (< 250 Baris):
+   - Membuat `src/components/presentation/sections/s2/docketData.ts` (86 baris): data terpusat Bab I makalah.
+   - Membuat `src/components/presentation/sections/s2/LatarFacts.tsx` (96 baris): sub-komponen Step 0–3 dengan transisi keluar halus saat step >= 4.
+   - Membuat `src/components/presentation/sections/s2/TheDocket.tsx` (214 baris): sub-komponen Step 4–7 dengan stack dimming, audio thump, dan manfaat penulisan.
+   - Refactor `src/components/presentation/sections/S2Latar.tsx` (37 baris): orchestrator bersih antara LatarFacts dan TheDocket.
+   - Refactor `src/lib/notes.ts` (21 baris) dengan memisahkan data ke `src/lib/notesData.ts` (247 baris) agar tidak ada file catatan yang melampaui batas 250 baris.
+   - Update `src/components/presentation/context.ts`: `SECTIONS[2].steps` diubah dari 4 menjadi 8.
+   - Update `src/components/presentation/rehearsal.ts`: durasi latihan Section 2 diubah menjadi `[35, 35, 35, 35, 45, 45, 45, 55]`.
+4. Verifikasi & Deployment:
+   - `bun x tsc --noEmit`: 0 error.
+   - `npm run lint`: 0 error, 1 pre-existing warning (font layout).
+   - `bun run build`: Berhasil 100% lokal (5.1s).
+   - Commit & push ke remote repository (`algojogacor/presentasi-indo-web`).
+   - Rebuild & restart PM2 di Azure VM (`presentasi.aryariap.my.id`).
+   - Audit baris: Seluruh 8 file terkait tetap < 250 baris.
+
+Stage Summary:
+- Status: SELESAI & TERVERIFIKASI LIVE.
+
+
 
 
 
