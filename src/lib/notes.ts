@@ -10,14 +10,18 @@ export interface StepNote {
 
 export const NOTE_PLAN: StepNote[][] = [
   [
-    // 00 OUVERTURE — 2 langkah
+    // 00 OUVERTURE — 3 langkah
     {
-      t: "Judul — atmosfer pembuka",
-      c: "Diam saat judul muncul; biarkan mata ruangan menyesuaikan ke layar.",
+      t: "Ouverture — atmosfer pembuka",
+      c: "Layar pembuka teater. Tekan Space untuk membunyikan sub-bass dan judul.",
     },
     {
-      t: "Kredit & gerbang",
-      c: "Sebut Kelompok 6 · PDB 93 singkat, langsung Space ke video.",
+      t: "Judul Utama — penegasan karya",
+      c: "Penegasan judul 'ANATOMI Karya Tulis Ilmiah'. Tekan Space untuk membuka kredit.",
+    },
+    {
+      t: "Kredit Tim & Dosen Pembimbing",
+      c: "Sebut Drs. Eddy Sugiri, M.Hum. & tim, lalu Space masuk ke video narasumber.",
     },
   ],
   [

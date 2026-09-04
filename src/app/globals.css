@@ -686,3 +686,49 @@ html.contrast-boost .act-wipe {
     animation: none !important;
   }
 }
+
+/* ---------- Section 0: Film Credit Roll Shimmer Effect ---------- */
+.credit-shimmer-dosen {
+  background: linear-gradient(
+    90deg,
+    #8B6914 0%,
+    #E8A020 30%,
+    #FFB740 50%,
+    #E8A020 70%,
+    #8B6914 100%
+  );
+  background-size: 250% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.credit-shimmer-member {
+  background: linear-gradient(
+    90deg,
+    #6B6B7A 0%,
+    #F0EDE8 50%,
+    #6B6B7A 100%
+  );
+  background-size: 250% 100%;
+  background-position: 100% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+}
+
+.credit-settled-dosen {
+  color: #E8A020 !important;
+  -webkit-text-fill-color: #E8A020 !important;
+  background: none !important;
+}
+
+.credit-settled-member {
+  color: #F0EDE8 !important;
+  -webkit-text-fill-color: #F0EDE8 !important;
+  background: none !important;
+}
+

@@ -7,6 +7,7 @@ import { audioManager } from "@/lib/audioManager";
 import { usePres } from "../context";
 import { useIsoLayoutEffect, useSectionKeys } from "../hooks";
 import { SplitChars } from "../atoms";
+import FilmCreditRoll from "./s0/FilmCreditRoll";
 
 const SENTENCE =
   "Setiap karya ilmiah punya tubuh. Hari ini kita bedah anatominya.";
@@ -14,6 +15,7 @@ const SENTENCE =
 export default function S0Opening({ step }: { step: number }) {
   const { settled, registerTimeline, setStep } = usePres();
   const root = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
   const ouvertureRef = useRef<HTMLDivElement>(null);
   const [ouStarted, setOuStarted] = useState(false);
   const ouTlRef = useRef<gsap.core.Timeline | null>(null);
@@ -21,7 +23,6 @@ export default function S0Opening({ step }: { step: number }) {
   // Mulai sekuens Ouverture setelah ada interaksi (Space/klik)
   const startOuverture = useCallback(() => {
     if (ouStarted) {
-      // Jika sudah berjalan dan ditekan lagi -> percepat langsung ke Step 1
       ouTlRef.current?.progress(1);
       return;
     }
@@ -49,7 +50,7 @@ export default function S0Opening({ step }: { step: number }) {
     tl.to(kicker, { y: 0, autoAlpha: 1, duration: 1.1, ease: "power2.out" }, 0.2);
     tl.to(line, { y: 0, autoAlpha: 1, duration: 1.0, ease: "power2.out" }, 0.45);
     tl.to(title, { y: 0, autoAlpha: 1, duration: 1.3, ease: "power3.out" }, 0.7);
-    tl.to({}, { duration: 6.5 }); // tahan menikmati ambiens teater sebelum pertunjukan
+    tl.to({}, { duration: 6.5 }); // jeda ambiens teater sebelum pertunjukan
     tl.to(el, { autoAlpha: 0, duration: 1.2, ease: "power2.inOut" });
   }, [ouStarted, setStep]);
 
@@ -67,7 +68,6 @@ export default function S0Opening({ step }: { step: number }) {
     if (!q) return;
     gsap.set(q.querySelector(".s0-sentence"), { autoAlpha: 0 });
     gsap.set(q.querySelectorAll("[data-char]"), { yPercent: 112, autoAlpha: 0 });
-    gsap.set(q.querySelectorAll(".s0-credit"), { autoAlpha: 0, y: 16 });
   }, []);
 
   // Inisialisasi visual Ouverture (Step 0)
@@ -92,12 +92,15 @@ export default function S0Opening({ step }: { step: number }) {
     if (!q) return;
     const sentence = q.querySelector<HTMLElement>(".s0-sentence")!;
     const chars = q.querySelectorAll<HTMLElement>("[data-char]");
-    const credits = q.querySelectorAll<HTMLElement>(".s0-credit");
+    const titleEl = titleRef.current;
+
+    if (titleEl) {
+      gsap.to(titleEl, { y: 0, duration: 0.5, ease: "power2.out" });
+    }
 
     if (settled) {
-      gsap.set(sentence, { autoAlpha: 0.22, top: "12%" });
+      gsap.set(sentence, { autoAlpha: 0.22, top: "10%" });
       gsap.set(chars, { yPercent: 0, autoAlpha: 1 });
-      gsap.set(credits, { autoAlpha: 1, y: 0 });
       sentence.textContent = SENTENCE;
       registerTimeline(null);
       return;
@@ -121,7 +124,7 @@ export default function S0Opening({ step }: { step: number }) {
     tl.to({}, { duration: 1.2 });
     tl.to(sentence, {
       autoAlpha: 0.22,
-      top: "12%",
+      top: "10%",
       duration: 0.9,
       ease: "power2.inOut",
     });
@@ -132,12 +135,6 @@ export default function S0Opening({ step }: { step: number }) {
       "<0.35",
     );
     tl.add(() => audio.thump(), "<"); // Sub-bass saat judul terlahir
-    tl.fromTo(
-      credits,
-      { autoAlpha: 0, y: 16 },
-      { autoAlpha: 1, y: 0, duration: 0.7, stagger: 0.12 },
-      "-=0.3",
-    );
     tl.add(() => registerTimeline(null));
     registerTimeline(tl);
 
@@ -148,10 +145,33 @@ export default function S0Opening({ step }: { step: number }) {
     };
   }, [step, settled, registerTimeline]);
 
+  // Posisi judul saat Step 2 (naik sedikit agar kredit lega)
+  useIsoLayoutEffect(() => {
+    if (step !== 2) return;
+    const q = root.current;
+    if (!q) return;
+    const sentence = q.querySelector<HTMLElement>(".s0-sentence")!;
+    const chars = q.querySelectorAll<HTMLElement>("[data-char]");
+    const titleEl = titleRef.current;
+
+    // Pastikan judul dan kalimat pembuka selalu settled di step 2
+    gsap.set(sentence, { autoAlpha: 0.22, top: "10%" });
+    gsap.set(chars, { yPercent: 0, autoAlpha: 1 });
+    sentence.textContent = SENTENCE;
+
+    if (titleEl) {
+      if (settled) {
+        gsap.set(titleEl, { y: -24 });
+      } else {
+        gsap.to(titleEl, { y: -24, duration: 0.7, ease: "power2.out" });
+      }
+    }
+  }, [step, settled]);
+
   return (
     <div
       ref={root}
-      className="absolute inset-0 flex flex-col items-center justify-center px-[8vw]"
+      className="absolute inset-0 flex flex-col items-center justify-center px-[6vw]"
     >
       {step === 0 && (
         <div
@@ -180,23 +200,20 @@ export default function S0Opening({ step }: { step: number }) {
         className="s0-sentence absolute top-[38%] left-1/2 w-[72vw] -translate-x-1/2 text-center font-display text-[2.5vw] italic leading-snug text-paper/90 opacity-0"
       />
 
-      <h1 className="text-center leading-[0.95]">
-        <span className="block font-display font-semibold text-[9vw] tracking-[0.02em] text-paper">
+      <h1 ref={titleRef} className="text-center leading-[0.95] transition-transform">
+        <span className="block font-display font-semibold text-[clamp(3.8rem,7.5vw,7.8rem)] tracking-[0.02em] text-paper">
           <SplitChars text="ANATOMI" />
         </span>
-        <span className="mt-[0.6vw] block font-display italic font-medium text-[3.1vw] text-paper/85">
+        <span className="mt-[0.5vw] block font-display italic font-medium text-[clamp(1.6rem,2.7vw,2.9rem)] text-paper/85">
           <SplitChars text="Karya Tulis Ilmiah" />
         </span>
       </h1>
 
-      <div className="mt-[4.5vw] flex flex-col items-center gap-[0.9vw]">
-        <p className="s0-credit font-code text-[11px] tracking-[0.45em] text-paper/70 opacity-0">
-          KELOMPOK 6 — PDB 93
-        </p>
-        <p className="s0-credit font-code text-[10px] tracking-[0.3em] text-mute opacity-0">
-          UNIVERSITAS AIRLANGGA · 2026
-        </p>
-      </div>
+      <FilmCreditRoll
+        active={step === 2}
+        settled={settled}
+        registerTimeline={registerTimeline}
+      />
     </div>
   );
 }

@@ -6,7 +6,7 @@
 import { SECTIONS } from "./context";
 
 export const REHEARSAL_PLAN: number[][] = [
-  [0, 60], // 00 OUVERTURE — judul + kredit
+  [0, 30, 45], // 00 OUVERTURE — pembuka + judul + kredit roll
   [30, 15, 645, 60], // 01 GUEST LECTURER — intro gelap + spotlight, tirai tampak, video, penutup
   [40, 40, 50, 50], // 02 LATAR BELAKANG
   [45, 45, 45, 45, 45, 45, 45, 45], // 03 HAKIKAT & KARAKTERISTIK
