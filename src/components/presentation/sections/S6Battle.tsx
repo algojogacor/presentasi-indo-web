@@ -1,76 +1,12 @@
 "use client";
 
 import { useRef } from "react";
-import { gsap } from "@/lib/gsap";
-import { BookOpen, Newspaper, GraduationCap, Rocket } from "lucide-react";
 import { usePres } from "../context";
 import { useIsoLayoutEffect, useSectionKeys } from "../hooks";
 import { Kicker, BigNumeral } from "../atoms";
-
-interface Row {
-  k: string;
-  v: string;
-  hot?: boolean;
-}
-
-interface Card {
-  title: string;
-  sub: string;
-  icon: typeof BookOpen;
-  rows: Row[];
-  note: string;
-}
-
-const CARDS: Card[] = [
-  {
-    title: "Makalah",
-    sub: "TERM PAPER · TUGAS KULIAH",
-    icon: BookOpen,
-    rows: [
-      { k: "FORMAT STRUKTUR", v: "Bab I (Pendahuluan) → Bab II (Pembahasan) → Bab III (Penutup)" },
-      { k: "PANJANG", v: "Ringkas (10–20 halaman)" },
-      { k: "FOKUS", v: "Kajian konseptual atau isu spesifik dalam perkuliahan" },
-      { k: "CIRI KUNCI", v: "Sistematika 3 bab sederhana, berbasis studi pustaka (Farida, 2024)" },
-    ],
-    note: "Ringkas 10–20 halaman untuk tugas kuliah dengan struktur Bab I–III.",
-  },
-  {
-    title: "Artikel Jurnal",
-    sub: "FORMAT IMRAD · PUBLIKASI",
-    icon: Newspaper,
-    rows: [
-      { k: "FORMAT STRUKTUR", v: "Format IMRaD (Introduction, Methods, Results, and Discussion)", hot: true },
-      { k: "PANJANG", v: "Solid (4.000–7.000 kata)" },
-      { k: "FOKUS", v: "Sangat memprioritaskan keterbaruan (novelty)", hot: true },
-      { k: "CIRI KUNCI", v: "Tanpa bab Romawi; seleksi ketat peer review (Fitriani et al., 2023)" },
-    ],
-    note: "Solid dan padat IMRaD — mengutamakan novelty untuk publikasi bereputasi.",
-  },
-  {
-    title: "Skripsi / Tesis",
-    sub: "LAPORAN PENELITIAN · KELULUSAN",
-    icon: GraduationCap,
-    rows: [
-      { k: "FORMAT STRUKTUR", v: "Format 5 Bab Lengkap (Pendahuluan, Teori, Metode, Hasil, Penutup)" },
-      { k: "PANJANG", v: "Menyeluruh & mendalam (puluhan hingga ratusan halaman)", hot: true },
-      { k: "FOKUS", v: "Penyajian metodologi dan instrumen secara rinci" },
-      { k: "CIRI KUNCI", v: "Karya mandiri dengan data empiris dan lampiran instrumen lengkap" },
-    ],
-    note: "Format 5 bab lengkap menyeluruh untuk pertanggungjawaban gelar akademik.",
-  },
-  {
-    title: "Proposal PKM",
-    sub: "KOMPETISI HIBAH KEMENDIKBUD",
-    icon: Rocket,
-    rows: [
-      { k: "FORMAT STRUKTUR", v: "Pendahuluan → Tinjauan Pustaka → Metode Pelaksanaan → Biaya & Jadwal" },
-      { k: "PANJANG", v: "Ketat batasan halaman (maksimal 10 halaman isi inti)", hot: true },
-      { k: "FOKUS", v: "Format administratif pokok sesuai Pedoman PKM", hot: true },
-      { k: "CIRI KUNCI", v: "Proposal aksi berorientasi luaran, patuh pada aturan Simbelmawa (Dikti, 2023)" },
-    ],
-    note: "Ketat maksimal 10 halaman isi inti — format administratif pokok Pedoman PKM.",
-  },
-];
+import { CARDS } from "@/data/battle";
+import BattleCard from "./s6/BattleCard";
+import { animateBattleCards } from "./s6/animations";
 
 /**
  * Section 6 — Battle Cards.
@@ -97,72 +33,7 @@ export default function S6Battle({ step }: { step: number }) {
   });
 
   useIsoLayoutEffect(() => {
-    const q = root.current;
-    if (!q) return;
-    const cards = Array.from(q.querySelectorAll<HTMLElement>(".battle-card"));
-
-    cards.forEach((el, i) => {
-      let xPct: number;
-      let scale: number;
-      let opacity: number;
-      let z = 1;
-      if (compare) {
-        xPct = (i - 1.5) * 112 - 50;
-        scale = 0.86;
-        opacity = 1;
-      } else if (selIdx >= 0) {
-        if (i === selIdx) {
-          xPct = -50;
-          scale = 1.42;
-          opacity = 1;
-          z = 10;
-        } else {
-          const d = i - selIdx;
-          const mag = Math.min(Math.abs(d), 2.2) * 108;
-          xPct = (d < 0 ? -mag : mag) - 50;
-          scale = 0.55;
-          opacity = 0.28;
-        }
-      } else {
-        xPct = (i - 1.5) * 108 - 50;
-        scale = 1;
-        opacity = 1;
-      }
-      gsap.to(el, {
-        xPercent: xPct,
-        yPercent: -50,
-        scale,
-        opacity,
-        zIndex: z,
-        duration: settled ? 0 : 0.85,
-        ease: "power3.inOut",
-        overwrite: "auto",
-      });
-
-      const rows = el.querySelectorAll<HTMLElement>(".card-row");
-      const note = el.querySelector<HTMLElement>(".card-note");
-      const showRows = compare || selIdx >= 0;
-      if (settled) {
-        gsap.set(rows, { autoAlpha: showRows ? 1 : 0, y: 0 });
-        if (note) gsap.set(note, { autoAlpha: selIdx === i ? 1 : 0 });
-        return;
-      }
-      if (showRows) {
-        gsap.fromTo(
-          rows,
-          { autoAlpha: 0, y: 10 },
-          { autoAlpha: 1, y: 0, duration: 0.45, stagger: 0.06, delay: 0.3, overwrite: "auto" },
-        );
-      } else {
-        gsap.to(rows, { autoAlpha: 0, duration: 0.2, overwrite: "auto" });
-      }
-      if (note)
-        gsap.to(note, {
-          autoAlpha: selIdx === i ? 1 : 0,
-          duration: settled ? 0 : 0.4,
-          delay: 0.35,
-        });
-    });
+    animateBattleCards(root.current, selIdx, compare, settled);
   }, [step, selIdx, compare, settled]);
 
   return (
@@ -178,57 +49,12 @@ export default function S6Battle({ step }: { step: number }) {
 
       <div className="absolute inset-0 pt-[16vh]">
         {CARDS.map((c, i) => (
-          <article
+          <BattleCard
             key={c.title}
-            data-card={i}
-            className="battle-card absolute top-1/2 left-1/2 h-[54vh] w-[20vw] overflow-hidden rounded-[3px] border border-edge bg-surface/85 p-[1.3vw] opacity-0 backdrop-blur-[2px]"
-            style={{ willChange: "transform" }}
-            aria-label={`Kartu ${c.title}`}
-          >
-            <header className="flex items-start justify-between gap-2">
-              <div>
-                <p className="font-code text-[9px] tracking-[0.3em] text-ember">
-                  {c.sub}
-                </p>
-                <h3 className="mt-2 font-display text-[1.95vw] leading-none text-paper">
-                  {c.title}
-                </h3>
-              </div>
-              <c.icon
-                className="h-[1.6vw] w-[1.6vw] shrink-0 text-mute"
-                strokeWidth={1.5}
-                aria-hidden
-              />
-            </header>
-
-            <div className="mt-[1.2vw] space-y-[0.75vw]">
-              {c.rows.map((r) => (
-                <div
-                  key={r.k}
-                  className={`card-row rounded-[2px] py-1 pl-2 ${
-                    r.hot && compare
-                      ? "border-l-2 border-ember bg-ember/10"
-                      : "border-l-2 border-transparent"
-                  }`}
-                >
-                  <p className="font-code text-[8px] tracking-[0.28em] text-mute">
-                    {r.k}
-                  </p>
-                  <p
-                    className={`mt-1 font-body text-[0.98vw] leading-snug ${
-                      r.hot && compare ? "text-ember" : "text-paper/80"
-                    }`}
-                  >
-                    {r.v}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            <p className="card-note absolute right-[1.3vw] bottom-[1.2vw] left-[1.3vw] border-t border-edge pt-3 font-display text-[1.05vw] italic text-paper/60 opacity-0">
-              {c.note}
-            </p>
-          </article>
+            card={c}
+            index={i}
+            compare={compare}
+          />
         ))}
       </div>
 

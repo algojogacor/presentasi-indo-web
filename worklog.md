@@ -1167,7 +1167,71 @@ Stage Summary:
   - `src/components/presentation/Experience.tsx`
   - `worklog.md`
 
+---
+Task ID: 30
+Agent: main (Antigravity — Gemini 3.8 Flash High)
+Task: Refactor Menyeluruh Codebase Menjadi Modular (<250 Baris Per File)
 
+Audit File Berukuran >250 Baris:
+1. `src/components/presentation/sections/S5Polling.tsx` (769 baris)
+2. `src/components/presentation/Experience.tsx` (647 baris)
+3. `src/components/presentation/sections/S1Video.tsx` (585 baris)
+4. `src/components/presentation/sections/S4Anatomy.tsx` (545 baris)
+5. `src/components/results/ResultsPage.tsx` (492 baris)
+6. `src/components/presentation/sections/S8Closing.tsx` (419 baris)
+7. `src/components/voting/VotingPage.tsx` (391 baris)
 
+Prinsip & Rencana Refactor:
+- Satu komponen = satu tanggung jawab.
+- Nol perubahan pada behavior, logic, animasi GSAP, style visual, maupun keyboard shortcuts.
+- Pemecahan terstruktur:
+  * Tahap 1: Ekstraksi tipe bersama ke `src/types/` dan konstanta konten/data ke `src/data/`.
+  * Tahap 2: Refactor `S1Video.tsx` → pecah ke sub-komponen `src/components/presentation/sections/s1/` (Searchlights, Curtains, CurtainFilterSvg, VideoFrame, Quotes, animations).
+  * Tahap 3: Refactor `S4Anatomy.tsx` → pecah ke `src/components/presentation/sections/s4/` (DocumentSheet, DissectionPanel, PrelimDissection, BodyDissection, PostDissection, animations).
+  * Tahap 4: Refactor `S5Polling.tsx` → pecah ke `src/components/presentation/sections/s5/` (ScoreboardOverlay, PollingSparkline, OptionBars, PollingQr, PollingVerdict, usePollingData).
+  * Tahap 5: Refactor `S8Closing.tsx` → pecah ke `src/components/presentation/sections/s8/` (SessionRecap, AmbientCloud, ConclusionCards, ClosingHero).
+  * Tahap 6: Refactor `Experience.tsx` → pecah ke `src/components/presentation/experience/` (PresenterTopBar, PresenterBottomBar, RehearsalBanner, useExperienceKeyboard).
+  * Tahap 7: Refactor `ResultsPage.tsx` → pecah ke `src/components/results/` (ResultsHeader, QuestionSummaryCard, ResultsTempoCurve, ResultsPrintView, exportCsv).
+  * Tahap 8: Refactor `VotingPage.tsx` → pecah ke `src/components/voting/` (ShareButton, QuestionCard, VotingHeader, VotingFooter).
+  * Tahap 9: Refactor `S6Battle.tsx` → pecah data ke `src/data/battle.ts` dan subkomponen ke `src/components/presentation/sections/s6/`.
+- Verifikasi ketat:
+  * Eksekusi satu file/modul per langkah.
+  * Jalankan `bun x tsc --noEmit` dan `npm run lint` setelah setiap file selesai direfaktor.
+  * Tidak melanjutkan jika ditemukan error.
 
+Work Log:
+1. Pra-refactor Sync & Git:
+   - Remote origin ditambahkan ke `https://github.com/algojogacor/presentasi-indo-web.git`.
+   - Commit dan push state awal berhasil ke branch `main`.
+2. Fondasi Tipe & Data:
+   - Dibuat `src/types/polling.ts` dan `src/types/presentation.ts` untuk tipe bersama.
+   - Dibuat `src/data/video.ts`, `src/data/anatomy.ts`, `src/data/closing.ts`, `src/data/battle.ts` untuk memisahkan data konten dan konfigurasi dari komponen UI.
+3. Modularisasi S1Video (585 -> 61 baris):
+   - Subkomponen: `CurtainFilterSvg.tsx`, `Curtains.tsx`, `Searchlights.tsx`, `VideoFrame.tsx`, `QuoteLayers.tsx`.
+   - Animasi terisolasi: `animations.ts`, `searchlightAnim.ts`, `curtainAnim.ts`.
+4. Modularisasi S4Anatomy (545 -> 92 baris):
+   - Subkomponen: `DocumentSheet.tsx`, `DissectionViews.tsx`.
+   - Animasi terisolasi: `animations.ts`.
+5. Modularisasi S5Polling (769 -> 227 baris):
+   - Hook terisolasi: `usePollingData.ts` (socket, polling, audio chime, tempo timeline).
+   - Subkomponen: `ScoreboardOverlay.tsx`, `PollingSparkline.tsx`, `PollingOptionsGrid.tsx`, `PollingResultBars.tsx`, `PollingQrBox.tsx`, `PollingIntro.tsx`.
+6. Modularisasi S8Closing (419 -> 77 baris):
+   - Subkomponen: `SessionRecap.tsx`, `AmbientWords.tsx`, `ConclusionStepper.tsx`, `ClosingCallback.tsx`, `ThankYouCard.tsx`.
+7. Modularisasi Experience (647 -> 175 baris):
+   - Hook terisolasi: `usePresentationState.ts`, `useExperienceKeyboard.ts`.
+   - Subkomponen: `PresenterHud.tsx`, `ProgressBar.tsx`, `RailTicks.tsx`, `ResumeGate.tsx`.
+8. Modularisasi ResultsPage (492 -> 144 baris):
+   - Subkomponen & helpers: `ResultsHeader.tsx`, `ClassSummarySection.tsx`, `QuestionDetailCard.tsx`, `ResultsFooter.tsx`, `helpers.ts`.
+9. Modularisasi VotingPage (391 -> 104 baris):
+   - Subkomponen: `ShareButton.tsx`, `QuestionCard.tsx`, `VotingHeader.tsx`, `VotingFooter.tsx`.
+10. Modularisasi S6Battle (241 -> 57 baris):
+   - Subkomponen: `BattleCard.tsx`, `animations.ts`, data di `src/data/battle.ts`.
 
+Verifikasi:
+- `bun x tsc --noEmit`: 0 error.
+- `npm run lint`: 0 error, 1 pre-existing warning (font di layout).
+- `bun run build`: Berhasil 100% dalam 3.6 detik.
+- Audit baris: Semua file aplikasi non-UI kini berada di bawah 250 baris (maksimal 243 baris di `src/lib/notes.ts`).
+
+Stage Summary:
+- Status: SELESAI & TERVERIFIKASI.

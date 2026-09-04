@@ -1,35 +1,19 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import { useRef, useState } from "react";
 import { gsap } from "@/lib/gsap";
-import { audio } from "@/lib/audio";
-import { PresCtx, SECTIONS, type PresApi } from "./context";
+import { PresCtx, SECTIONS } from "./context";
 import { useIsoLayoutEffect } from "./hooks";
 import { Grain } from "./atoms";
 import MapOverlay from "./MapOverlay";
 import HelpOverlay from "./HelpOverlay";
 import NotesPanel from "./NotesPanel";
+import { visitedActs } from "./session";
 import {
-  subscribeSession,
-  getPosSnapshot,
-  getClockRunning,
-  getElapsedSeconds,
-  savePos,
-  startClock,
-  visitedActs,
-  getRehearsalOn,
-  getRemainingSeconds,
-  setRehearsal,
-  armStep,
-  deferDeadline,
-} from "./session";
-import {
-  stepDuration,
   plannedElapsed,
   PLAN_TOTAL,
   TOTAL_STEPS,
   cumStepsBefore,
-  fmtDelta,
 } from "./rehearsal";
 import S0Opening from "./sections/S0Opening";
 import S1Video from "./sections/S1Video";
@@ -40,6 +24,12 @@ import S5Polling from "./sections/S5Polling";
 import S6Battle from "./sections/S6Battle";
 import S7Kaidah from "./sections/S7Kaidah";
 import S8Closing from "./sections/S8Closing";
+import PresenterHud from "./experience/PresenterHud";
+import ProgressBar from "./experience/ProgressBar";
+import RailTicks from "./experience/RailTicks";
+import ResumeGate from "./experience/ResumeGate";
+import { useExperienceKeyboard } from "./experience/useExperienceKeyboard";
+import { usePresentationState } from "./experience/usePresentationState";
 
 const SECTION_COMPONENTS = [
   S0Opening,
@@ -53,207 +43,38 @@ const SECTION_COMPONENTS = [
   S8Closing,
 ];
 
-interface NavState {
-  section: number;
-  step: number;
-  /** Section ini pernah dilihat sebelumnya → remount = settle instan. */
-  settled: boolean;
-}
-
-const pad2 = (n: number) => String(n).padStart(2, "0");
-
 export default function Experience() {
-  const [nav, setNav] = useState<NavState>({
-    section: 0,
-    step: 0,
-    settled: false,
-  });
-  const [gShow, setGShow] = useState(false); // kosmetik HUD "// G→_" saja
-  const [contrast, setContrast] = useState(false);
-  const [muted, setMuted] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
   const [helpSheet, setHelpSheet] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
   const [helpOn, setHelpOn] = useState(true);
-  // Sesi presenter (posisi tersimpan + jam) — store eksternal modul
-  const savedPos = useSyncExternalStore(
-    subscribeSession,
-    getPosSnapshot,
-    () => null,
-  );
-  const clockRunning = useSyncExternalStore(
-    subscribeSession,
-    getClockRunning,
-    () => false,
-  );
-  const elapsed = useSyncExternalStore(
-    subscribeSession,
-    getElapsedSeconds,
-    () => 0,
-  );
-  // Mode latihan — auto-advance + patokan waktu (store eksternal, runtime saja)
-  const rehearsalOn = useSyncExternalStore(
-    subscribeSession,
-    getRehearsalOn,
-    () => false,
-  );
-  const remaining = useSyncExternalStore(
-    subscribeSession,
-    getRemainingSeconds,
-    () => 0,
-  );
-  const [huds, setHuds] = useState<
-    { id: number; msg: string; tone: "info" | "ember" }[]
-  >([]);
 
   const sectionRef = useRef<HTMLDivElement>(null);
-  const keyHandlerRef = useRef<
-    ((k: string, e: KeyboardEvent) => boolean | void) | null
-  >(null);
-  const activeTlRef = useRef<gsap.core.Timeline | null>(null);
-  const hudSeq = useRef(0);
-  const gTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  // G+digit dibaca dari ref — kebal terhadap staleness closure bila kedua
-  // tombol datang hampir bersamaan (state belum ter-flush antar keydown).
-  const gArmedRef = useRef(false);
-  // advance terbaru untuk interval auto-advance (bebas stale closure)
-  const advanceRef = useRef<() => void>(() => {});
 
-  const { section, step, settled } = nav;
+  const {
+    section,
+    step,
+    settled,
+    savedPos,
+    clockRunning,
+    elapsed,
+    rehearsalOn,
+    remaining,
+    contrast,
+    muted,
+    huds,
+    keyHandlerRef,
+    advance,
+    back,
+    goto,
+    resume,
+    toggleContrast,
+    toggleMute,
+    hud,
+    api,
+  } = usePresentationState(mapOpen);
 
-  const hud = useCallback(
-    (msg: string, tone: "info" | "ember" = "info") => {
-      const id = ++hudSeq.current;
-      setHuds((h) => [...h.slice(-2), { id, msg, tone }]);
-      setTimeout(() => {
-        setHuds((h) => h.filter((x) => x.id !== id));
-      }, 2000);
-    },
-    [],
-  );
-
-  const goto = useCallback((s: number, st = 0) => {
-    const target = Math.max(0, Math.min(SECTIONS.length - 1, s));
-    const wasSeen = visitedActs.has(target); // ditentukan SEBELUM menandai kedatangan
-    setNav((n) => {
-      const targetStep = Math.max(
-        0,
-        Math.min(SECTIONS[target].steps - 1, st),
-      );
-      if (target === n.section) return { ...n, step: targetStep };
-      visitedActs.add(n.section); // babak yang ditinggalkan → "pernah dilihat"
-      return {
-        section: target,
-        step: targetStep,
-        settled: wasSeen,
-      };
-    });
-  }, []);
-
-  // Lanjut dari posisi tersimpan (refresh tak sengaja) — settle instan, tanpa replay
-  const resume = useCallback(() => {
-    if (!savedPos) return;
-    visitedActs.add(savedPos.section); // ditandai dulu → goto melihat "pernah dilihat"
-    audio.tick();
-    hud(
-      `LANJUT — ACT.${pad2(savedPos.section)} // STEP.${pad2(savedPos.step)}`,
-      "ember",
-    );
-    goto(savedPos.section, savedPos.step);
-  }, [savedPos, goto, hud]);
-
-  const setStep = useCallback((n2: number) => {
-    setNav((n) => ({
-      ...n,
-      step: Math.max(0, Math.min(SECTIONS[n.section].steps - 1, n2)),
-    }));
-  }, []);
-
-  const advance = useCallback(() => {
-    const tl = activeTlRef.current;
-    if (tl && tl.isActive()) {
-      tl.progress(1); // Space memotong timeline yang sedang berjalan
-      return;
-    }
-    const maxStep = SECTIONS[section].steps - 1;
-    if (step < maxStep) {
-      audio.tick();
-      setNav((n) => ({ ...n, step: n.step + 1 }));
-    } else if (section < SECTIONS.length - 1) {
-      audio.tick();
-      goto(section + 1, 0);
-    } else {
-      hud("AKHIR — [O] PETA · [G]+# LOMPAT BEBAS");
-    }
-  }, [section, step, goto, hud]);
-
-  const back = useCallback(() => {
-    if (step > 0) {
-      audio.tick();
-      setNav((n) => ({ ...n, step: n.step - 1 }));
-    } else if (section > 0) {
-      audio.tick();
-      goto(section - 1, SECTIONS[section - 1].steps - 1);
-    }
-  }, [section, step, goto]);
-
-  const toggleContrast = useCallback(() => {
-    setContrast((c) => {
-      const next = !c;
-      document.documentElement.classList.toggle("contrast-boost", next);
-      hud(
-        next ? "CONTRAST BOOST — ON [C]" : "CONTRAST BOOST — OFF [C]",
-        "ember",
-      );
-      return next;
-    });
-  }, [hud]);
-
-  const toggleMute = useCallback(() => {
-    audio.init();
-    const m = audio.toggleMute();
-    setMuted(m);
-    hud(m ? "AUDIO — MUTED [M]" : "AUDIO — ON [M]", "ember");
-  }, [hud]);
-
-  // Persistensi posisi + mulai jam — menulis ke store eksternal (bukan setState)
-  // + pasang tenggat auto-advance untuk langkah baru (no-op bila latihan mati).
-  useEffect(() => {
-    if (section === 0 && step === 0) return; // gerbang awal tidak disimpan
-    startClock();
-    savePos({ section, step });
-    armStep(stepDuration(section, step));
-  }, [section, step]);
-
-  // Advance terbaru selalu tersedia bagi interval auto-advance (ref diperbarui
-  // di efek, bukan saat render — patuh aturan react-hooks/refs).
-  useEffect(() => {
-    advanceRef.current = advance;
-  }, [advance]);
-
-  // Auto-advance mode latihan: satu detak per detik, tenggat disimpan di store
-  // sesi. Peta terbuka / animasi aktif → tenggat ditunda, tidak dipotong.
-  useEffect(() => {
-    if (!rehearsalOn) return;
-    const iv = setInterval(() => {
-      if (mapOpen) {
-        deferDeadline(1000);
-        return;
-      }
-      if (!getClockRunning()) return; // belum melewati gerbang
-      if (getRemainingSeconds() > 0) return;
-      const tl = activeTlRef.current;
-      if (tl && tl.isActive()) {
-        deferDeadline(1000);
-        return;
-      }
-      armStep(9999); // cadangan bila advance mentok di posisi akhir
-      advanceRef.current(); // → efek [section,step] memasang durasi baru
-    }, 1000);
-    return () => clearInterval(iv);
-  }, [rehearsalOn, mapOpen]);
-
-  // Fade masuk saat ganti babak (remount karena key)
+  // Fade masuk saat ganti babak
   useIsoLayoutEffect(() => {
     const el = sectionRef.current;
     if (!el) return;
@@ -268,159 +89,8 @@ export default function Experience() {
     );
   }, [section, settled]);
 
-  // ---- Keyboard: satu-satunya antarmuka kontrol presenter ----
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => {
-      const target = e.target as HTMLElement | null;
-      if (
-        target &&
-        (target.tagName === "INPUT" ||
-          target.tagName === "TEXTAREA" ||
-          target.isContentEditable)
-      ) {
-        return;
-      }
-      const k = e.key;
-      if (k === " " || k === "ArrowRight" || k === "ArrowLeft")
-        e.preventDefault();
-      audio.init();
-
-      // Halaman Ouverture (Section 0 Step 0): biarkan auto-play dan auto-lanjut tanpa interaksi keyboard
-      if (section === 0 && step === 0) {
-        return;
-      }
-
-      // [?] / [F1] — lembar bantuan lengkap (dialog modal)
-      if (k === "?" || k === "F1") {
-        e.preventDefault();
-        setHelpSheet((h) => !h);
-        audio.tick();
-        return;
-      }
-      if (helpSheet) {
-        if (k === "Escape" || k === "?") setHelpSheet(false);
-        return; // lembar bantuan terbuka → tombol lain ditelan
-      }
-
-      // [O] / [Tab] — peta navigasi (daftar isi babak)
-      if (k === "Tab" || k.toLowerCase() === "o") {
-        e.preventDefault();
-        audio.tick();
-        setMapOpen((m) => !m);
-        return;
-      }
-      if (mapOpen) {
-        if (k === "Escape") setMapOpen(false);
-        else if (/^[0-9]$/.test(k)) {
-          const n = Number(k);
-          if (n < SECTIONS.length) {
-            audio.tick();
-            setMapOpen(false);
-            goto(n, 0);
-          }
-        }
-        return; // peta terbuka → tombol lain tidak menyentuh babak
-      }
-
-      // [Esc] — tutup panel catatan presenter (non-modal, navigasi tetap hidup)
-      if (k === "Escape" && notesOpen) {
-        setNotesOpen(false);
-        return;
-      }
-
-      // Shift+S — lewati section video
-      if (e.shiftKey && (k === "S" || k === "s")) {
-        if (section === 1) {
-          hud("SKIP — MENUJU LATAR BELAKANG", "ember");
-          audio.tick();
-          goto(2, 0);
-        }
-        return;
-      }
-
-      // Mode jump G + angka — ref agar kekal dua keydown berurutan cepat
-      if (gArmedRef.current) {
-        if (/^[0-9]$/.test(k)) {
-          const n = Number(k);
-          if (n < SECTIONS.length) {
-            audio.tick();
-            hud(`ACT.${pad2(n)} — ${SECTIONS[n].label}`, "ember");
-            goto(n, 0);
-          } else {
-            hud("BABAK DI LUAR JANGKAUAN");
-          }
-        }
-        gArmedRef.current = false;
-        setGShow(false);
-        if (gTimer.current) clearTimeout(gTimer.current);
-        return;
-      }
-
-      if (k === " " || k === "ArrowRight") {
-        advance();
-        return;
-      }
-      if (k === "ArrowLeft") {
-        back();
-        return;
-      }
-      const lk = k.toLowerCase();
-      if (lk === "l" && savedPos && section === 0 && step === 0) {
-        resume();
-        return;
-      }
-      if (lk === "h") {
-        setHelpOn((h) => !h);
-        return;
-      }
-      // [N] — catatan presenter: panduan penyampaian langkah aktif (non-modal)
-      if (lk === "n") {
-        audio.tick();
-        setNotesOpen((v) => !v);
-        hud(
-          notesOpen ? "CATATAN PRESENTER — DITUTUP [N]" : "CATATAN PRESENTER — AKTIF [N]",
-          "ember",
-        );
-        return;
-      }
-      if (lk === "g") {
-        gArmedRef.current = true;
-        setGShow(true);
-        hud("G → [0–8] PILIH BABAK", "ember");
-        if (gTimer.current) clearTimeout(gTimer.current);
-        gTimer.current = setTimeout(() => {
-          gArmedRef.current = false;
-          setGShow(false);
-        }, 1400);
-        return;
-      }
-      // [T] — mode latihan: auto-advance + patokan waktu per babak
-      if (lk === "t") {
-        const next = !getRehearsalOn();
-        setRehearsal(next, stepDuration(section, step));
-        audio.tick();
-        hud(
-          next
-            ? "REHEARSAL ON — AUTO-ACTIVE · RENCANA 53 MENIT [T]"
-            : "REHEARSAL OFF — KONTROL MANUAL [T]",
-          next ? "ember" : "info",
-        );
-        return;
-      }
-      if (lk === "c") {
-        toggleContrast();
-        return;
-      }
-      if (lk === "m") {
-        toggleMute();
-        return;
-      }
-      // Tombol khusus section (1/2/3, A–E, B, F, R)
-      keyHandlerRef.current?.(lk, e);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [
+  // Keyboard navigation hook
+  const { gShow } = useExperienceKeyboard({
     section,
     step,
     mapOpen,
@@ -430,33 +100,20 @@ export default function Experience() {
     advance,
     back,
     goto,
-    hud,
     resume,
     toggleContrast,
     toggleMute,
-  ]);
-
-  const api = useMemo<PresApi>(
-    () => ({
-      section,
-      step,
-      settled,
-      setStep,
-      goto,
-      registerKeyHandler: (fn) => {
-        keyHandlerRef.current = fn;
-      },
-      registerTimeline: (tl) => {
-        activeTlRef.current = tl;
-      },
-      hud,
-    }),
-    [section, step, settled, setStep, goto, hud],
-  );
+    hud,
+    setHelpSheet,
+    setMapOpen,
+    setNotesOpen,
+    setHelpOn,
+    keyHandlerRef,
+  });
 
   const SectionComp = SECTION_COMPONENTS[section];
 
-  // Pita progres: posisi aktual (langkah) vs posisi rencana (waktu latihan)
+  // Pita progres
   const posPct = Math.min(
     100,
     ((cumStepsBefore(section) + step) / TOTAL_STEPS) * 100,
@@ -479,7 +136,7 @@ export default function Experience() {
         {/* Vignette sinematik — pinggir layar menggelap perlahan */}
         <div className="vignette" aria-hidden="true" />
 
-        {/* Peta navigasi — daftar isi presentasi itu sendiri */}
+        {/* Peta navigasi */}
         {mapOpen && (
           <MapOverlay
             current={section}
@@ -491,10 +148,10 @@ export default function Experience() {
           />
         )}
 
-        {/* Lembar bantuan presenter — pintas keyboard lengkap */}
+        {/* Lembar bantuan presenter */}
         {helpSheet && <HelpOverlay onClose={() => setHelpSheet(false)} />}
 
-        {/* Catatan presenter per langkah — panel non-modal [N] */}
+        {/* Catatan presenter per langkah */}
         {notesOpen && !helpSheet && !mapOpen && (
           <NotesPanel
             section={section}
@@ -504,142 +161,37 @@ export default function Experience() {
         )}
 
         {/* Gerbang lanjut: posisi tersimpan dari refresh sebelumnya */}
-        {savedPos && section === 0 && step === 0 && (
-          <div className="pointer-events-none fixed bottom-[15vh] left-1/2 z-[70] -translate-x-1/2 text-center font-code text-[10px] tracking-[0.22em] text-paper/40">
-            {`POSISI TERSIMPAN — [L] LANJUT ACT.${pad2(savedPos.section)} // STEP.${pad2(savedPos.step)}`}
-          </div>
-        )}
+        <ResumeGate savedPos={savedPos} section={section} step={step} />
 
         {/* Rel babak — 9 tick, babak aktif menyala amber */}
-        <div
-          className="pointer-events-none fixed right-6 bottom-5 z-[70] flex items-end gap-[3px]"
-          aria-hidden="true"
-        >
-          {SECTIONS.map((_, i) => (
-            <span
-              key={i}
-              className={
-                i === section
-                  ? "rail-live h-[10px] w-[3px] bg-ember"
-                  : visitedActs.has(i)
-                    ? "h-[6px] w-[3px] bg-paper/30"
-                    : "h-[6px] w-[3px] bg-white/12"
-              }
-            />
-          ))}
-        </div>
+        <RailTicks section={section} />
 
-        {/* Pita progres tepi-bawah — posisi aktual (amber) + penanda rencana
-            (belah ketupat) saat mode latihan. Hanya tampil setelah gerbang. */}
-        {clockRunning && (
-          <div
-            className="pointer-events-none fixed inset-x-0 bottom-0 z-[68] h-[3px]"
-            aria-hidden="true"
-          >
-            <div className="absolute inset-0 bg-white/7" />
-            {/* Segmen babak — tint selang-seling untuk membedakan teritori */}
-            {SECTIONS.slice(1).map((s, i) => (
-              <span
-                key={`seg-${i}`}
-                className={
-                  i % 2 === 0 ? "absolute inset-y-0 bg-white/[0.05]" : ""
-                }
-                style={{
-                  left: `${(cumStepsBefore(i + 1) / TOTAL_STEPS) * 100}%`,
-                  width: `${(s.steps / TOTAL_STEPS) * 100}%`,
-                }}
-              />
-            ))}
-            {/* Batas antar-babak */}
-            {SECTIONS.slice(1).map((_, i) => (
-              <span
-                key={`tick-${i}`}
-                className="absolute top-0 bottom-0 w-px bg-white/25"
-                style={{
-                  left: `${(cumStepsBefore(i + 1) / TOTAL_STEPS) * 100}%`,
-                }}
-              />
-            ))}
-            {/* Isian posisi — gradasi ember + titik ujung menyala */}
-            <div
-              className="ribbon-fill absolute inset-y-0 left-0 bg-gradient-to-r from-ember/40 to-ember"
-              style={{ width: `${posPct}%` }}
-            />
-            <span
-              className="ribbon-tip"
-              style={{ left: `${posPct}%` }}
-            />
-            {rehearsalOn && (
-              <span className="plan-dot" style={{ left: `${planPct}%` }} />
-            )}
-          </div>
-        )}
+        {/* Pita progres tepi-bawah */}
+        <ProgressBar
+          clockRunning={clockRunning}
+          posPct={posPct}
+          planPct={planPct}
+          rehearsalOn={rehearsalOn}
+        />
 
         {/* HUD Presenter — koordinat state, sangat redup, kiri bawah */}
-        <div
-          className="pointer-events-none fixed bottom-5 left-6 z-[70] border-l border-edge/70 pl-3 font-code text-[10px] leading-[1.8] tracking-[0.14em]"
-          style={{ color: "var(--hud)" }}
-          aria-hidden="true"
-        >
-          {huds.map((h) => (
-            <div
-              key={h.id}
-              className={`hud-msg ${h.tone === "ember" ? "text-ember/80" : ""}`}
-            >
-              {h.msg}
-            </div>
-          ))}
-          <div>
-            {`ACT.${pad2(section)} // STEP.${pad2(step)}/${pad2(
-              SECTIONS[section].steps - 1,
-            )}`}
-            {gShow ? " // G→_" : ""}
-            {mapOpen ? " // PETA" : ""}
-            {helpSheet ? " // BANTUAN" : ""}
-            {notesOpen ? " // CATATAN" : ""}
-          </div>
-          {clockRunning && (
-            <div className={elapsed >= 50 * 60 ? "text-ember/75" : undefined}>
-              {`T+${pad2(Math.floor(elapsed / 60))}:${pad2(elapsed % 60)} / 60:00`}
-            </div>
-          )}
-          {rehearsalOn && clockRunning && (
-            <div className={remaining <= 10 ? "text-ember/85" : undefined}>
-              {`REHEARSAL · AUTO ${pad2(remaining)}S`}
-            </div>
-          )}
-          {rehearsalOn && clockRunning && (
-            <div
-              className={
-                planDelta > 60
-                  ? "text-ember/85"
-                  : planDelta < -45
-                    ? "text-paper/55"
-                    : "text-paper/45"
-              }
-            >
-              {`RENCANA ${fmtDelta(planDelta)} · ${
-                planDelta > 60
-                  ? "TERLAMBAT"
-                  : planDelta < -45
-                    ? "LEBIH CEPAT"
-                    : "SESUAI JADWAL"
-              }`}
-            </div>
-          )}
-          {(contrast || muted) && (
-            <div className="mt-0.5 flex gap-1.5">
-              {contrast && <span className="hud-lamp">C+</span>}
-              {muted && <span className="hud-lamp">MUTE</span>}
-              {notesOpen && <span className="hud-lamp">NOTE</span>}
-            </div>
-          )}
-          {helpOn && (
-            <div className="text-[9px] tracking-[0.2em] text-paper/30">
-              [SPACE] LANJUT · [G]+# LOMPAT · [O] PETA · [N] CATATAN · [T] LATIHAN · [?] BANTUAN · [H] SEMBUNYI
-            </div>
-          )}
-        </div>
+        <PresenterHud
+          huds={huds}
+          section={section}
+          step={step}
+          gShow={gShow}
+          mapOpen={mapOpen}
+          helpSheet={helpSheet}
+          notesOpen={notesOpen}
+          clockRunning={clockRunning}
+          elapsed={elapsed}
+          rehearsalOn={rehearsalOn}
+          remaining={remaining}
+          planDelta={planDelta}
+          contrast={contrast}
+          muted={muted}
+          helpOn={helpOn}
+        />
       </div>
     </PresCtx.Provider>
   );
