@@ -1235,3 +1235,19 @@ Verifikasi:
 
 Stage Summary:
 - Status: SELESAI & TERVERIFIKASI.
+
+---
+Task ID: 31
+Agent: main (Antigravity — Gemini 3.8 Flash High)
+Task: Matikan Port 3000 dan Deploy Server Lokal Ulang
+
+Actions:
+1. Memeriksa proses yang mendengarkan pada port 3000 (PID 16024 node.exe).
+2. Mematikan proses dengan `Stop-Process -Force`.
+3. Memastikan port 3000 telah bersih dari listener aktif.
+4. Menjalankan kembali server Next.js lokal via `bun run dev` di port 3000.
+5. Verifikasi koneksi ke `http://localhost:3000` via HTTP GET yang mengembalikan status code 200 OK.
+
+Stage Summary:
+- Status: SELESAI & TERVERIFIKASI.
+
