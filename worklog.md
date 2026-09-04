@@ -1251,3 +1251,66 @@ Actions:
 Stage Summary:
 - Status: SELESAI & TERVERIFIKASI.
 
+---
+Task ID: 32
+Agent: main (Antigravity — Gemini 3.8 Flash High)
+Task: Penambahan Sistem Audio Presentasi (CC0 / Freesound) & AudioManager
+
+Deskripsi & Sumber Audio (Lisensi Creative Commons 0 / Bebas Atribusi Berbayar):
+1. Ouverture ambient:
+   - File: `public/audio/ouverture-ambient.mp3`
+   - Sumber: Freesound sound #338254 oleh leo153 ("150 people in a small theater low talking before play starts").
+   - Lisensi: Creative Commons 0 (CC0).
+   - Durasi: ~16 detik. Fade in 1.5s, fade out mulus 1.2s saat memasuki Step 1.
+2. Opening drone:
+   - File: `public/audio/opening-drone.mp3`
+   - Sumber: Freesound sound #466293 oleh The-Sacha-Rush ("Wide Cinematic Anxious Drone").
+   - Lisensi: Creative Commons 0 (CC0).
+   - Durasi: ~24 detik (loopable). Fade in 2.0s, fade out mulus 1.5s saat meninggalkan Section 0.
+3. Searchlight reveal:
+   - File: `public/audio/searchlight-reveal.mp3`
+   - Sumber: Freesound sound #322021 oleh Burningmonkey ("Servo motor sweeping").
+   - Lisensi: Creative Commons 0 (CC0).
+   - Durasi: ~8.7 detik (one-shot dengan fade out dinamis).
+4. Curtain open:
+   - File: `public/audio/curtain-open.mp3`
+   - Sumber: Freesound sound #51140 oleh RutgerMuller ("Curtains Textile Texture.wav").
+   - Lisensi: Creative Commons 0 (CC0).
+   - Durasi: ~3.58 detik.
+5. Transition whoosh:
+   - File: `public/audio/transition-whoosh.mp3`
+   - Sumber: Freesound sound #719636 oleh zapsplat.com ("Fast whoosh, bamboo swoosh through air").
+   - Lisensi: Creative Commons 0 (CC0).
+   - Durasi: ~0.55 detik.
+
+Arsitektur & Implementasi:
+1. `src/lib/audioManager.ts`:
+   - Menggunakan Web Audio API terintegrasi dengan shared AudioContext & master gain node dari `AudioEngine` (rule 6 AGENTS.md).
+   - Menangani decode audio buffer lokal tanpa delay jaringan saat playback.
+   - Ramp volume linear/eksponensial pada setiap start/stop sehingga tidak ada audio yang terputus tiba-tiba.
+   - Sinkronisasi penuh dengan state mute (`shortcut M`).
+2. Browser Audio Policy & Gate Interaksi:
+   - Audio tidak autoplay sebelum user berinteraksi.
+   - Di Section 0 Step 0 (Ouverture), layar menampilkan teks `OUVERTURE` dan badge prompt berkedip `[ TEKAN SPASI UNTUK MEMULAI ]`.
+   - Menekan Spasi pertama kali (atau klik layar) menginisialisasi audio context, memutar ambience ruang teater, dan menjalankan sekuens.
+   - Spasi berikutnya mempercepat transisi ke Step 1.
+3. Integrasi Section:
+   - Section 0 Step 1 memutar drone sinematik, hening sebelum judul, dan dentum sub-bass.
+   - Section 1 Step 1 memutar searchlight servo audio.
+   - Section 1 Step 3 memutar suara tirai panggung tersibak (`animateCurtainOpen`).
+   - Navigasi antar-babak (`goto` / transisi babak) memutar transition whoosh lembut.
+
+Verifikasi:
+- `bun x tsc --noEmit`: 0 error.
+- `npm run lint`: 0 error, 1 pre-existing warning (font layout).
+- `bun run build`: Berhasil 100% (3.6s).
+- Pengujian Browser (browser_subagent):
+  * Membuka `http://localhost:3000/`, verifikasi tampilan Ouverture dan prompt spasi.
+  * Console error check awal: 0 error.
+  * Interaksi tombol Spasi: Audio terinisialisasi mulus dan presentasi bertransisi ke judul tanpa error console.
+- Audit Baris: Semua file tetap berada di bawah 250 baris.
+
+Stage Summary:
+- Status: SELESAI & TERVERIFIKASI.
+
+

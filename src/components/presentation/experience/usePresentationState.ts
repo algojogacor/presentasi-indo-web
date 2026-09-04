@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import type { gsap } from "@/lib/gsap";
 import { audio } from "@/lib/audio";
+import { audioManager } from "@/lib/audioManager";
 import { SECTIONS, type PresApi } from "../context";
 import {
   subscribeSession,
@@ -87,6 +88,11 @@ export function usePresentationState(mapOpen: boolean) {
         Math.min(SECTIONS[target].steps - 1, st),
       );
       if (target === n.section) return { ...n, step: targetStep };
+      audioManager.playWhoosh();
+      if (n.section === 0) {
+        audioManager.fadeOutDrone(1.2);
+        audioManager.fadeOutOuverture(0.8);
+      }
       visitedActs.add(n.section);
       return {
         section: target,
@@ -155,8 +161,8 @@ export function usePresentationState(mapOpen: boolean) {
   }, [hud]);
 
   const toggleMute = useCallback(() => {
-    audio.init();
-    const m = audio.toggleMute();
+    audioManager.init();
+    const m = audioManager.toggleMute();
     setMuted(m);
     hud(m ? "AUDIO — MUTED [M]" : "AUDIO — ON [M]", "ember");
   }, [hud]);

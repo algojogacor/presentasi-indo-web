@@ -1,4 +1,5 @@
 import { gsap } from "@/lib/gsap";
+import { audioManager } from "@/lib/audioManager";
 import {
   REST_WAVE_SCALE,
   SEARCHLIGHT_BEAMS,
@@ -133,6 +134,7 @@ export function animateS1Step(
       gsap.set(closing, { autoAlpha: 0 });
       startSearchlightOscillation(searchlights);
     } else {
+      audioManager.playSearchlight();
       const tl = gsap.timeline({
         onComplete: () => startSearchlightOscillation(searchlights),
       });
@@ -211,6 +213,7 @@ export function animateS1Step(
       const tl = gsap.timeline();
       tl.set(blackLayer, { y: "110vh", autoAlpha: 0 });
       tl.set([l, r], { autoAlpha: 1 });
+      tl.add(() => audioManager.playCurtain(), 0);
       animateCurtainOpen(tl, l, r, frame, updateWave);
       registerTimeline(tl);
     }

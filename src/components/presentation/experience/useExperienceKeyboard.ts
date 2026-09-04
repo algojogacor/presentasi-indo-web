@@ -70,8 +70,8 @@ export function useExperienceKeyboard({
       }
       audio.init();
 
-      // Halaman Ouverture (Section 0 Step 0): biarkan auto-play dan auto-lanjut
-      if (section === 0 && step === 0) {
+      // Izinkan handler section (misal Section 0 Step 0) mencegat tombol sebelum aksi global
+      if (keyHandlerRef.current?.(k, e)) {
         return;
       }
 

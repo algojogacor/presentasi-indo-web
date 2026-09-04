@@ -13,6 +13,14 @@ class AudioEngine {
     return this._muted;
   }
 
+  getContext(): AudioContext | null {
+    return this.ctx;
+  }
+
+  getMaster(): GainNode | null {
+    return this.master;
+  }
+
   /** Harus dipanggil dari gesture pengguna (keydown) agar AudioContext boleh jalan. */
   init(): void {
     if (typeof window === "undefined") return;
