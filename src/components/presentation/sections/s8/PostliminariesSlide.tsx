@@ -84,9 +84,15 @@ export default function PostliminariesSlide({
             </div>
 
             {(ref.doi || ref.url) && (
-              <p className="mt-1.5 pl-2 font-code text-[9px] text-[#E8A020]/80 truncate">
-                {ref.doi ?? ref.url}
-              </p>
+              <a
+                href={ref.doi || ref.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-1.5 pl-2 font-code text-[9.5px] text-[#E8A020]/80 hover:text-[#FFB740] hover:underline truncate flex items-center gap-1 transition-colors"
+              >
+                <span className="text-[10px]">↗</span>
+                <span className="truncate">{ref.doi ?? ref.url}</span>
+              </a>
             )}
           </div>
         ))}
