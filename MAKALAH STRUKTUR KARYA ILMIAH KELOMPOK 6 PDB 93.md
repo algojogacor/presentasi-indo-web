@@ -176,7 +176,7 @@ Jumadi, A., Saputra, Z. E., & Sari, G. (2024). Analisis kesalahan berbahasa Indo
 Musdalifah, M., Karim, A., & Saud, C. F. (2025). Membangun literasi akademik melalui pelatihan penulisan karya ilmiah untuk mahasiswa baru. Inovasi Sosial: Jurnal Pengabdian Masyarakat, 2(4), 1–10. https://doi.org/10.62951/inovasisosial.v2i4.2249
 Nugraha, M. S., Rohmadi, M., & Nugraheni, A. S. (2022). Bahasa Indonesia untuk perguruan tinggi: Teori dan penerapan penulisan ilmiah. Cakrawala Media. https://bintangpusnas.perpusnas.go.id/konten/BK47058/bahasa-indonesia-untuk-perguruan-tinggi
 Samal, A. L., & Ardianto, A. (2025). Bahasa Indonesia dan karya tulis ilmiah untuk perguruan tinggi. IAIN Manado Press. https://repository.iain-manado.ac.id/2188/
-Sugiyono. (2022). Metode penelitian kuantitatif, kualitatif, dan R&D (Edisi terbaru). Alfabeta. https://cvalfabeta.com/product/metode-penelitian-kuantitatif-kualitatif-dan-rd-sugiyono/
+Sugiyono. (2022). Metode penelitian kuantitatif, kualitatif, dan R&D (Edisi terbaru). Alfabeta. https://dn721804.ca.archive.org/0/items/buku-metode-penelitian-sugiyono/buku-metode-penelitian-sugiyono.pdf
 Widiyastuti, R., Wardani, K., & Hasanah, U. (2023). Panduan praktis penulisan karya tulis ilmiah. Unwim Press. https://repo.unwim.ac.id/1239/
 Wulandari, A. A., Panudju, A. A. T., Hidayatullah, M. A., Maryani, M., Supriyati, W., Amalia, N., Dewi, L. P., Desderius, K., & Barus, F. A. (2024). Penulisan karya ilmiah (U. Y. Sundari, Ed.). CV. Gita Lentera. https://www.researchgate.net/publication/389853704_PENULISAN_KARYA_ILMIAH
 

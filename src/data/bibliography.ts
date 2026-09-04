@@ -137,7 +137,7 @@ export const REFERENCES: ReferenceItem[] = [
     year: "2022",
     title: "Metode penelitian kuantitatif, kualitatif, dan R&D (Edisi terbaru)",
     source: "Alfabeta.",
-    url: "https://cvalfabeta.com/product/metode-penelitian-kuantitatif-kualitatif-dan-rd-sugiyono/",
+    url: "https://dn721804.ca.archive.org/0/items/buku-metode-penelitian-sugiyono/buku-metode-penelitian-sugiyono.pdf",
     type: "BUKU TEKS",
     acts: [4],
   },
