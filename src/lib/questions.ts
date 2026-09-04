@@ -20,28 +20,37 @@ export interface PollQuestion {
 export const QUESTIONS: PollQuestion[] = [
   {
     id: 1,
-    prompt: "Menurut kamu, apa perbedaan paling mendasar antara makalah dan artikel jurnal?",
+    prompt:
+      "Menurut kajian sistematika KTI, apa perbedaan paling esensial antara artikel jurnal ilmiah dan makalah tugas perkuliahan?",
     options: [
-      { key: "A", label: "Jumlah halaman dan panjang tulisan" },
-      { key: "B", label: "Struktur dan tujuan publikasinya", correct: true },
-      { key: "C", label: "Bahasa dan jenis huruf yang digunakan" },
-      { key: "D", label: "Tema atau topik yang diangkat" },
+      { key: "A", label: "Jumlah halaman fisik dan batas waktu pengumpulan tugas" },
+      {
+        key: "B",
+        label: "Format struktur IMRaD tanpa bab Romawi serta orientasi mutlak pada novelty",
+        correct: true,
+      },
+      { key: "C", label: "Penggunaan kosakata teknis dan bahasa asing yang jauh lebih dominan" },
+      { key: "D", label: "Topik bahasan yang diangkat oleh penulis di ruang kelas" },
     ],
     answerNote:
-      "Makalah bergerak relatif bebas mengikuti pedoman studi — artikel jurnal terikat struktur IMRAD yang ketat karena tujuannya dipublikasikan dan melewati peer review. Perbedaan mendasarnya ada pada kerangka tubuh dan habitatnya, bukan sekadar ukuran.",
+      "Berdasarkan Tabel 2 (Fitriani et al., 2023), artikel jurnal memadatkan struktur menjadi format IMRaD (Introduction, Methods, Results, Discussion) tanpa bab berangka Romawi dan sangat memprioritaskan keterbaruan (novelty) untuk publikasi bereputasi, berbeda dengan makalah kuliah yang menggunakan format 3 bab ringkas untuk kajian konseptual tugas.",
   },
   {
     id: 2,
     prompt:
-      "Karakteristik KTI yang menuntut penulis bebas dari kepentingan pribadi dan bertumpu pada fakta serta data adalah…",
+      "Di manakah letak pembuktian kontribusi ilmiah dan orisinalitas utama seorang peneliti dalam struktur karya ilmiah?",
     options: [
-      { key: "A", label: "Logis" },
-      { key: "B", label: "Objektif", correct: true },
-      { key: "C", label: "Verifikatif" },
-      { key: "D", label: "Cendekia" },
+      { key: "A", label: "Kelengkapan sajian data mentah dan grafik pada deskripsi hasil (Bab IV)" },
+      {
+        key: "B",
+        label: "Dialektika tafsir temuan dengan teori dan riset terdahulu di pembahasan (Bab IV)",
+        correct: true,
+      },
+      { key: "C", label: "Banyaknya kutipan teori mutakhir yang dihimpun di tinjauan pustaka (Bab II)" },
+      { key: "D", label: "Keluasan ruang lingkup saran dan rekomendasi kebijakan di penutup (Bab V)" },
     ],
     answerNote:
-      "Objektif = sikap netral yang bertumpu pada fakta dan data. Logis menjaga runtutnya penalaran, verifikatif menjaga bisa-diujinya kembali — sedangkan kemerdekaan dari kepentingan pribadi adalah wilayah objektif.",
+      "Sesuai sub-bab 2.2.2, Pembahasan (Discussion) adalah bagian paling kritis dalam karya ilmiah. Kontribusi ilmiah bukan sekadar memaparkan angka data mentah, melainkan kemampuan penulis menafsirkan temuan, mengonfrontasikannya dengan teori Bab II, membandingkannya dengan riset terdahulu, serta menjelaskan penyebab temuan tersebut (Widiyastuti et al., 2023).",
   },
 ];
 

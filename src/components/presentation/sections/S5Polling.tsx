@@ -391,7 +391,7 @@ export default function S5Polling({ step }: { step: number }) {
       {/* ---- Papan skor [P] — peringkat opsi pada langkah reveal ---- */}
       {qid > 0 && scoreOpen && (
         <div
-          className="fade-slide-in absolute inset-0 flex flex-col px-0 pt-[13vh] pb-[10vh]"
+          className="fade-slide-in absolute inset-0 flex flex-col px-[8vw] pt-[12vh] pb-[8vh]"
           data-testid="scoreboard"
           aria-label={`Papan skor pertanyaan ${qid}`}
         >
@@ -500,7 +500,7 @@ export default function S5Polling({ step }: { step: number }) {
 
       {/* ---- Pertanyaan live / reveal (tampilan standar) ---- */}
       {qid > 0 && !scoreOpen && (
-        <div className="absolute inset-0 flex flex-col px-0 pt-[13vh] pb-[10vh]">
+        <div className="absolute inset-0 flex flex-col px-[8vw] pt-[12vh] pb-[8vh]">
           <div className="flex items-baseline gap-4">
             <span className="font-code text-[10px] tracking-[0.3em] text-ember">
               PERTANYAAN 0{qid}

@@ -21,79 +21,84 @@ interface Point {
 const POINTS: Point[] = [
   {
     idx: "07.1",
-    title: "EYD Edisi V",
-    tag: "EJAAN — EDISI 2022 · 25 BUTIR PENYESUAIAN",
-    desc: "Ejaan resmi terbaru menggantikan EYD IV (2015). Perubahan yang paling terasa di KTI: istilah asing ditulis dengan huruf tebal — bukan miring.",
+    title: "Penerapan Ejaan (EYD Edisi V)",
+    tag: "TATA TULIS RESMI · KEPMENDIKBUDRISTEK NO. 0424/P/2022",
+    desc: "Penulisan karya ilmiah wajib mengacu pada EYD Edisi V (Badan Bahasa, 2022), mencakup penggunaan huruf miring untuk istilah asing, penulisan huruf kapital, penggabungan kata berimbuhan, serta ketepatan tanda baca.",
     before: {
-      label: "SEBELUM — ISTILAH ASING DITULIS MIRING",
+      label: "SALAH — ISTILAH ASING TIDAK DIBERI HURUF MIRING",
       body: (
         <>
-          Data diusulkan dan diproses menggunakan metode{" "}
-          <em className="text-paper/55 italic underline decoration-wrong/60 underline-offset-4">
-            machine learning
-          </em>
-          .
+          Data penelitian diolah secara online menggunakan metode deep learning
+          dan data mining.
+          <span className="mt-3 block border-l-2 border-wrong pl-2 font-code text-[10px] tracking-[0.2em] text-wrong">
+            ISTILAH ASING TIDAK TERCETAK MIRING
+          </span>
         </>
       ),
     },
     after: {
-      label: "SESUDAH — HURUF TEBAL",
+      label: "BENAR (EYD V) — HURUF MIRING UNTUK ISTILAH ASING",
       body: (
         <>
-          Data diusulkan dan diproses menggunakan metode{" "}
-          <strong className="font-semibold text-ember">machine learning</strong>
-          .
+          Data penelitian diolah secara{" "}
+          <em className="font-semibold italic text-ember">online</em> menggunakan
+          metode <em className="font-semibold italic text-ember">deep learning</em>{" "}
+          dan <em className="font-semibold italic text-ember">data mining</em>.
         </>
       ),
     },
   },
   {
     idx: "07.2",
-    title: "Kalimat Efektif",
-    tag: "HEMAT KATA · PADAT · SUBJEK DI DEPAN",
-    desc: "Kalimat efektif membuang kata sisa dan menempatkan subjek di depan — pembaca menerima gagasan pada kontak pertama.",
+    title: "Struktur Kalimat Efektif",
+    tag: "HEMAT KATA · SUBJEK-PREDIKAT TEGAS · ANTI-SINTAKSIS RANCU",
+    desc: "Kalimat ilmiah wajib memiliki subjek dan predikat yang jelas, tidak ambigu, hemat kata, serta bebas dari kalimat menggantung (fragment sentence) dan kerancuan aktif-pasif (Jumadi et al., 2024).",
     before: {
-      label: "SEBELUM — 18 KATA",
+      label: "TIDAK EFEKTIF — 16 KATA, PREPOSISI GANDA & RANCU",
       body: (
         <>
-          Dalam penelitian ini, penulis akan mencoba untuk menguraikan tentang
-          anatomi karya tulis ilmiah.
+          Di dalam penelitian ini adalah bertujuan untuk membahas daripada pengaruh
+          struktur terhadap kualitas karya tulis ilmiah.
+          <span className="mt-3 block border-l-2 border-wrong pl-2 font-code text-[10px] tracking-[0.2em] text-wrong">
+            SUBJEK KABUR · KATA BERLEBIHAN
+          </span>
         </>
       ),
     },
     after: {
-      label: "SESUDAH — 6 KATA",
+      label: "EFEKTIF — 8 KATA, LUGAS & SUBJEK-PREDIKAT JELAS",
       body: (
         <>
-          Penelitian ini menguraikan anatomi karya tulis ilmiah.
+          Penelitian ini bertujuan menganalisis pengaruh struktur terhadap kualitas
+          karya tulis ilmiah.
         </>
       ),
     },
   },
   {
     idx: "07.3",
-    title: "Anti-Plagiarisme",
-    tag: "ETIKA — GAGASAN DIPINJAM, WAJIB DIPULANGKAN",
-    desc: "Menyalin tanpa rujukan adalah mencuri tubuh gagasan orang lain. Parafrasa dan sitasi menjadikan pinjaman itu tercatat.",
+    title: "Integritas & Anti-Plagiarisme",
+    tag: "ETIKA AKADEMIK · TEKNIK SITASI · PENGELOLA REFERENSI",
+    desc: "Setiap pemikiran, data, atau kutipan pihak lain wajib dicantumkan sumber rujukannya secara jujur (parafrasa atau kutipan langsung) dengan bantuan pengelola referensi seperti Mendeley atau Zotero (Farida, 2024).",
     before: {
-      label: "SEBELUM — SALIN TANPA RUJUKAN",
+      label: "PELANGGARAN ETIKA — MENYALIN TANPA RUJUKAN",
       body: (
         <>
-          Karya tulis ilmiah adalah laporan yang ditulis dan diterbitkan untuk
-          memenuhi norma dan etika ilmiah yang ditaati.
+          Karya ilmiah adalah produk komunikasi akademik tertulis yang menyajikan
+          gagasan rasional atau hasil investigasi empiris dengan metode ilmiah.
           <span className="mt-3 block border-l-2 border-wrong pl-2 font-code text-[10px] tracking-[0.2em] text-wrong">
-            TANPA SITASI — PLAGIARISME
+            TANPA SITASI — KLAIM SEPIHAK (PLAGIARISME)
           </span>
         </>
       ),
     },
     after: {
-      label: "SESUDAH — PARAFRASA + SITASI",
+      label: "BERINTEGRITAS — PARAFRASA DENGAN SITASI BAKU",
       body: (
         <>
-          KTI lahir dari kewajiban tunduk pada norma dan etika ilmiah yang
-          ditaati
-          <span className="text-ember"> (KBBI, Edisi V)</span>.
+          Komunikasi akademik tertulis yang menyajikan investigasi empiris secara
+          metodologis dikategorikan sebagai karya ilmiah{" "}
+          <span className="font-semibold text-ember">(Samal &amp; Ardianto, 2025)</span>.
         </>
       ),
     },

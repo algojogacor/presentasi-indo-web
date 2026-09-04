@@ -21,203 +21,211 @@ export const NOTE_PLAN: StepNote[][] = [
     },
   ],
   [
-    // 01 GUEST LECTURER — 3 langkah
+    // 01 GUEST LECTURER — 5 langkah
     {
-      t: "Pembuka narasumber",
-      c: "Perkenalkan guest lecturer dan topiknya dalam dua kalimat.",
+      t: "Pembuka narasumber — gelap",
+      c: "Ruang gelap total. Bacakan pengantar presenter dengan tenang.",
     },
     {
-      t: "Video berjalan",
-      c: "Putar penuh ±10 menit. Shift+S bila waktu mepet.",
+      t: "Lampu sorot — spotlight",
+      c: "Lampu sorot panggung menyala di belakang quote; beri jeda sejenak.",
     },
     {
-      t: "Jembatan ke latar",
-      c: "Satu kalimat kunci dari video, arahkan ke 'mengapa KTI penting'.",
+      t: "Penyingkapan tirai teater",
+      c: "Layar hitam runtuh ke bawah; tirai merah beludru tertutup siap dibuka.",
+    },
+    {
+      t: "Tirai dibuka — video berjalan",
+      c: "Tirai tersibak dramatis, video diputar. Tekan Shift+S bila waktu mepet.",
+    },
+    {
+      t: "Tirai menutup — jembatan ke latar",
+      c: "Kutipan penutup narasumber sebagai jembatan menuju Anatomi KTI.",
     },
   ],
   [
     // 02 LATAR BELAKANG — 4 langkah
     {
-      t: "Kalimat pemantik",
-      c: "Tanya: siapa sudah pernah menulis KTI? Tunggu dua jawaban.",
+      t: "Pernyataan kunci — kerangka logis",
+      c: "Tekankan kutipan sub-bab 1.1: struktur sebagai kerangka logis alur pemikiran penulis.",
     },
     {
-      t: "FAKTA 01 — Struktur",
-      c: "Struktur bukan formalitas — alat berpikir. Beri napas setelah angka.",
+      t: "FAKTA 01 — Komunikasi Akademik",
+      c: "KTI alat kembang berpikir kritis di tengah tuntutan publikasi bereputasi (Musdalifah et al., 2025).",
     },
     {
-      t: "FAKTA 02 — Konvensi",
-      c: "Kontras singkat: tulisan ilmiah vs postingan media sosial.",
+      t: "FAKTA 02 — Hambatan Mahasiswa",
+      c: "Banyak mahasiswa terhambat karena minim penguasaan struktur & latihan (Baharuddin et al., 2025).",
     },
     {
-      t: "FAKTA 03 — Konsekuensi",
-      c: "Naikkan tempo — 'maka kita bedah tubuhnya' — masuk ACT.03.",
+      t: "FAKTA 03 — Kerangka Logis",
+      c: "Struktur bukan sebatas teknis, melainkan esensial dalam membentuk argumen ilmiah yang sahih.",
     },
   ],
   [
     // 03 HAKIKAT & KARAKTERISTIK — 8 langkah
     {
-      t: "Definisi — KBBI Edisi V",
-      c: "Baca perlahan; definisi resmi = pijakan bersama ruangan.",
+      t: "Definisi — KBBI Daring (2024)",
+      c: "Pijakan resmi Badan Bahasa: patuh kaidah keilmuan & hasil pengamatan/penelitian.",
     },
     {
-      t: "Definisi — Wulandari dkk.",
-      c: "Sorot frasa 'metode ilmiah' sebagai pembeda inti.",
+      t: "Definisi — Wulandari et al. (2024)",
+      c: "Sorot pemecahan masalah tertentu berbasis data primer dan data sekunder.",
     },
     {
-      t: "Definisi — Samal & Ardianto",
-      c: "Tiga definisi = tiga sudut satu gunung; rangkum sekali.",
+      t: "Definisi — Samal & Ardianto (2025)",
+      c: "Komunikasi akademik tertulis yang menyajikan gagasan rasional/investigasi empiris terbuka.",
     },
     {
       t: "Karakteristik 01 — Objektif",
-      c: "Contoh cepat: data vs opini di kolom komentar.",
+      c: "Berdasarkan data faktual/empiris, bukan opini pribadi emosional.",
     },
     {
-      t: "Karakteristik 02 — Logis",
-      c: "Analogi rantai — klaim terhubung, tak ada yang menggantung.",
+      t: "Karakteristik 02 — Logis & Rasional",
+      c: "Alur penalaran runtut, koheren, dan masuk akal (induktif maupun deduktif).",
     },
     {
       t: "Karakteristik 03 — Sistematis",
-      c: "Teaser: 'struktur ini kita bedah di babak berikutnya.'",
+      c: "Pola organisasi terstruktur, baku, dan berkesinambungan antarbab.",
     },
     {
-      t: "Karakteristik 04 — Cendekia",
-      c: "Sentuh bahasa baku — jembatan ke kaidah ACT.07.",
+      t: "Karakteristik 04 — Cendekia & Lugas",
+      c: "Bahasa baku, efektif, istilah teknis tepat, hindari ambiguitas atau metafora berlebihan.",
     },
     {
       t: "Karakteristik 05 — Verifikatif",
-      c: "Kalimat pamungkas: yang tak teruji bukan ilmu.",
+      c: "Prosedur transparan sehingga memungkinkan replikasi oleh peneliti lain.",
     },
   ],
   [
     // 04 ANATOMY THEATER — 9 langkah
     {
       t: "Peta tubuh — overview",
-      c: "Perkenalkan metode: tubuh KTI dibaca sebagai anatomi.",
+      c: "Tiga rongga anatomi KTI: preliminaries, body text, dan postliminaries.",
     },
     {
       t: "Preliminaries",
-      c: "Sampul & kata pengantar — mahkota sebelum isi.",
+      c: "5 komponen awal: judul, pengesahan, abstrak & kata kunci, pengantar, daftar navigasi.",
     },
     {
       t: "Body Text",
-      c: "Fokus ke poros tengah; BAB I–V siap dibedah satu-satu.",
+      c: "Rongga argumen utama: standar baku lima bab (BAB I–V).",
     },
     {
       t: "BAB I — Pendahuluan",
-      c: "Empat pintu masuk argumen; semua bab wajib menepatinya.",
+      c: "Piramida terbalik, batasan, rumusan 5W1H, korespondensi tujuan 1:1, manfaat teoretis-praktis.",
     },
     {
-      t: "BAB II — Tinjauan Pustaka",
-      c: "Dialog dengan literatur — bukan tumpukan kutipan.",
+      t: "BAB II — Kajian Pustaka",
+      c: "Teori mutakhir, pemetaan riset terdahulu untuk novelty, kerangka berpikir, hipotesis statistik.",
     },
     {
-      t: "BAB III — Metode",
-      c: "Jelaskan desain agar temuan bisa direplikasi.",
+      t: "BAB III — Metodologi Penelitian",
+      c: "Desain, tempat/waktu, populasi-sampel, instrumen valid/reliabel, teknik analisis data.",
     },
     {
       t: "BAB IV — Hasil & Pembahasan",
-      c: "Momen kontribusi ilmiah — penekanan terpanjang di sini.",
+      c: "Bagian paling kritis: data objektif temuan dipertemukan dalam dialektika teori Bab II.",
     },
     {
       t: "BAB V — Simpulan & Saran",
-      c: "Janji BAB I ditepati; nada final dan tegas.",
+      c: "Simpulan substantif menjawab masalah (bukan data mentah) + rekomendasi operasional.",
     },
     {
       t: "Postliminaries",
-      c: "Daftar pustaka & lampiran — etika pengutipan ditutup di sini.",
+      c: "Daftar pustaka alfabetis baku (APA/Harvard/IEEE), lampiran data mentah, riwayat hidup.",
     },
   ],
   [
     // 05 SESI INTERAKTIF — 5 langkah
     {
       t: "Kalimat pemantik",
-      c: "Umpan 'test insting' — pastikan HP siap sebelum lanjut.",
+      c: "Ajak audiens menyiapkan ponsel untuk menguji pemahaman sistematika KTI.",
     },
     {
       t: "Q1 — voting live",
-      c: "Pantau responden & perangkat; [F] fallback bila macet, [R] reset.",
+      c: "Perbedaan artikel jurnal vs makalah: struktur IMRaD & novelty vs tugas konseptual.",
     },
     {
       t: "Q1 — reveal",
-      c: "Bacakan persen benar; bahas mayoritas yang keliru lebih dulu.",
+      c: "Bahas hasil voting dan kuatkan konsep format IMRaD dari Tabel 2.",
     },
     {
       t: "Q2 — voting live",
-      c: "Naikkan energi: 'pertanyaan terakhir — jangan kelewat.'",
+      c: "Letak kontribusi ilmiah & orisinalitas utama peneliti (Pembahasan Bab IV).",
     },
     {
       t: "Q2 — reveal & ekspor",
-      c: "Reveal, lalu [E] ekspor CSV sebagai lampiran laporan.",
+      c: "Bongkar miskonsepsi bahwa tumpukan data mentah bukanlah kontribusi sebelum dibahas kritis.",
     },
   ],
   [
     // 06 VARIASI KTI — 6 langkah
     {
       t: "Galeri variasi",
-      c: "Bingkai: satu spesies, empat habitat berbeda.",
+      c: "Sistematika menyesuaikan wadah: data Tabel 2 karya tulis ilmiah.",
     },
     {
       t: "Makalah",
-      c: "Sorot bobot analisis dan lebar cakupan.",
+      c: "Format ringkas Bab I–III (10–20 hlm) untuk kajian konseptual tugas kuliah.",
     },
     {
       t: "Artikel Jurnal",
-      c: "Tekankan peer review sebagai gerbang mutu.",
+      c: "Format IMRaD padat (4.000–7.000 kata) tanpa nomor bab Romawi, orientasi novelty.",
     },
     {
-      t: "Skripsi",
-      c: "Karya sarjana — metodologi jadi panggung utama.",
+      t: "Skripsi / Tesis",
+      c: "Format 5 bab lengkap menyeluruh dengan pengujian instrumen dan metodologi rinci.",
     },
     {
       t: "Proposal PKM",
-      c: "Ketuk aspek kebaruan dan kelayakan anggaran.",
+      c: "Ketat maksimal 10 halaman isi inti sesuai format administratif Pedoman Simbelmawa.",
     },
     {
       t: "Mode komparasi [B]",
-      c: "Bandingkan sekaligus; tutup: 'pilih sesuai medannya.'",
+      c: "Bandingkan format struktur dan karakteristik kunci antargenre secara simultan.",
     },
   ],
   [
     // 07 KAIDAH & ETIKA — 3 langkah
     {
-      t: "EYD Edisi V",
-      c: "Contoh cepat perubahan ejaan 2022 — jangan baca semua butir.",
+      t: "Penerapan EYD Edisi V",
+      c: "Kepatuhan Kepmendikbudristek No. 0424/P/2022: huruf miring untuk istilah asing & tanda baca.",
     },
     {
-      t: "Kalimat Efektif",
-      c: "Bacakan sebelum/sesudah dengan intonasi berbeda.",
+      t: "Struktur Kalimat Efektif",
+      c: "Subjek-predikat tegas, hemat kata, hindari kalimat menggantung (Jumadi et al., 2024).",
     },
     {
-      t: "Anti-Plagiarisme",
-      c: "Nada serius: gagasan dipinjam wajib dipulangkan.",
+      t: "Integritas & Anti-Plagiarisme",
+      c: "Etika perujukan, teknik parafrasa, dan penggunaan Mendeley/Zotero (Farida, 2024).",
     },
   ],
   [
     // 08 PENUTUP — 6 langkah
     {
-      t: "Simpulan 1 — Struktur",
-      c: "Pelankan tempo; ruangan mulai berkesan.",
+      t: "Simpulan 1 — Hakikat KTI",
+      c: "Pemecahan masalah dengan metode ilmiah yang dapat dipertanggungjawabkan.",
     },
     {
-      t: "Simpulan 2 — Alur argumen",
-      c: "Tangan kanan menelusuri kiri→kanan; gestur sederhana.",
+      t: "Simpulan 2 — Tiga Rongga Anatomi",
+      c: "Bagian awal (preliminaries), inti (body text 5 bab), dan akhir (postliminaries).",
     },
     {
-      t: "Simpulan 3 — Adaptasi",
-      c: "Kaitkan balik ke kartu Variasi KTI.",
+      t: "Simpulan 3 — Fleksibilitas Wadah",
+      c: "Adaptasi struktur pada makalah, artikel jurnal IMRaD, hingga proposal PKM.",
     },
     {
-      t: "Simpulan 4 — Bahasa",
-      c: "Presisi bahasa = presisi berpikir; jeda setelah kalimat ini.",
+      t: "Simpulan 4 — Bahasa & Etika",
+      c: "Keharmonisan logika antarbab, EYD V, kalimat efektif, dan integritas sitasi.",
     },
     {
       t: "Callback kalimat pembuka",
-      c: "'Kita SUDAH bedah anatominya' — beri tekanan pada SUDAH.",
+      c: "'Hari ini kita SUDAH bedah anatominya' — beri penekanan pada kata SUDAH.",
     },
     {
       t: "Terima kasih & tanya jawab",
-      c: "Buka lantai; statistik sesi tampil sebagai penutup meyakinkan.",
+      c: "Buka sesi diskusi kelas PDB 93; rekap statistik sesi tampil di layar.",
     },
   ],
 ];

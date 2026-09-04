@@ -9,7 +9,6 @@ import { Grain } from "./atoms";
 import MapOverlay from "./MapOverlay";
 import HelpOverlay from "./HelpOverlay";
 import NotesPanel from "./NotesPanel";
-import ActCard from "./ActCard";
 import {
   subscribeSession,
   getPosSnapshot,
@@ -108,7 +107,6 @@ export default function Experience() {
   >([]);
 
   const sectionRef = useRef<HTMLDivElement>(null);
-  const wipeRef = useRef<HTMLDivElement>(null);
   const keyHandlerRef = useRef<
     ((k: string, e: KeyboardEvent) => boolean | void) | null
   >(null);
@@ -268,26 +266,6 @@ export default function Experience() {
       { autoAlpha: 0 },
       { autoAlpha: 1, duration: 0.55, ease: "power1.out" },
     );
-  }, [section]);
-
-  // Sapuan garis ember — penanda pergantian babak sinematik. Garis tipis
-  // menyapu layar saat memasuki babak baru (bukan ketika kembali/settle).
-  useIsoLayoutEffect(() => {
-    const w = wipeRef.current;
-    if (!w || settled || section === 0) return;
-    const tl = gsap.timeline();
-    tl.set(w, { scaleX: 0, autoAlpha: 1, transformOrigin: "left center" });
-    tl.to(w, {
-      scaleX: 1,
-      duration: 0.42,
-      ease: "power2.inOut",
-    });
-    tl.set(w, { transformOrigin: "right center" }, ">0.04");
-    tl.to(w, { autoAlpha: 0, duration: 0.34, ease: "power1.out" });
-    return () => {
-      tl.kill();
-      gsap.set(w, { autoAlpha: 0 });
-    };
   }, [section, settled]);
 
   // ---- Keyboard: satu-satunya antarmuka kontrol presenter ----
@@ -306,6 +284,11 @@ export default function Experience() {
       if (k === " " || k === "ArrowRight" || k === "ArrowLeft")
         e.preventDefault();
       audio.init();
+
+      // Halaman Ouverture (Section 0 Step 0): biarkan auto-play dan auto-lanjut tanpa interaksi keyboard
+      if (section === 0 && step === 0) {
+        return;
+      }
 
       // [?] / [F1] — lembar bantuan lengkap (dialog modal)
       if (k === "?" || k === "F1") {
@@ -491,9 +474,6 @@ export default function Experience() {
           <SectionComp step={step} />
         </div>
 
-        {/* Kartu babak — kilasan judul saat memasuki babak yang belum pernah dilihat */}
-        {!settled && <ActCard key={`ac-${section}`} section={section} />}
-
         <Grain />
 
         {/* Vignette sinematik — pinggir layar menggelap perlahan */}
@@ -522,9 +502,6 @@ export default function Experience() {
             onClose={() => setNotesOpen(false)}
           />
         )}
-
-        {/* Sapuan garis ember — penanda pergantian babak (bukan replay) */}
-        <div ref={wipeRef} className="act-wipe" aria-hidden="true" />
 
         {/* Gerbang lanjut: posisi tersimpan dari refresh sebelumnya */}
         {savedPos && section === 0 && step === 0 && (

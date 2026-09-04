@@ -9,55 +9,55 @@ import { Kicker, BigNumeral } from "../atoms";
 const ROMAN = ["I", "II", "III", "IV", "V"];
 
 const PRELIM_ITEMS: [string, string, string][] = [
-  ["01", "Halaman judul", "identitas karya, penulis, dan institusi"],
-  ["02", "Lembar pengesahan", "legitimasi pembimbing dan penguji"],
-  ["03", "Kata pengantar", "jembatan personal penulis"],
-  ["04", "Abstrak", "seluruh tubuh dalam satu tarikan napas"],
-  ["05", "Daftar isi, tabel & gambar", "peta navigasi dokumen"],
+  ["01", "Halaman Judul", "Judul, tujuan penulisan, logo institusi, identitas penyusun, instansi, dan tahun"],
+  ["02", "Halaman Pengesahan", "Tanda tangan pembimbing dan penguji sebagai bukti legalitas serta validitas"],
+  ["03", "Abstrak & Kata Kunci", "Inti ringkas: latar belakang, tujuan, metode, hasil temuan, simpulan, serta 3–5 kata kunci"],
+  ["04", "Kata Pengantar", "Ucapan syukur, maksud penulisan, apresiasi pihak pembantu, dan keterbukaan kritik/saran"],
+  ["05", "Daftar Isi & Visual", "Navigasi halaman untuk bab, subbab, tabel, gambar, serta lampiran guna mempermudah pembaca"],
 ];
 
 const CHAPTERS = [
   {
     k: "A",
     title: "BAB I — Pendahuluan",
-    one: "Alasan lahirnya penelitian.",
+    one: "Pola piramida terbalik & formulasi masalah.",
     detail:
-      "Latar belakang, rumusan masalah, tujuan, dan manfaat — empat pintu masuk argumen. Semua bab setelahnya wajib menjawab apa yang dijanjikan di sini.",
+      "1. Latar Belakang Masalah (pola piramida terbalik: isu umum, urgensi, gap penelitian, justifikasi topik); 2. Identifikasi & Pembatasan Masalah (penegasan fokus); 3. Rumusan Masalah (spesifik 5W1H); 4. Tujuan Penelitian (korespondensi 1:1); 5. Manfaat Penelitian (teoretis & praktis).",
   },
   {
     k: "B",
-    title: "BAB II — Tinjauan Pustaka",
-    one: "Posisi kajian dalam peta ilmu.",
+    title: "BAB II — Kajian Pustaka",
+    one: "Landasan teoretis, novelty, & kerangka pikir.",
     detail:
-      "Teori acuan dan penelitian terdahulu — tempat penulis menunjukkan celah penelitian yang hendak diisi.",
+      "1. Kajian Teori (konsep dan model mutakhir sebagai basis analisis); 2. Tinjauan Penelitian Terdahulu (pemetaan posisi & kebaruan/novelty); 3. Kerangka Berpikir (bagan alur penalaran hubungan variabel); 4. Hipotesis Penelitian (dugaan sementara uji statistik).",
   },
   {
     k: "C",
-    title: "BAB III — Metode Penelitian",
-    one: "Cara kerja yang bisa diuji ulang.",
+    title: "BAB III — Metodologi Penelitian",
+    one: "Prosedur transparan untuk replikasi ilmiah.",
     detail:
-      "Desain, data, instrumen, dan teknik analisis — kunci karakter verifikatif: pembaca harus bisa mengulang jalannya penelitian.",
+      "1. Pendekatan & Jenis (kuantitatif, kualitatif, mixed methods, tindakan); 2. Tempat & Waktu; 3. Populasi, Sampel / Sumber Data & Teknik Sampling; 4. Teknik Pengumpulan Data; 5. Instrumen & Uji Validitas/Reliabilitas; 6. Teknik Analisis Data.",
   },
   {
     k: "D",
-    title: "BAB IV — Hasil & Pembahasan",
-    one: "Temuan dihadirkan, lalu diperdebatkan.",
+    title: "BAB IV — Hasil dan Pembahasan",
+    one: "Penyajian data objektif & dialektika kritis.",
     detail:
-      "Data disajikan jujur, kemudian ditaruh dalam dialog dengan teori BAB II — di sinilah kontribusi ilmiah diperjuangkan.",
+      "1. Deskripsi Hasil (penyajian naratif, tabel, atau grafik data objektif temuan); 2. Pembahasan (bagian paling kritis: menafsirkan temuan, mengaitkannya dengan teori Bab II, membandingkan riset terdahulu, menjelaskan sebab hasil, serta limitasi penelitian).",
   },
   {
     k: "E",
-    title: "BAB V — Simpulan & Saran",
-    one: "Jawaban atas rumusan masalah.",
+    title: "BAB V — Penutup",
+    one: "Jawaban rumusan masalah & rekomendasi.",
     detail:
-      "Simpulan menjawab tujuan penelitian; saran menawarkan tindak lanjut. Tidak ada klaim baru yang boleh muncul di sini.",
+      "1. Simpulan (ringkasan substantif yang menjawab rumusan masalah secara lugas berdasarkan pembahasan, bukan mengulang angka data mentah); 2. Saran (rekomendasi operasional bagi pihak terkait dan arah penelitian lanjutan/future research).",
   },
 ];
 
 const POST_ITEMS: [string, string, string][] = [
-  ["01", "Daftar pustaka", "semua sumber tercatat — napas ilmiah karya"],
-  ["02", "Lampiran", "data mentah, instrumen, dokumentasi"],
-  ["03", "Riwayat hidup penulis", "konvensi skripsi"],
+  ["01", "Daftar Pustaka", "Seluruh rujukan in-text disusun alfabetis sesuai gaya baku (APA, Harvard, IEEE)"],
+  ["02", "Lampiran (Appendices)", "Dokumen pelengkap detail: instrumen kuesioner, transkrip wawancara, perhitungan statistik mentah, surat izin"],
+  ["03", "Riwayat Hidup (CV)", "Profil singkat rekam jejak akademis penulis (opsional pada skripsi atau laporan)"],
 ];
 
 const ZONE_META: Record<number, { label: string; hex: string; rgba: (a: number) => string }> = {
@@ -129,25 +129,24 @@ export default function S4Anatomy({ step }: { step: number }) {
      
   }, []);
 
-  // Panel kanan: expand dari atas dengan clip-path saat berganti rongga
+  // Panel kanan: transisi halus saat berganti rongga
   useIsoLayoutEffect(() => {
     const p = panelRef.current;
     if (!p) return;
     if (settled) {
-      gsap.set(p, { clipPath: "inset(0% 0 0% 0)", autoAlpha: 1 });
+      gsap.set(p, { autoAlpha: 1, y: 0 });
       return;
     }
     gsap.fromTo(
       p,
-      { clipPath: "inset(0 0 100% 0)", autoAlpha: 0.4 },
+      { autoAlpha: 0, y: 14 },
       {
-        clipPath: "inset(0% 0 0% 0)",
         autoAlpha: 1,
-        duration: 0.65,
-        ease: "power3.out",
+        y: 0,
+        duration: 0.55,
+        ease: "power2.out",
       },
     );
-     
   }, [part]);
 
   // Baris panel muncul berurutan saat berganti rongga (bukan saat drill BAB)
@@ -440,8 +439,8 @@ export default function S4Anatomy({ step }: { step: number }) {
                 ))}
               </div>
               <p className="mt-6 border-l-2 border-ember/70 pl-4 font-display italic text-[1.35vw] leading-snug text-paper/80">
-                Fungsi bagian awal: membangun kredibilitas dan orientasi
-                sebelum pembaca menyentuh argumen.
+                Fungsi bagian awal: pengantar sebelum pembaca memasuki
+                substansi pokok karya ilmiah, sekaligus penegak legalitas.
               </p>
             </div>
           )}
@@ -460,31 +459,44 @@ export default function S4Anatomy({ step }: { step: number }) {
                   return (
                     <div
                       key={c.k}
-                      className={`p-row border-l-2 py-[0.55vw] pl-[1.1vw] pr-2 transition-colors duration-300 ${
-                        sel ? "border-ember bg-ember/10" : "border-edge"
+                      className={`p-row border-l-2 py-[0.6vw] pl-[1.1vw] pr-3 rounded-r-[2px] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                        sel
+                          ? "border-ember bg-ember/10"
+                          : "border-edge bg-transparent hover:border-edge/80"
                       }`}
                     >
                       <div className="flex items-baseline gap-[1vw]">
                         <span
-                          className={`font-code text-[10px] ${sel ? "text-ember" : "text-mute"}`}
+                          className={`font-code text-[10px] transition-colors duration-300 ${
+                            sel ? "text-ember font-semibold" : "text-mute"
+                          }`}
                         >
                           {c.k}
                         </span>
-                        <span className="font-body text-[1.2vw] font-semibold text-paper">
+                        <span
+                          className={`font-body text-[1.2vw] font-semibold transition-colors duration-300 ${
+                            sel ? "text-paper" : "text-paper/85"
+                          }`}
+                        >
                           {c.title}
                         </span>
                         <span className="ml-auto hidden font-display text-[1vw] italic text-mute xl:inline">
                           {c.one}
                         </span>
                       </div>
-                      {sel && (
-                        <p
-                          key={c.k}
-                          className="fade-slide-in mt-2 max-w-[28vw] font-body text-[1.1vw] leading-relaxed text-paper/75"
-                        >
-                          {c.detail}
-                        </p>
-                      )}
+                      <div
+                        className={`grid transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                          sel
+                            ? "grid-rows-[1fr] opacity-100 mt-2"
+                            : "grid-rows-[0fr] opacity-0 mt-0 pointer-events-none"
+                        }`}
+                      >
+                        <div className="overflow-hidden">
+                          <p className="max-w-[38vw] font-body text-[1.05vw] leading-relaxed text-paper/85 pt-1 pb-0.5">
+                            {c.detail}
+                          </p>
+                        </div>
+                      </div>
                     </div>
                   );
                 })}
@@ -520,8 +532,8 @@ export default function S4Anatomy({ step }: { step: number }) {
                 ))}
               </div>
               <p className="mt-6 border-l-2 border-ember/70 pl-4 font-display italic text-[1.35vw] leading-snug text-paper/80">
-                Bagian ini menjamin karakter verifikatif: pembaca dapat
-                menelusuri dan menguji ulang setiap klaim.
+                Bagian akhir memuat kelengkapan administratif dan akademis
+                pendukung guna menjamin karakter verifikatif serta integritas sitasi.
               </p>
             </div>
           )}

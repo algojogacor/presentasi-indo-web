@@ -12,12 +12,14 @@ const SENTENCE =
 
 /**
  * Section 0 — Opening Cinematic.
- * Step 0: gerbang redup (menunggu [SPACE] — sekaligus membuka izin audio).
- * Step 1: kalimat scamble → jeda 1.2s → judul per karakter + dentum sub-bass → kredit.
+ * Step 0: Halaman Ouverture sinematik (~15vw "OUVERTURE", kicker "ANATOMI KARYA TULIS ILMIAH",
+ *         garis amber 100px, staggered fade-in 2s, diam 2s, fade-out ke hitam, auto-play ke Step 1).
+ * Step 1: Kalimat scramble → jeda 1.2s → judul per karakter + dentum sub-bass → kredit.
  */
 export default function S0Opening({ step }: { step: number }) {
   const { settled, registerTimeline, setStep } = usePres();
   const root = useRef<HTMLDivElement>(null);
+  const ouvertureRef = useRef<HTMLDivElement>(null);
 
   // State awal sebelum cat pertama — set semuanya tersembunyi
   useIsoLayoutEffect(() => {
@@ -29,8 +31,84 @@ export default function S0Opening({ step }: { step: number }) {
     gsap.set(sentence, { autoAlpha: 0 });
     gsap.set(chars, { yPercent: 112, autoAlpha: 0 });
     gsap.set(credits, { autoAlpha: 0, y: 16 });
-     
   }, []);
+
+  // Timeline Ouverture (Step 0) — auto-play & auto-lanjut
+  useIsoLayoutEffect(() => {
+    if (step !== 0) return;
+    const el = ouvertureRef.current;
+    if (!el) return;
+
+    if (settled) {
+      // Kembali ke opening setelah presentasi berjalan → langsung ke step 1
+      setStep(1);
+      return;
+    }
+
+    const kicker = el.querySelector<HTMLElement>(".ou-kicker");
+    const line = el.querySelector<HTMLElement>(".ou-line");
+    const title = el.querySelector<HTMLElement>(".ou-title");
+    if (!kicker || !line || !title) return;
+
+    // Set awal tersembunyi di bawah
+    gsap.set([kicker, line, title], { autoAlpha: 0, y: 32 });
+
+    const tl = gsap.timeline({
+      onComplete: () => {
+        // Otomatis lanjut ke Section 0 (Step 1)
+        audio.init();
+        setStep(1);
+      },
+    });
+
+    // 1. Animasi masuk: semua elemen fade in staggered dari bawah, total durasi ~2 detik
+    tl.to(
+      kicker,
+      {
+        y: 0,
+        autoAlpha: 1,
+        duration: 1.1,
+        ease: "power2.out",
+      },
+      0,
+    );
+
+    tl.to(
+      line,
+      {
+        y: 0,
+        autoAlpha: 1,
+        duration: 1.0,
+        ease: "power2.out",
+      },
+      0.28,
+    );
+
+    tl.to(
+      title,
+      {
+        y: 0,
+        autoAlpha: 1,
+        duration: 1.35,
+        ease: "power3.out",
+      },
+      0.55,
+    );
+
+    // 2. Diam selama 2 detik penuh setelah semua elemen masuk
+    tl.to({}, { duration: 2.0 });
+
+    // 3. Kemudian fade out ke hitam, baru masuk Section 0 (Step 1)
+    tl.to(el, {
+      autoAlpha: 0,
+      duration: 0.6,
+      ease: "power2.inOut",
+    });
+
+    return () => {
+      tl.kill();
+    };
+  }, [step, settled, setStep]);
 
   // Timeline opening berjalan saat memasuki step 1
   useIsoLayoutEffect(() => {
@@ -91,7 +169,6 @@ export default function S0Opening({ step }: { step: number }) {
       tl.kill();
       registerTimeline(null);
     };
-     
   }, [step]);
 
   return (
@@ -99,60 +176,35 @@ export default function S0Opening({ step }: { step: number }) {
       ref={root}
       className="absolute inset-0 flex flex-col items-center justify-center px-[8vw]"
     >
-      {/* Cahaya panggung samar — hanya di gerbang awal */}
+      {/* Halaman Ouverture (Step 0) — layar hitam penuh, auto-play & auto-lanjut */}
       {step === 0 && (
         <div
-          aria-hidden
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              "radial-gradient(ellipse 55% 38% at 50% -12%, rgba(232,160,32,0.06), transparent 70%)",
-          }}
-        />
-      )}
-
-      {step === 0 && (
-        <div className="relative flex flex-col items-center gap-[2vw] px-[5vw] py-[3.2vw]">
-          {/* Bingkai panggung — bracket sudut bernafas */}
+          ref={ouvertureRef}
+          className="pointer-events-none fixed inset-0 z-[75] flex flex-col items-center justify-center bg-[#0A0A0F] select-none"
+          aria-hidden="true"
+        >
+          {/* Teks kecil di atas: IBM Plex Mono, #E8A020, letter-spacing lebar */}
           <span
-            aria-hidden
-            className="gate-bracket absolute -top-3 -left-3 h-4 w-4 border-t border-l border-ember/50"
-          />
-          <span
-            aria-hidden
-            className="gate-bracket absolute -top-3 -right-3 h-4 w-4 border-t border-r border-ember/50"
-          />
-          <span
-            aria-hidden
-            className="gate-bracket absolute -bottom-3 -left-3 h-4 w-4 border-b border-l border-ember/50"
-          />
-          <span
-            aria-hidden
-            className="gate-bracket absolute -bottom-3 -right-3 h-4 w-4 border-b border-r border-ember/50"
-          />
-
-          <p className="font-code text-[10px] tracking-[0.5em] text-mute">
-            ANATOMI KARYA TULIS ILMIAH
-          </p>
-          <span
-            aria-hidden
-            className="h-px w-[16vw] bg-gradient-to-r from-transparent via-edge to-transparent"
-          />
-          <button
-            type="button"
-            onClick={() => {
-              audio.init();
-              setStep(1);
-            }}
-            onKeyDown={(e) => {
-              // Space pada tombol jangan dobel-trigger dengan handler global
-              if (e.key === " ") e.stopPropagation();
-            }}
-            className="font-code text-[11px] tracking-[0.4em] text-ember/70 animate-pulse transition-colors duration-300 hover:text-ember"
-            aria-label="Tekan Space untuk memulai"
+            className="ou-kicker font-code text-xs md:text-sm uppercase tracking-[0.5em] text-[#E8A020]"
+            style={{ color: "#E8A020" }}
           >
-            [ SPACE ] — MULAI
-          </button>
+            ANATOMI KARYA TULIS ILMIAH
+          </span>
+
+          {/* Garis amber tipis (~100px) di antara keduanya */}
+          <div
+            className="ou-line my-[2.5vh] h-[1px] w-[100px] bg-[#E8A020]"
+            style={{ width: "100px", height: "1px", backgroundColor: "#E8A020" }}
+            aria-hidden="true"
+          />
+
+          {/* Teks utama: "OUVERTURE" ~15vw, font Cormorant Garamond, warna #F0EDE8 */}
+          <h1
+            className="ou-title font-display text-[15vw] font-normal leading-[0.88] tracking-wide text-[#F0EDE8] text-center select-none"
+            style={{ color: "#F0EDE8" }}
+          >
+            OUVERTURE
+          </h1>
         </div>
       )}
 

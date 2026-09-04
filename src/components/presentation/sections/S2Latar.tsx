@@ -6,20 +6,20 @@ import { useStepReveal, useIsoLayoutEffect } from "../hooks";
 import { Kicker, BigNumeral } from "../atoms";
 
 const STATEMENT =
-  "Banyak mahasiswa yang bisa menulis, tapi tidak tahu apa yang mereka tulis.";
+  "Struktur dalam penulisan karya ilmiah berfungsi sebagai kerangka logis yang mengarahkan pembaca untuk memahami alur pemikiran penulis dari perumusan fenomena hingga penarikan kesimpulan.";
 
 const FACTS = [
   {
-    tag: "FAKTA 01 — STRUKTUR",
-    text: "Menulis lancar tidak sama dengan menulis terstruktur. Banyak tulisan mahasiswa runtuh bukan karena idenya — tapi karena anatominya.",
+    tag: "FAKTA 01 — KOMUNIKASI AKADEMIK",
+    text: "Karya ilmiah bukan sekadar sarana melaporkan riset, melainkan alat krusial pengembang pemikiran kritis dan analitis di tengah pesatnya tuntutan publikasi bereputasi (Musdalifah et al., 2025).",
   },
   {
-    tag: "FAKTA 02 — KONVENSI",
-    text: "Struktur KTI adalah konvensi komunitas ilmiah: bagian awal, inti, dan akhir punya fungsi yang tidak bisa ditukar tempat.",
+    tag: "FAKTA 02 — HAMBATAN MAHASISWA",
+    text: "Banyak mahasiswa masih terhambat menyusun karya ilmiah standar akibat minimnya penguasaan struktur anatomi dan kurangnya latihan penulisan terarah (Baharuddin et al., 2025).",
   },
   {
-    tag: "FAKTA 03 — KONSEKUENSI",
-    text: "Salah struktur berarti gagal komunikasi — pembaca tersesat sebelum sampai pada isi.",
+    tag: "FAKTA 03 — KERANGKA LOGIS",
+    text: "Setiap bab KTI memiliki fungsi distingtif; memahami struktur anatomi bukan sebatas kepatuhan teknis, melainkan esensial dalam membangun argumen ilmiah yang utuh dan sahih.",
   },
 ];
 
@@ -30,29 +30,28 @@ const FACTS = [
  */
 export default function S2Latar({ step }: { step: number }) {
   const root = useRef<HTMLDivElement>(null);
+  const statementRef = useRef<HTMLDivElement>(null);
   useStepReveal(root, step);
 
   // Saat fakta mulai muncul, pernyataan naik & mengecil agar fakta bernafas
   useIsoLayoutEffect(() => {
-    const el = root.current?.querySelector<HTMLElement>(".s2-statement");
+    const el = statementRef.current;
     if (!el) return;
     if (step >= 1) {
       gsap.to(el, {
-        yPercent: -16,
+        y: "-14vh",
         scale: 0.82,
-        autoAlpha: 0.55,
+        autoAlpha: 0.6,
         duration: 0.7,
         ease: "power3.inOut",
-        transformOrigin: "center top",
       });
     } else {
       gsap.to(el, {
-        yPercent: 0,
+        y: 0,
         scale: 1,
         autoAlpha: 1,
-        duration: 0.6,
+        duration: 0.65,
         ease: "power2.out",
-        transformOrigin: "center top",
       });
     }
   }, [step]);
@@ -60,30 +59,38 @@ export default function S2Latar({ step }: { step: number }) {
   return (
     <div
       ref={root}
-      className="absolute inset-0 flex flex-col items-center justify-center px-[10vw]"
+      className="absolute inset-0 px-[8vw]"
     >
       <Kicker act="02">LATAR BELAKANG</Kicker>
       <BigNumeral>02</BigNumeral>
 
-      <p
+      {/* Pernyataan besar — terpusat penuh saat Step 0, naik anggun saat fakta masuk */}
+      <div
+        ref={statementRef}
         data-step="0"
-        className="s2-statement max-w-[58vw] text-center font-display italic text-[3.4vw] leading-[1.18] text-paper"
+        className="absolute top-[46%] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center text-center w-[68vw] pointer-events-none"
       >
-        {STATEMENT}
-      </p>
+        <p className="s2-statement font-display italic text-[2.7vw] leading-[1.3] text-paper">
+          &ldquo;{STATEMENT}&rdquo;
+        </p>
+        <span className="mt-3 font-code text-[10px] tracking-[0.3em] text-ember/70">
+          — SUB-BAB 1.1 · LATAR BELAKANG MASALAH
+        </span>
+      </div>
 
-      <div className="mt-[4.5vw] w-[54vw] space-y-[1.5vw]">
+      {/* Tiga fakta urgensi sekuensial — muncul di paruh bawah saat Step 1–3 */}
+      <div className="absolute top-[50vh] left-1/2 -translate-x-1/2 w-[62vw] space-y-[1.3vw]">
         {FACTS.map((f, i) => (
           <div
             key={f.tag}
             data-step={i + 1}
             data-reveal="clip"
-            className="grid grid-cols-[15vw_1fr] items-baseline gap-[2vw] border-t border-edge pt-[1.1vw]"
+            className="grid grid-cols-[16vw_1fr] items-baseline gap-[2vw] border-t border-edge pt-[1vw]"
           >
             <span className="font-code text-[10px] tracking-[0.18em] text-ember whitespace-nowrap">
               {f.tag}
             </span>
-            <p className="font-body text-[1.35vw] leading-snug text-paper/90">
+            <p className="font-body text-[1.22vw] leading-snug text-paper/90">
               {f.text}
             </p>
           </div>

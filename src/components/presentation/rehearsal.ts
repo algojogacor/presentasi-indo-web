@@ -7,7 +7,7 @@ import { SECTIONS } from "./context";
 
 export const REHEARSAL_PLAN: number[][] = [
   [0, 60], // 00 OUVERTURE — judul + kredit
-  [15, 645, 60], // 01 GUEST LECTURER — video ± 10,5 menit
+  [15, 15, 15, 645, 60], // 01 GUEST LECTURER — intro gelap, spotlight, tirai tampak, video, penutup
   [40, 40, 50, 50], // 02 LATAR BELAKANG
   [45, 45, 45, 45, 45, 45, 45, 45], // 03 HAKIKAT & KARAKTERISTIK
   [35, 45, 50, 55, 55, 60, 60, 65, 55], // 04 ANATOMY THEATER
