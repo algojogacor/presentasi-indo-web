@@ -136,19 +136,27 @@ export default function S7Kaidah({ step }: { step: number }) {
           </p>
 
           <div className="mt-[4vh] grid max-w-[76vw] grid-cols-2 gap-[2vw]">
-            <div className="border-t-2 border-wrong/60 pt-4">
+            <div className="rounded-r border-t-2 border-wrong/60 bg-wrong/[0.03] p-4 pt-3">
+              <div className="inline-flex items-center gap-1.5 rounded bg-wrong/15 px-2 py-0.5 font-code text-[8.5px] text-wrong mb-2 border border-wrong/30">
+                <span className="h-1.5 w-1.5 rounded-full bg-wrong" />
+                <span>KETIDAKBAKUAN TEKS</span>
+              </div>
               <p className="font-code text-[10px] tracking-[0.25em] text-wrong">
                 {p.before.label}
               </p>
-              <p className="mt-4 font-body text-[1.35vw] leading-relaxed text-paper/70">
+              <p className="mt-3 font-body text-[1.3vw] leading-relaxed text-paper/75">
                 {p.before.body}
               </p>
             </div>
-            <div className="border-t-2 border-ember pt-4">
+            <div className="rounded-r border-t-2 border-ember bg-ember/[0.03] p-4 pt-3 shadow-[0_4px_25px_rgba(232,160,32,0.05)]">
+              <div className="inline-flex items-center gap-1.5 rounded bg-ember/15 px-2 py-0.5 font-code text-[8.5px] text-ember mb-2 border border-ember/30">
+                <span className="h-1.5 w-1.5 rounded-full bg-ember animate-pulse" />
+                <span>STANDAR BAKU EYD V</span>
+              </div>
               <p className="font-code text-[10px] tracking-[0.25em] text-ember">
                 {p.after.label}
               </p>
-              <p className="mt-4 font-body text-[1.35vw] leading-relaxed text-paper/95">
+              <p className="mt-3 font-body text-[1.3vw] leading-relaxed text-paper/95 font-medium">
                 {p.after.body}
               </p>
             </div>

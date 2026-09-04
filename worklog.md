@@ -1614,6 +1614,41 @@ Work Log:
 Stage Summary:
 - Status: SELESAI & TERVERIFIKASI LOKAL (Browser subagent, tsc, build).
 
+---
+Task ID: 41
+Agent: main (Antigravity — Gemini 3.8 Flash High)
+Task: Implementasi Perbaikan Ejaan EYD V, Harmonisasi Istilah Baku KBBI, dan Peningkatan Micro-Detailing Desain (Spine of Coherence, Status Badges, Battle Card Detailing)
+
+Work Log:
+1. Koreksi Kaidah Kebahasaan & Ejaan EYD V:
+   - `src/components/presentation/sections/s0/creditData.ts`:
+     * Mengubah label dari "DIBAWAH BIMBINGAN" menjadi "DI BAWAH BIMBINGAN" sesuai ketetapan ejaan pemisahan kata depan 'di' pada EYD Edisi V.
+   - `src/components/presentation/sections/s2/docketData.ts`:
+     * Mengubah judul "MANFAAT TEORITIS" menjadi "MANFAAT TEORETIS" (baku KBBI) dengan anotasi linguistik penegas.
+   - `src/lib/notesData.ts`:
+     * Menyinkronkan cue presenter untuk S0 kredit ('di bawah bimbingan') dan S2 step 7 ('manfaat teoretis (ingatkan bentuk baku KBBI)').
+2. Peningkatan Micro-Detailing Desain Visual & SVG:
+   - `src/components/presentation/sections/s4/DocumentSheet.tsx`:
+     * Menambahkan header metadata kalibrasi spesimen: `A4 · 210×297MM · 1:√2` dan `MARGIN 4-4-3-3 CM`.
+     * Menambahkan Tulang Punggung Koherensi Riset (*Spine of Coherence*) pada ZONE 2 Body Text: garis konektor vertikal dengan node vertebra per bab untuk memvisualisasikan hubungan logis Bab I (Masalah) ⇄ Bab III (Metode) ⇄ Bab IV (Pembahasan) ⇄ Bab V (Simpulan).
+     * Memperbarui label metadata footer ke format resmi `PDB 93 UNAIR`.
+   - `src/components/presentation/sections/s6/BattleCard.tsx`:
+     * Menambahkan penomoran kartu `0{i + 1}/04` pada header.
+     * Menambahkan aksen sudut geometris emas (*corner brackets*).
+     * Menambahkan indikator dot amber berdenyut (*pulsing dot*) pada baris metrik kunci saat mode komparasi aktif (`compare && r.hot`).
+   - `src/components/presentation/sections/S7Kaidah.tsx`:
+     * Menambahkan status badge kontras tinggi: "KETIDAKBAKUAN TEKS" (merah) vs "STANDAR BAKU EYD V" (amber) pada perbandingan sebelum vs sesudah agar terbaca jelas dari jarak 5–8 meter.
+   - `src/components/presentation/experience/useExperienceKeyboard.ts`:
+     * Menambahkan audio feedback `audio.tick()` saat menutup modal pustaka atau catatan presenter via tombol `Escape`.
+3. Verifikasi & Build:
+   - `bun x tsc --noEmit`: 0 error.
+   - `bun run lint`: 0 error, 1 pre-existing warning (font di layout).
+   - `bun run build`: Berhasil 100% (produksi teroptimasi dalam 3.8s).
+   - Audit batas baris kode: Seluruh file tetap < 250 baris (`DocumentSheet.tsx`: 165 baris, `BattleCard.tsx`: 75 baris, `S7Kaidah.tsx`: 169 baris, `creditData.ts`: 31 baris, `docketData.ts`: 85 baris, `notesData.ts`: 231 baris).
+
+Stage Summary:
+- Status: SELESAI & TERVERIFIKASI LOKAL (tsc, lint, build).
+
 
 
 

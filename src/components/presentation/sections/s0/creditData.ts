@@ -7,7 +7,7 @@ export interface MemberCredit {
 }
 
 export const DOSEN_PENGAMPU = {
-  label: "DIBAWAH BIMBINGAN",
+  label: "DI BAWAH BIMBINGAN",
   name: "Drs. Eddy Sugiri, M.Hum.",
   nip: "NIP. 195508051985021001",
 };

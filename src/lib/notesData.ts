@@ -19,7 +19,7 @@ export const NOTE_PLAN: StepNote[][] = [
     },
     {
       t: "Kredit Tim & Dosen Pembimbing",
-      c: "Sebut Drs. Eddy Sugiri, M.Hum. & tim, lalu Space masuk ke video narasumber.",
+      c: "Sebut Drs. Eddy Sugiri, M.Hum. ('di bawah bimbingan') & 6 anggota tim, lalu Space masuk ke video narasumber.",
     },
   ],
   [
@@ -73,7 +73,7 @@ export const NOTE_PLAN: StepNote[][] = [
     },
     {
       t: "Dakwaan IV & Manfaat Penulisan",
-      c: "Bacakan rumusan IV (Kaidah & Etika); simpulkan manfaat teoritis & praktis sebelum melangkah ke Babak 3.",
+      c: "Bacakan rumusan IV (Kaidah & Etika); simpulkan manfaat teoretis (ingatkan bentuk baku KBBI) & praktis sebelum melangkah ke Babak 3.",
     },
   ],
   [

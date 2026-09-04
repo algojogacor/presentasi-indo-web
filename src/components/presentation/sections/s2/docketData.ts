@@ -74,8 +74,8 @@ export const DOCKET_ITEMS: DocketItem[] = [
 export const MANFAAT_DATA = {
   label: "SUB-BAB 1.4 · MANFAAT PENULISAN",
   teoritis: {
-    title: "MANFAAT TEORITIS",
-    desc: "Acuan komparatif dalam mempelajari bahasa teks akademik & kajian keilmuan struktur penulisan ilmiah di perguruan tinggi.",
+    title: "MANFAAT TEORETIS",
+    desc: "Acuan komparatif dalam mempelajari bahasa teks akademik & kajian keilmuan struktur penulisan ilmiah di perguruan tinggi (baku KBBI).",
   },
   praktis: {
     title: "MANFAAT PRAKTIS",

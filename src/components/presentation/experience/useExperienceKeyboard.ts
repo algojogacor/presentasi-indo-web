@@ -114,11 +114,13 @@ export function useExperienceKeyboard({
       // [Esc] — tutup modal pustaka / panel catatan presenter
       if (k === "Escape") {
         if (bibOpen) {
+          audio.tick();
           setBibOpen(false);
           hud("DAFTAR PUSTAKA — DITUTUP [P]");
           return;
         }
         if (notesOpen) {
+          audio.tick();
           setNotesOpen(false);
           return;
         }
