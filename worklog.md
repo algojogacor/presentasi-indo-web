@@ -1497,6 +1497,44 @@ Work Log:
 Stage Summary:
 - Status: SELESAI & TERVERIFIKASI LOKAL.
 
+---
+Task ID: 38
+Agent: main (Antigravity — Gemini 3.8 Flash High)
+Task: Implementasi Modal Overlay Daftar Pustaka Baku (Shortcut [P]) & Slide Postliminaries Section 8 Step 7
+
+Work Log:
+1. Integrasi 13 Referensi Resmi Makalah (Bab III):
+   - Membuat `src/data/bibliography.ts` (138 baris) berisi metadata 13 referensi baku (APA Style edisi ke-7), mapping babak sitasi (`acts: number[]`), tipe sumber (`JURNAL`, `BUKU TEKS`, `PEDOMAN RESMI`, `LEKSIKOGRAFI`), tahun, penulis, judul, sumber, dan DOI/URL.
+2. Modal Overlay Jurnal Ilmiah (Shortcut [P]):
+   - Membuat `src/components/presentation/BibliographyModal.tsx` (243 baris) dengan estetika halaman jurnal ilmiah dua kolom, hanging indent, filter tabs (SEMUA, DIKUTIP DI ACT.0X, JURNAL, BUKU TEKS, PEDOMAN & LEKSIKO).
+   - Fitur nilai tambah Contextual Smart Highlight: referensi yang dikutip pada babak aktif otomatis mendapatkan glowing border emas dan lencana `[DIKUTIP PADA ACT.0X]`.
+   - Ditutup dengan tombol `ESC` atau shortcut `P`.
+3. Slide Penutup Resmi Section 8 Step 7 (Postliminaries):
+   - Membuat `src/components/presentation/sections/s8/PostliminariesSlide.tsx` (108 baris) menampilkan ke-13 pustaka sebagai penutup anatomis resmi (Preliminaries -> Body Text -> Postliminaries) setelah sesi tanya jawab.
+   - Memperbarui `src/components/presentation/sections/S8Closing.tsx` untuk mengorkestrasi 8 langkah (Step 0..3: Simpulan, Step 4: The Verdict, Step 5: Callback, Step 6: Terima Kasih & Tanya Jawab, Step 7: PostliminariesSlide).
+4. Penyesuaian State & Arsitektur:
+   - `src/components/presentation/context.ts`: `SECTIONS[8].steps` diset ke 8.
+   - `src/components/presentation/rehearsal.ts`: `REHEARSAL_PLAN[8]` diset ke 8 langkah `[30, 30, 30, 30, 45, 40, 45, 60]`.
+   - `src/lib/notesData.ts`: Menambahkan catatan presenter Step 7 Postliminaries.
+   - `src/components/presentation/experience/useExperienceKeyboard.ts`: Menambahkan listener `[P]` toggle dan `Escape` handler.
+   - `src/components/presentation/experience/PresenterHud.tsx`: Menambahkan indikator status `PUSTAKA` dan prompt pintasan `[P] PUSTAKA`.
+   - `src/components/presentation/Experience.tsx`: Inisialisasi state `bibOpen`, meneruskan ke keyboard hook & HUD, dan merender `<BibliographyModal />`.
+5. Verifikasi & Pengujian:
+   - `bun x tsc --noEmit`: 0 error.
+   - `npm run lint`: 0 error, 1 warning (pre-existing layout font).
+   - `bun run build`: Berhasil 100% lokal dalam 4.7s.
+   - Pengujian interaktif browser subagent di `http://localhost:3000`:
+     * Menekan `P` di Act 0 memunculkan overlay modal dengan layout 2-kolom dan 13 rujukan.
+     * Filter `JURNAL (4)` memfilter hanya 4 entri jurnal.
+     * `Escape` menutup modal dengan mulus.
+     * Navigasi `G` + `8` lalu maju ke Step 7 menampilkan `PostliminariesSlide` dengan sempurna.
+     * Menekan `P` di Act 8 memunculkan filter contextual `DIKUTIP DI ACT.08 (1)` dan border emas menyala.
+   - Audit baris kode: Seluruh file tetap terjaga ketat di bawah 250 baris.
+
+Stage Summary:
+- Status: SELESAI & TERVERIFIKASI LOKAL (Browser subagent, tsc, lint, build).
+
+
 
 
 

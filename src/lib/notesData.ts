@@ -216,7 +216,7 @@ export const NOTE_PLAN: StepNote[][] = [
     },
   ],
   [
-    // 08 PENUTUP — 7 langkah (4 Simpulan + 2 Saran + Callback + Tanya Jawab)
+    // 08 PENUTUP — 8 langkah (4 Simpulan + 2 Saran + Callback + Tanya Jawab + Postliminaries)
     { t: "Simpulan 1 — Hakikat KTI", c: "Pemecahan masalah dengan metode ilmiah yang dapat dipertanggungjawabkan." },
     { t: "Simpulan 2 — Tiga Rongga Anatomi", c: "Bagian awal (preliminaries), inti (body text 5 bab), dan akhir (postliminaries)." },
     { t: "Simpulan 3 — Fleksibilitas Wadah", c: "Adaptasi struktur pada makalah, artikel jurnal IMRaD, hingga proposal PKM." },
@@ -224,5 +224,6 @@ export const NOTE_PLAN: StepNote[][] = [
     { t: "Putusan Saran & Rekomendasi", c: "Dua preskripsi: koherensi segitiga emas mahasiswa & praktikum penulisan jurnal MKWU." },
     { t: "Callback Kalimat Pembuka", c: "'Hari ini kita SUDAH bedah anatominya' — beri penekanan pada kata SUDAH." },
     { t: "Terima Kasih & Tanya Jawab", c: "Buka sesi diskusi kelas PDB 93; [V] untuk buka rincian statistik voting live." },
+    { t: "Postliminaries — Daftar Pustaka Lengkap", c: "Tampilkan 13 rujukan resmi APA 7th edition penutup struktur anatomi KTI." },
   ],
 ];

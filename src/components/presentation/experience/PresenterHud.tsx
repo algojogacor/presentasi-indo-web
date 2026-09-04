@@ -17,6 +17,7 @@ interface PresenterHudProps {
   mapOpen: boolean;
   helpSheet: boolean;
   notesOpen: boolean;
+  bibOpen?: boolean;
   clockRunning: boolean;
   elapsed: number;
   rehearsalOn: boolean;
@@ -35,6 +36,7 @@ export default function PresenterHud({
   mapOpen,
   helpSheet,
   notesOpen,
+  bibOpen,
   clockRunning,
   elapsed,
   rehearsalOn,
@@ -45,15 +47,15 @@ export default function PresenterHud({
   helpOn,
 }: PresenterHudProps) {
   return (
-    <div
-      className="pointer-events-none fixed bottom-5 left-6 z-[70] border-l border-edge/70 pl-3 font-code text-[10px] leading-[1.8] tracking-[0.14em]"
-      style={{ color: "var(--hud)" }}
-      aria-hidden="true"
-    >
+    <div className="pointer-events-none fixed bottom-4 left-6 z-[70] select-none font-code text-[11px] tracking-wider text-mute/80 space-y-0.5">
       {huds.map((h) => (
         <div
           key={h.id}
-          className={`hud-msg ${h.tone === "ember" ? "text-ember/80" : ""}`}
+          className={
+            h.tone === "ember"
+              ? "text-ember font-semibold animate-pulse"
+              : "text-paper/90"
+          }
         >
           {h.msg}
         </div>
@@ -66,6 +68,7 @@ export default function PresenterHud({
         {mapOpen ? " // PETA" : ""}
         {helpSheet ? " // BANTUAN" : ""}
         {notesOpen ? " // CATATAN" : ""}
+        {bibOpen ? " // PUSTAKA" : ""}
       </div>
       {clockRunning && (
         <div className={elapsed >= 50 * 60 ? "text-ember/75" : undefined}>
@@ -96,16 +99,17 @@ export default function PresenterHud({
           }`}
         </div>
       )}
-      {(contrast || muted) && (
+      {(contrast || muted || notesOpen || bibOpen) && (
         <div className="mt-0.5 flex gap-1.5">
           {contrast && <span className="hud-lamp">C+</span>}
           {muted && <span className="hud-lamp">MUTE</span>}
           {notesOpen && <span className="hud-lamp">NOTE</span>}
+          {bibOpen && <span className="hud-lamp">PUSTAKA</span>}
         </div>
       )}
       {helpOn && (
         <div className="text-[9px] tracking-[0.2em] text-paper/30">
-          [SPACE] LANJUT · [G]+# LOMPAT · [O] PETA · [N] CATATAN · [T] LATIHAN · [?] BANTUAN · [H] SEMBUNYI
+          [SPACE] LANJUT · [P] PUSTAKA · [G]+# LOMPAT · [O] PETA · [N] CATATAN · [T] LATIHAN · [?] BANTUAN · [H] SEMBUNYI
         </div>
       )}
     </div>

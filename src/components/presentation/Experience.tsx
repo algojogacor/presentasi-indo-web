@@ -8,6 +8,7 @@ import { Grain } from "./atoms";
 import MapOverlay from "./MapOverlay";
 import HelpOverlay from "./HelpOverlay";
 import NotesPanel from "./NotesPanel";
+import BibliographyModal from "./BibliographyModal";
 import { visitedActs } from "./session";
 import {
   plannedElapsed,
@@ -47,6 +48,7 @@ export default function Experience() {
   const [mapOpen, setMapOpen] = useState(false);
   const [helpSheet, setHelpSheet] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
+  const [bibOpen, setBibOpen] = useState(false);
   const [helpOn, setHelpOn] = useState(true);
 
   const sectionRef = useRef<HTMLDivElement>(null);
@@ -96,6 +98,7 @@ export default function Experience() {
     mapOpen,
     helpSheet,
     notesOpen,
+    bibOpen,
     savedPos,
     advance,
     back,
@@ -107,6 +110,7 @@ export default function Experience() {
     setHelpSheet,
     setMapOpen,
     setNotesOpen,
+    setBibOpen,
     setHelpOn,
     keyHandlerRef,
   });
@@ -152,13 +156,20 @@ export default function Experience() {
         {helpSheet && <HelpOverlay onClose={() => setHelpSheet(false)} />}
 
         {/* Catatan presenter per langkah */}
-        {notesOpen && !helpSheet && !mapOpen && (
+        {notesOpen && !helpSheet && !mapOpen && !bibOpen && (
           <NotesPanel
             section={section}
             step={step}
             onClose={() => setNotesOpen(false)}
           />
         )}
+
+        {/* Modal Daftar Pustaka Ilmiah (Shortcut [P]) */}
+        <BibliographyModal
+          isOpen={bibOpen}
+          onClose={() => setBibOpen(false)}
+          currentSection={section}
+        />
 
         {/* Gerbang lanjut: posisi tersimpan dari refresh sebelumnya */}
         <ResumeGate savedPos={savedPos} section={section} step={step} />
@@ -183,6 +194,7 @@ export default function Experience() {
           mapOpen={mapOpen}
           helpSheet={helpSheet}
           notesOpen={notesOpen}
+          bibOpen={bibOpen}
           clockRunning={clockRunning}
           elapsed={elapsed}
           rehearsalOn={rehearsalOn}

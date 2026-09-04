@@ -11,16 +11,17 @@ import VerdictCards from "./s8/VerdictCards";
 import ClosingCallback from "./s8/ClosingCallback";
 import ThankYouCard from "./s8/ThankYouCard";
 import SessionRecap from "./s8/SessionRecap";
+import PostliminariesSlide from "./s8/PostliminariesSlide";
 
 /**
  * Section 8 — Penutup (BAB III Makalah).
  *
- * Alur Pacing Teatrikal (7 Langkah):
+ * Alur Pacing Teatrikal (8 Langkah):
  * - Step 0–3: Empat simpulan eksekutif (Sub-bab 3.1 Makalah).
- * - Step 4: The Verdict — Dua Kartu Rekomendasi/Saran (Sub-bab 3.2 Makalah)
- *           untuk Mahasiswa Peneliti & Institusi/Pengampu MKWU.
+ * - Step 4: The Verdict — Dua Kartu Rekomendasi/Saran (Sub-bab 3.2 Makalah).
  * - Step 5: Callback kalimat pembuka — kata "sudah" bernasib ember di tengah layar.
  * - Step 6: Kredit, terima kasih, tanya jawab & rekapitulasi interaktif live.
+ * - Step 7: Postliminaries — Lembaran Daftar Pustaka Lengkap (13 Rujukan Baku).
  */
 export default function S8Closing({ step }: { step: number }) {
   const root = useRef<HTMLDivElement>(null);
@@ -30,7 +31,7 @@ export default function S8Closing({ step }: { step: number }) {
 
   // [V] — rekap sesi: rincian per pertanyaan di layar tanya jawab (step 6).
   useSectionKeys((key) => {
-    if (key === "v" && step >= 6) {
+    if (key === "v" && step === 6) {
       setRecapDetail((d) => {
         hud(
           d ? "REKAP SESI — RINGKAS [V]" : "REKAP SESI — RINCIAN [V]",
@@ -73,7 +74,9 @@ export default function S8Closing({ step }: { step: number }) {
       ? "PENUTUP · SIMPULAN"
       : step === 4
         ? "PENUTUP · REKOMENDASI"
-        : "PENUTUP";
+        : step === 7
+          ? "PENUTUP · POSTLIMINARIES"
+          : "PENUTUP";
 
   return (
     <div ref={root} className="absolute inset-0" data-testid="penutup">
@@ -92,10 +95,13 @@ export default function S8Closing({ step }: { step: number }) {
       <ClosingCallback callbackRef={callbackRef} />
 
       {/* Kredit & tanya jawab (Step 6) */}
-      {step >= 6 && <ThankYouCard />}
+      {step === 6 && <ThankYouCard />}
 
       {/* Rekap sesi hidup selama tanya jawab (step 6) — [V] buka rincian */}
-      {step >= 6 && <SessionRecap detail={recapDetail} />}
+      {step === 6 && <SessionRecap detail={recapDetail} />}
+
+      {/* Postliminaries — Daftar Pustaka Lengkap 13 Rujukan (Step 7) */}
+      <PostliminariesSlide active={step === 7} />
     </div>
   );
 }

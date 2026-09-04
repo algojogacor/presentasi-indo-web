@@ -12,6 +12,7 @@ interface UseExperienceKeyboardProps {
   mapOpen: boolean;
   helpSheet: boolean;
   notesOpen: boolean;
+  bibOpen: boolean;
   savedPos: { section: number; step: number } | null;
   advance: () => void;
   back: () => void;
@@ -23,6 +24,7 @@ interface UseExperienceKeyboardProps {
   setHelpSheet: React.Dispatch<React.SetStateAction<boolean>>;
   setMapOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setNotesOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  setBibOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setHelpOn: React.Dispatch<React.SetStateAction<boolean>>;
   keyHandlerRef: React.MutableRefObject<
     ((k: string, e: KeyboardEvent) => boolean | void) | null
@@ -35,6 +37,7 @@ export function useExperienceKeyboard({
   mapOpen,
   helpSheet,
   notesOpen,
+  bibOpen,
   savedPos,
   advance,
   back,
@@ -46,6 +49,7 @@ export function useExperienceKeyboard({
   setHelpSheet,
   setMapOpen,
   setNotesOpen,
+  setBibOpen,
   setHelpOn,
   keyHandlerRef,
 }: UseExperienceKeyboardProps) {
@@ -107,10 +111,17 @@ export function useExperienceKeyboard({
         return;
       }
 
-      // [Esc] — tutup panel catatan presenter
-      if (k === "Escape" && notesOpen) {
-        setNotesOpen(false);
-        return;
+      // [Esc] — tutup modal pustaka / panel catatan presenter
+      if (k === "Escape") {
+        if (bibOpen) {
+          setBibOpen(false);
+          hud("DAFTAR PUSTAKA — DITUTUP [P]");
+          return;
+        }
+        if (notesOpen) {
+          setNotesOpen(false);
+          return;
+        }
       }
 
       // Shift+S — lewati section video
@@ -156,6 +167,18 @@ export function useExperienceKeyboard({
       }
       if (lk === "h") {
         setHelpOn((h) => !h);
+        return;
+      }
+      // [P] — daftar pustaka & rujukan ilmiah on-demand
+      if (lk === "p") {
+        audio.tick();
+        setBibOpen((v) => !v);
+        hud(
+          bibOpen
+            ? "DAFTAR PUSTAKA — DITUTUP [P]"
+            : "DAFTAR PUSTAKA — AKTIF [P]",
+          "ember",
+        );
         return;
       }
       // [N] — catatan presenter
@@ -207,25 +230,11 @@ export function useExperienceKeyboard({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [
-    section,
-    step,
-    mapOpen,
-    helpSheet,
-    notesOpen,
-    savedPos,
-    advance,
-    back,
-    goto,
-    hud,
-    resume,
-    toggleContrast,
-    toggleMute,
-    setHelpSheet,
-    setMapOpen,
-    setNotesOpen,
-    setHelpOn,
-    keyHandlerRef,
+    section, step, mapOpen, helpSheet, notesOpen, bibOpen, savedPos,
+    advance, back, goto, hud, resume, toggleContrast, toggleMute,
+    setHelpSheet, setMapOpen, setNotesOpen, setBibOpen, setHelpOn, keyHandlerRef,
   ]);
 
   return { gShow };
 }
+
