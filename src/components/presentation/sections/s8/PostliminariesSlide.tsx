@@ -52,7 +52,7 @@ export default function PostliminariesSlide({
         </div>
 
         <div className="text-right hidden sm:block font-code text-[10px] text-mute tracking-wider">
-          <span className="text-[#E8A020] font-bold">13 SUMBER</span> TERVERIFIKASI
+          <span className="text-[#E8A020] font-bold">{REFERENCES.length} SUMBER</span> TERVERIFIKASI
         </div>
       </div>
 

@@ -212,7 +212,7 @@ export const NOTE_PLAN: StepNote[][] = [
     },
     {
       t: "Integritas & Anti-Plagiarisme",
-      c: "Etika perujukan, teknik parafrasa, dan penggunaan Mendeley/Zotero (Farida, 2024).",
+      c: "Etika perujukan, teknik parafrasa, dan penggunaan Mendeley/Zotero (Samal & Ardianto, 2025).",
     },
   ],
   [
@@ -224,7 +224,7 @@ export const NOTE_PLAN: StepNote[][] = [
     { t: "Putusan Saran & Rekomendasi", c: "Dua preskripsi: koherensi segitiga emas mahasiswa & praktikum penulisan jurnal MKWU." },
     { t: "Callback Kalimat Pembuka", c: "'Hari ini kita SUDAH bedah anatominya' — beri penekanan pada kata SUDAH." },
     { t: "Terima Kasih & Tanya Jawab", c: "Buka sesi diskusi kelas PDB 93; [V] untuk buka rincian statistik voting live." },
-    { t: "Postliminaries — Daftar Pustaka Lengkap", c: "Tampilkan 13 rujukan resmi APA 7th edition penutup struktur anatomi KTI." },
+    { t: "Postliminaries — Daftar Pustaka Lengkap", c: "Tampilkan 12 rujukan resmi APA 7th edition penutup struktur anatomi KTI." },
     { t: "Postliminaries — Lampiran & Berkas Asli", c: "Persilakan audiens memindai QR code untuk membuka naskah lengkap (/makalah) atau unduh .docx." },
   ],
 ];

@@ -22,7 +22,7 @@ import AppendixSlide from "./s8/AppendixSlide";
  * - Step 4: The Verdict — Dua Kartu Rekomendasi/Saran (Sub-bab 3.2 Makalah).
  * - Step 5: Callback kalimat pembuka — kata "sudah" bernasib ember di tengah layar.
  * - Step 6: Kredit, terima kasih, tanya jawab & rekapitulasi interaktif live.
- * - Step 7: Postliminaries — Lembaran Daftar Pustaka Lengkap (13 Rujukan Baku).
+ * - Step 7: Postliminaries — Lembaran Daftar Pustaka Lengkap (12 Rujukan Baku).
  * - Step 8: Postliminaries — Lampiran & Naskah Lengkap (QR Code + Dokumen Asli).
  */
 export default function S8Closing({ step }: { step: number }) {
@@ -104,7 +104,7 @@ export default function S8Closing({ step }: { step: number }) {
       {/* Rekap sesi hidup selama tanya jawab (step 6) — [V] buka rincian */}
       {step === 6 && <SessionRecap detail={recapDetail} />}
 
-      {/* Postliminaries — Daftar Pustaka Lengkap 13 Rujukan (Step 7) */}
+      {/* Postliminaries — Daftar Pustaka Lengkap 12 Rujukan (Step 7) */}
       <PostliminariesSlide active={step === 7} />
 
       {/* Postliminaries — Lampiran Resmi & Dokumen Asli (Step 8) */}

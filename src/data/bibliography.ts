@@ -1,4 +1,4 @@
-// Data 13 Daftar Pustaka resmi dari Bab III Makalah Kelompok 6 PDB 93 (APA Style 7th Edition)
+// Data 12 Daftar Pustaka resmi dari Bab III Makalah Kelompok 6 PDB 93 (APA Style 7th Edition)
 
 export type ReferenceType =
   | "JURNAL"
@@ -67,15 +67,6 @@ export const REFERENCES: ReferenceItem[] = [
   },
   {
     id: 5,
-    authors: "Farida, Y. E.",
-    year: "2024",
-    title: "Buku ajar bahasa Indonesia perguruan tinggi",
-    source: "Penerbit Deepublish.",
-    type: "BUKU TEKS",
-    acts: [3, 4, 6, 7],
-  },
-  {
-    id: 6,
     authors: "Fitriani, L., Gultom, R. H., & Nainggolan, N. P.",
     year: "2023",
     title:
@@ -87,7 +78,7 @@ export const REFERENCES: ReferenceItem[] = [
     acts: [4, 5, 6],
   },
   {
-    id: 7,
+    id: 6,
     authors: "Jumadi, A., Saputra, Z. E., & Sari, G.",
     year: "2024",
     title:
@@ -99,7 +90,7 @@ export const REFERENCES: ReferenceItem[] = [
     acts: [7],
   },
   {
-    id: 8,
+    id: 7,
     authors: "Musdalifah, M., Karim, A., & Saud, C. F.",
     year: "2025",
     title:
@@ -110,7 +101,7 @@ export const REFERENCES: ReferenceItem[] = [
     acts: [2],
   },
   {
-    id: 9,
+    id: 8,
     authors: "Nugraha, M. S., Rohmadi, M., & Nugraheni, A. S.",
     year: "2022",
     title:
@@ -121,17 +112,17 @@ export const REFERENCES: ReferenceItem[] = [
     acts: [4],
   },
   {
-    id: 10,
+    id: 9,
     authors: "Samal, A. L., & Ardianto, A.",
     year: "2025",
     title: "Bahasa Indonesia dan karya tulis ilmiah untuk perguruan tinggi",
     source: "IAIN Manado Press.",
     url: "https://www.researchgate.net/publication/393986375_Bahasa_Indonesia_dan_Karya_Tulis_Ilmiah_untuk_Perguruan_Tinggi",
     type: "BUKU TEKS",
-    acts: [3],
+    acts: [3, 6, 7],
   },
   {
-    id: 11,
+    id: 10,
     authors: "Sugiyono.",
     year: "2022",
     title: "Metode penelitian kuantitatif, kualitatif, dan R&D (Edisi terbaru)",
@@ -141,7 +132,7 @@ export const REFERENCES: ReferenceItem[] = [
     acts: [4],
   },
   {
-    id: 12,
+    id: 11,
     authors: "Widiyastuti, R., Wardani, K., & Hasanah, U.",
     year: "2023",
     title: "Panduan praktis penulisan karya tulis ilmiah",
@@ -151,7 +142,7 @@ export const REFERENCES: ReferenceItem[] = [
     acts: [3, 4, 5],
   },
   {
-    id: 13,
+    id: 12,
     authors:
       "Wulandari, A. A., Panudju, A. A. T., Hidayatullah, M. A., Maryani, M., Supriyati, W., Amalia, N., Dewi, L. P., Desderius, K., & Barus, F. A.",
     year: "2024",

@@ -33,7 +33,7 @@ export default function AppendixSlide() {
         </h2>
 
         <p className="mt-2 max-w-[46vw] font-body text-[1.2vw] leading-relaxed text-paper/80">
-          Naskah ilmiah 20+ halaman berstandar akademik lengkap dengan tinjauan teoritis, metodologi, pembahasan mendalam, serta seluruh 13 sumber rujukan baku.
+          Naskah ilmiah 20+ halaman berstandar akademik lengkap dengan tinjauan teoritis, metodologi, pembahasan mendalam, serta seluruh 12 sumber rujukan baku.
         </p>
       </div>
 

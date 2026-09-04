@@ -1575,6 +1575,46 @@ Work Log:
 Stage Summary:
 - Status: SELESAI & TERVERIFIKASI LOKAL (Browser subagent, tsc, lint, build).
 
+---
+Task ID: 40
+Agent: main (Antigravity — Gemini 3.8 Flash High)
+Task: Audit dan Pembersihan Tuntas Daftar Pustaka (Penghapusan Farida 2024 & Pembaruan Rujukan ResearchGate Samal & Ardianto)
+
+Work Log:
+1. Penghapusan Entri Farida (2024):
+   - Menghapus entri Farida, Y. E. (2024) dari `src/data/bibliography.ts` karena tautan komersial pembelian buku dan keputusan kelompok untuk tidak lagi merujuk ke sana.
+   - Merenumber 12 entri rujukan resmi yang tersisa (1..12).
+2. Pembaruan Sitasi Teks Terpadu:
+   - `MAKALAH STRUKTUR KARYA ILMIAH KELOMPOK 6 PDB 93.md`:
+     * Sub-bab 2.1: Sitasi karakteristik dialihkan sepenuhnya ke `(Widiyastuti et al., 2023)`.
+     * Sub-bab 2.2: Sitasi anatomi dialihkan ke `(Nugraha et al., 2022)`.
+     * Sub-bab 2.3 (Tabel 2 Makalah): Karakteristik makalah dialihkan ke `(Samal & Ardianto, 2025)`.
+     * Sub-bab 2.4: Etika/anti-plagiarisme & pengelola sitasi dialihkan ke `(Samal & Ardianto, 2025)`.
+     * Daftar Pustaka: Dihapus entri Farida.
+   - `src/components/paper/BabTwo.tsx`: Selaras dengan naskah markdown (Widiyastuti, Nugraha, Samal & Ardianto).
+   - `src/components/presentation/sections/S7Kaidah.tsx`: Sitasi etika/anti-plagiarisme diganti menjadi `(Samal & Ardianto, 2025)`.
+   - `src/data/battle.ts`: Kartu perbandingan genre makalah diperbarui ke `(Samal & Ardianto, 2025)`.
+   - `src/lib/notesData.ts`: Catatan cue card presenter diperbarui ke `(Samal & Ardianto, 2025)` dan diubah dari 13 rujukan menjadi 12 rujukan.
+3. Sinkronisasi UI & Penghitung Rujukan Dinamis:
+   - `src/components/presentation/BibliographyModal.tsx`: Menggunakan `{REFERENCES.length} Rujukan Primer & Sekunder`.
+   - `src/components/presentation/sections/s8/PostliminariesSlide.tsx`: Menggunakan `{REFERENCES.length} SUMBER`.
+   - `src/components/presentation/sections/s8/AppendixSlide.tsx`: Diperbarui menjadi "12 sumber rujukan baku".
+   - `src/components/presentation/sections/S8Closing.tsx`: Komentar arsitektur disinkronkan ke 12 rujukan.
+4. Pembaruan URL Samal & Ardianto (2025):
+   - Diganti dari repository IAIN Manado (yang mengalami kendala koneksi server 522) ke publikasi resmi di ResearchGate:
+     `https://www.researchgate.net/publication/393986375_Bahasa_Indonesia_dan_Karya_Tulis_Ilmiah_untuk_Perguruan_Tinggi`
+5. Verifikasi:
+   - `bun x tsc --noEmit`: 0 error.
+   - `bun run build`: Berhasil 100% (produksi teroptimasi tanpa kendala).
+   - Pengujian browser subagent:
+     * Modal `[P]`: Menampilkan "12 Rujukan Primer & Sekunder", Farida bersih tidak ada, Samal aktif menuju ResearchGate.
+     * Halaman `/makalah#pustaka`: Menampilkan tepat 12 rujukan terformat rapi dengan tautan ResearchGate & Internet Archive (Sugiyono).
+   - Kepatuhan baris kode: Seluruh file tetap < 250 baris.
+
+Stage Summary:
+- Status: SELESAI & TERVERIFIKASI LOKAL (Browser subagent, tsc, build).
+
+
 
 
 

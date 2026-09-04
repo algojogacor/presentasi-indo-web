@@ -77,14 +77,14 @@ PEMBAHASAN
 2.1 Hakikat dan Karakteristik Karya Tulis Ilmiah
 Karya ilmiah didefinisikan oleh Wulandari et al. (2024), sebagai uraian atau penjabaran hasil temuan berdasarkan data sekunder dan data primer yang bertujuan untuk memecahkan masalah tertentu. Adapun data primer yang didapat langsung oleh peneliti melalui wawancara, kuesioner, atau observasi, dan data sekunder yang diperoleh melalui literatur atau data yang sudah ada seperti jurnal, buku, arsip, atau dokumen.
 Menurut KBBI Daring (Badan Bahasa, 2024), karya ilmiah merupakan karya tulis yang sengaja dibuat dengan mematuhi kaidah-kaidah keilmuan dan dilandasi oleh hasil pengamatan, peninjauan, atau penelitian dalam bidang tertentu. Senada dengan hal tersebut, Samal dan Ardianto (2025) menjelaskan bahwa karya ilmiah adalah produk komunikasi akademik tertulis yang menyajikan gagasan rasional atau hasil investigasi empiris dengan metode ilmiah yang dapat dipertanggungjawabkan secara terbuka.
-Karya tulis ilmiah memiliki karakteristik distingtif yang membedakannya dari karya sastra atau teks populer non-ilmiah (Widiyastuti et al., 2023; Farida, 2024):
+Karya tulis ilmiah memiliki karakteristik distingtif yang membedakannya dari karya sastra atau teks populer non-ilmiah (Widiyastuti et al., 2023):
 1.	Objektif: Setiap pernyataan, analisis, dan simpulan didasarkan pada data faktual atau bukti empiris, bukan opini pribadi yang emosional.
 2.	Logis dan Rasional: Alur penalaran disusun secara runtut, koheren, dan dapat diterima akal sehat (induktif maupun deduktif).
 3.	Sistematis: Mengikuti pola organisasi penulisan yang terstruktur, baku, dan berkesinambungan antarbab atau antarseksi.
 4.	Cendekia dan Lugas: Menggunakan ragam bahasa baku, kalimat efektif, istilah teknis yang tepat, serta menghindari ambiguitas atau metafora berlebihan.
 5.	Dapat Diuji Kebenarannya (Verifikatif): Prosedur penelitian dan metodologi disajikan secara transparan sehingga memungkinkan peneliti lain melakukan replikasi.
 2.2 Struktur Anatomi Umum Karya Tulis Ilmiah
-Secara umum, anatomi karya tulis ilmiah terbagi menjadi tiga bagian utama, yaitu bagian awal (preliminaries), bagian inti (body text), dan bagian akhir (postliminaries) (Farida, 2024; Nugraha et al., 2022). Tabel 1 merangkum pembagian struktur tersebut.
+Secara umum, anatomi karya tulis ilmiah terbagi menjadi tiga bagian utama, yaitu bagian awal (preliminaries), bagian inti (body text), dan bagian akhir (postliminaries) (Nugraha et al., 2022). Tabel 1 merangkum pembagian struktur tersebut.
 Tabel 1. Struktur Anatomi Umum Karya Tulis Ilmiah
 BAGIAN AWAL	BAGIAN INTI	BAGIAN AKHIR
 • Halaman Judul
@@ -141,7 +141,7 @@ Bagian akhir memuat kelengkapan administratif dan akademis pendukung:
 Meskipun prinsip dasarnya sama, struktur karya ilmiah disesuaikan dengan format penerbitan atau tujuan akademiknya (Direktorat Pembelajaran dan Kemahasiswaan, 2023; Fitriani et al., 2023). Variasi tersebut disajikan pada Tabel 2.
 Tabel 2. Variasi Struktur Berdasarkan Jenis Karya Ilmiah
 Jenis Karya Ilmiah	Format Struktur Utama	Karakteristik Kunci
-Makalah (Term Paper)	Bab I (Pendahuluan) → Bab II (Pembahasan) → Bab III (Penutup)	Ringkas (10–20 halaman), fokus pada kajian konseptual atau isu spesifik dalam perkuliahan (Farida, 2024).
+Makalah (Term Paper)	Bab I (Pendahuluan) → Bab II (Pembahasan) → Bab III (Penutup)	Ringkas (10–20 halaman), fokus pada kajian konseptual atau isu spesifik dalam perkuliahan (Samal & Ardianto, 2025).
 Artikel Jurnal Ilmiah	Format IMRaD (Introduction, Methods, Results, and Discussion)	Solid (4.000–7.000 kata), tanpa pembagian bab berangka Romawi, sangat memprioritaskan keterbaruan (novelty) (Fitriani et al., 2023).
 Skripsi / Tesis / Laporan	Format 5 Bab Lengkap (Pendahuluan, Teori, Metode, Hasil & Pembahasan, Penutup)	Menyeluruh, mendalam, menyajikan metodologi dan instrumen secara rinci.
 Proposal PKM (Dikti)	Pendahuluan → Tinjauan Pustaka → Metode Pelaksanaan → Biaya & Jadwal	Ketat dalam batasan halaman (maksimal 10 halaman isi inti), format administratif pokok sesuai Pedoman PKM.
@@ -150,7 +150,7 @@ Proposal PKM (Dikti)	Pendahuluan → Tinjauan Pustaka → Metode Pelaksanaan →
 Kelayakan sebuah karya ilmiah tidak hanya ditentukan oleh struktur anatominya, melainkan juga oleh ketepatan bahasa dan ketaatan pada etika akademik:
 1.	Penerapan Ejaan dan Tata Tulis Resmi: Penulisan karya ilmiah wajib mengacu pada ketetapan Pedoman Umum Ejaan Bahasa Indonesia (EYD Edisi V) yang ditetapkan melalui Kepmendikbudristek No. 0424/P/2022 (Badan Bahasa, 2022), mencakup penggunaan huruf miring untuk istilah asing, penulisan huruf kapital, penggabungan kata berimbuhan, serta ketepatan tanda baca (titik, koma, titik dua).
 2.	Struktur Kalimat Efektif: Kalimat ilmiah harus mempunyai subjek dan predikat yang jelas, tidak ambigu, hemat kata, dan menggunakan kata baku sesuai standar leksikal. Kesalahan sintaksis seperti kalimat menggantung (fragment sentence) atau kerancuan struktur aktif-pasif dapat mengacaukan kejelasan argumen ilmiah (Jumadi et al., 2024).
-3.	Integritas Akademik dan Pencegahan Plagiarisme: Setiap pemikiran, data, atau kutipan milik pihak lain wajib dicantumkan sumbernya dengan teknik pengutipan yang benar (kutipan langsung maupun parafrasa). Penggunaan aplikasi pengelola referensi (seperti Mendeley atau Zotero) sangat disarankan untuk menjaga konsistensi sitasi (Farida, 2024).
+3.	Integritas Akademik dan Pencegahan Plagiarisme: Setiap pemikiran, data, atau kutipan milik pihak lain wajib dicantumkan sumbernya dengan teknik pengutipan yang benar (kutipan langsung maupun parafrasa). Penggunaan aplikasi pengelola referensi (seperti Mendeley atau Zotero) sangat disarankan untuk menjaga konsistensi sitasi (Samal & Ardianto, 2025).
  
 BAB III
 PENUTUP
@@ -170,7 +170,6 @@ Badan Pengembangan dan Pembinaan Bahasa. (2022). Pedoman umum ejaan bahasa Indon
 Badan Pengembangan dan Pembinaan Bahasa. (2024). Kamus besar bahasa Indonesia (KBBI daring). Kementerian Pendidikan, Kebudayaan, Riset, dan Teknologi Republik Indonesia. https://kbbi.kemendikdasmen.go.id/
 Baharuddin, B., Muthi, I., Haryono, P., Misbahul Alam, D., Sugiarti, D. Y., Muntaha, M., Apriliantoni, A., Annuri, A., Darwis, D., Eriyatuzzahro, D., Khumaidi, A., Paradiyawan, P., Sumodiharjo, B., Dindin, D., & Ulfa, M. (2025). Pengembangan kompetensi profesional guru melalui strategi penulisan karya ilmiah. Jurnal Pengabdian Masyarakat dan Riset Pendidikan, 4(1), 1–15. https://doi.org/10.31004/jerkin.v4i1.1813
 Direktorat Pembelajaran dan Kemahasiswaan. (2023). Buku pedoman Program Kreativitas Mahasiswa (PKM) tahun 2023. Ditjen Diktiristek, Kemendikbudristek RI. https://simbelmawa.kemdiktisaintek.go.id/portal/pedoman-pkm-tahun-2023-diktiridtek/
-Farida, Y. E. (2024). Buku ajar bahasa Indonesia perguruan tinggi. Penerbit Deepublish.
 Fitriani, L., Gultom, R. H., & Nainggolan, N. P. (2023). Struktur dan pengaruh teks akademik dan non-akademik dalam meningkatkan pemahaman mahasiswa. Jurnal Bima: Pusat Publikasi Ilmu Pendidikan Bahasa dan Sastra, 1(4), 307–326. https://journal.aripi.or.id/index.php/Bima/article/view/307
 Jumadi, A., Saputra, Z. E., & Sari, G. (2024). Analisis kesalahan berbahasa Indonesia pada karya tulis ilmiah mahasiswa. Jurnal Idebahasa: Jurnal Pendidikan Bahasa dan Sastra Indonesia, 6(2), 112–125. https://jurnal.idebahasa.or.id/index.php/Idebahasa/article/view/196
 Musdalifah, M., Karim, A., & Saud, C. F. (2025). Membangun literasi akademik melalui pelatihan penulisan karya ilmiah untuk mahasiswa baru. Inovasi Sosial: Jurnal Pengabdian Masyarakat, 2(4), 1–10. https://doi.org/10.62951/inovasisosial.v2i4.2249

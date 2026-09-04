@@ -66,7 +66,7 @@ export default function BibliographyModal({
               Daftar Pustaka Baku (APA Style 7th Edition)
             </h2>
             <p className="font-code text-[10px] text-mute/80 tracking-wider">
-              13 Rujukan Primer & Sekunder · Kelompok 6 PDB 93 Universitas Airlangga
+              {REFERENCES.length} Rujukan Primer &amp; Sekunder · Kelompok 6 PDB 93 Universitas Airlangga
             </p>
           </div>
 

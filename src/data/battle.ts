@@ -23,7 +23,7 @@ export const CARDS: BattleCardData[] = [
       { k: "FORMAT STRUKTUR", v: "Bab I (Pendahuluan) → Bab II (Pembahasan) → Bab III (Penutup)" },
       { k: "PANJANG", v: "Ringkas (10–20 halaman)" },
       { k: "FOKUS", v: "Kajian konseptual atau isu spesifik dalam perkuliahan" },
-      { k: "CIRI KUNCI", v: "Sistematika 3 bab sederhana, berbasis studi pustaka (Farida, 2024)" },
+      { k: "CIRI KUNCI", v: "Sistematika 3 bab sederhana, berbasis studi pustaka (Samal & Ardianto, 2025)" },
     ],
     note: "Ringkas 10–20 halaman untuk tugas kuliah dengan struktur Bab I–III.",
   },

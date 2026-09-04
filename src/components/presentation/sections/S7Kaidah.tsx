@@ -79,7 +79,7 @@ const POINTS: Point[] = [
     idx: "07.3",
     title: "Integritas & Anti-Plagiarisme",
     tag: "ETIKA AKADEMIK · TEKNIK SITASI · PENGELOLA REFERENSI",
-    desc: "Setiap pemikiran, data, atau kutipan pihak lain wajib dicantumkan sumber rujukannya secara jujur (parafrasa atau kutipan langsung) dengan bantuan pengelola referensi seperti Mendeley atau Zotero (Farida, 2024).",
+    desc: "Setiap pemikiran, data, atau kutipan pihak lain wajib dicantumkan sumber rujukannya secara jujur (parafrasa atau kutipan langsung) dengan bantuan pengelola referensi seperti Mendeley atau Zotero (Samal & Ardianto, 2025).",
     before: {
       label: "PELANGGARAN ETIKA — MENYALIN TANPA RUJUKAN",
       body: (

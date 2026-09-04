@@ -21,7 +21,7 @@ export default function BabTwo() {
           Menurut KBBI Daring (Badan Bahasa, 2024), karya ilmiah merupakan karya tulis yang sengaja dibuat dengan mematuhi kaidah-kaidah keilmuan dan dilandasi oleh hasil pengamatan, peninjauan, atau penelitian dalam bidang tertentu. Senada dengan hal tersebut, Samal dan Ardianto (2025) menjelaskan bahwa karya ilmiah adalah produk komunikasi akademik tertulis yang menyajikan gagasan rasional atau hasil investigasi empiris dengan metode ilmiah yang dapat dipertanggungjawabkan secara terbuka.
         </p>
         <p className="font-body text-[14px] md:text-[15px] leading-relaxed text-paper/85 text-justify">
-          Karya tulis ilmiah memiliki karakteristik distingtif yang membedakannya dari karya sastra atau teks populer non-ilmiah (Widiyastuti et al., 2023; Farida, 2024):
+          Karya tulis ilmiah memiliki karakteristik distingtif yang membedakannya dari karya sastra atau teks populer non-ilmiah (Widiyastuti et al., 2023):
         </p>
         <ul className="list-disc pl-6 space-y-2 font-body text-[14px] md:text-[15px] text-paper/90">
           <li><strong>Objektif:</strong> Setiap pernyataan, analisis, dan simpulan didasarkan pada data faktual atau bukti empiris, bukan opini pribadi yang emosional.</li>
@@ -38,7 +38,7 @@ export default function BabTwo() {
           2.2 Struktur Anatomi Umum Karya Tulis Ilmiah
         </h3>
         <p className="font-body text-[14px] md:text-[15px] leading-relaxed text-paper/85 text-justify">
-          Secara umum, anatomi karya tulis ilmiah terbagi menjadi tiga bagian utama, yaitu bagian awal (<em>preliminaries</em>), bagian inti (<em>body text</em>), dan bagian akhir (<em>postliminaries</em>) (Farida, 2024; Nugraha et al., 2022).
+          Secara umum, anatomi karya tulis ilmiah terbagi menjadi tiga bagian utama, yaitu bagian awal (<em>preliminaries</em>), bagian inti (<em>body text</em>), dan bagian akhir (<em>postliminaries</em>) (Nugraha et al., 2022).
         </p>
 
         {/* Tabel 1 */}
@@ -114,7 +114,7 @@ export default function BabTwo() {
               <tr>
                 <td className="p-3 font-semibold text-paper">Makalah (Term Paper)</td>
                 <td className="p-3">Bab I (Pendahuluan) → Bab II (Pembahasan) → Bab III (Penutup)</td>
-                <td className="p-3">Ringkas (10–20 halaman), fokus pada kajian konseptual atau isu spesifik dalam perkuliahan (Farida, 2024).</td>
+                <td className="p-3">Ringkas (10–20 halaman), fokus pada kajian konseptual atau isu spesifik dalam perkuliahan (Samal &amp; Ardianto, 2025).</td>
               </tr>
               <tr>
                 <td className="p-3 font-semibold text-paper">Artikel Jurnal Ilmiah</td>
@@ -149,7 +149,7 @@ export default function BabTwo() {
             <strong>Struktur Kalimat Efektif:</strong> Memiliki subjek dan predikat yang jelas, tidak ambigu, hemat kata, serta bebas dari kalimat menggantung (<em>fragment sentence</em>) dan kerancuan aktif-pasif (Jumadi et al., 2024).
           </li>
           <li>
-            <strong>Integritas Akademik dan Pencegahan Plagiarisme:</strong> Setiap pemikiran atau data pihak lain wajib dicantumkan sumbernya dengan teknik pengutipan yang benar (kutipan langsung maupun parafrasa) dengan bantuan aplikasi pengelola referensi (Mendeley/Zotero) (Farida, 2024).
+            <strong>Integritas Akademik dan Pencegahan Plagiarisme:</strong> Setiap pemikiran atau data pihak lain wajib dicantumkan sumbernya dengan teknik pengutipan yang benar (kutipan langsung maupun parafrasa) dengan bantuan aplikasi pengelola referensi (Mendeley/Zotero) (Samal &amp; Ardianto, 2025).
           </li>
         </ol>
       </div>
