@@ -21,14 +21,10 @@ export const NOTE_PLAN: StepNote[][] = [
     },
   ],
   [
-    // 01 GUEST LECTURER — 5 langkah
+    // 01 GUEST LECTURER — 4 langkah
     {
-      t: "Pembuka narasumber — gelap",
-      c: "Ruang gelap total. Bacakan pengantar presenter dengan tenang.",
-    },
-    {
-      t: "Lampu sorot — spotlight",
-      c: "Lampu sorot panggung menyala di belakang quote; beri jeda sejenak.",
+      t: "Pembuka narasumber — spotlight",
+      c: "Ruang gelap. Quote muncul dan spotlight otomatis menyala setelah 1 detik.",
     },
     {
       t: "Penyingkapan tirai teater",

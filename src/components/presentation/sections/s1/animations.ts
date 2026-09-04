@@ -46,24 +46,29 @@ export function setWaveScale(
   dispR?.setAttribute("scale", String(val));
 }
 
-export function initS1State(root: HTMLElement | null, step: number) {
+export function initS1State(
+  root: HTMLElement | null,
+  step: number,
+  settled = false,
+) {
   if (!root) return;
   const { blackLayer, searchlights, quote, l, r, closing, frame } =
     queryS1Elements(root);
 
-  if (step <= 1) {
+  if (step === 0) {
     gsap.set(blackLayer, { y: 0, autoAlpha: 1 });
-    initSearchlights(searchlights, step);
-    gsap.set(quote, { autoAlpha: step === 1 ? 1 : 0.52 });
+    initSearchlights(searchlights);
+    gsap.set(quote, { autoAlpha: settled ? 1 : 0 });
     gsap.set([l, r], { xPercent: 0, autoAlpha: 0 });
   } else {
     gsap.set(blackLayer, { y: "110vh", autoAlpha: 0 });
     gsap.set([l, r], {
-      xPercent: (i: number) => (step >= 3 && step !== 4 ? (i === 0 ? -100 : 100) : 0),
+      xPercent: (i: number) => (step === 2 ? (i === 0 ? -100 : 100) : 0),
       autoAlpha: 1,
     });
+    gsap.set(quote, { autoAlpha: 0 });
   }
-  gsap.set(closing, { autoAlpha: step === 4 ? 1 : 0 });
+  gsap.set(closing, { autoAlpha: step === 3 ? 1 : 0 });
   gsap.set(frame, { autoAlpha: 1, scale: 1 });
 }
 
@@ -92,7 +97,7 @@ export function animateS1Step(
 
   const updateWave = (val: number) => setWaveScale(dispL, dispR, val);
 
-  // Step 0: Layar hitam penuh (#0A0A0F) + quote redup, searchlight mati
+  // Step 0: Layar hitam + quote muncul, delay 1s searchlight otomatis nyala
   if (step === 0) {
     killSearchlights(searchlights);
     if (settled) {
@@ -100,77 +105,51 @@ export function animateS1Step(
       searchlights.forEach((el, i) => {
         const cfg = SEARCHLIGHT_BEAMS[i];
         if (!cfg) return;
-        gsap.set(el, { autoAlpha: 0, rotation: cfg.rotFrom });
-      });
-      gsap.set(quote, { autoAlpha: 0.52 });
-      gsap.set([l, r], { xPercent: 0, autoAlpha: 0 });
-      gsap.set(closing, { autoAlpha: 0 });
-      gsap.set(frame, { autoAlpha: 1, scale: 1 });
-      updateWave(REST_WAVE_SCALE);
-    } else {
-      const tl = gsap.timeline();
-      tl.to(blackLayer, { y: 0, autoAlpha: 1, duration: 0.4 });
-      tl.to(searchlights, { autoAlpha: 0, duration: 0.4 }, "<");
-      tl.to(quote, { autoAlpha: 0.52, duration: 0.4 }, "<");
-      tl.set([l, r], { xPercent: 0, autoAlpha: 0 });
-      tl.set(closing, { autoAlpha: 0 });
-      registerTimeline(tl);
-    }
-  }
-  // Step 1: 7 searchlight beams fade in staggered, lalu berosilasi asinkron
-  else if (step === 1) {
-    killSearchlights(searchlights);
-
-    if (settled) {
-      gsap.set(blackLayer, { y: 0, autoAlpha: 1 });
-      searchlights.forEach((el, i) => {
-        const cfg = SEARCHLIGHT_BEAMS[i];
-        if (!cfg) return;
         const midRot = (cfg.rotFrom + cfg.rotTo) / 2;
-        gsap.set(el, { autoAlpha: 1, rotation: midRot });
+        gsap.set(el, { autoAlpha: 1, rotation: midRot, y: 0 });
       });
       gsap.set(quote, { autoAlpha: 1 });
       gsap.set([l, r], { xPercent: 0, autoAlpha: 0 });
       gsap.set(closing, { autoAlpha: 0 });
+      gsap.set(frame, { autoAlpha: 1, scale: 1 });
+      updateWave(REST_WAVE_SCALE);
       startSearchlightOscillation(searchlights);
     } else {
-      audioManager.playSearchlight();
-      const tl = gsap.timeline({
-        onComplete: () => startSearchlightOscillation(searchlights),
-      });
-      tl.set(blackLayer, { y: 0, autoAlpha: 1 });
-
+      gsap.set(blackLayer, { y: 0, autoAlpha: 1 });
       searchlights.forEach((el, i) => {
         const cfg = SEARCHLIGHT_BEAMS[i];
         if (!cfg) return;
-        gsap.set(el, { rotation: cfg.rotFrom, autoAlpha: 0 });
+        gsap.set(el, { rotation: cfg.rotFrom, autoAlpha: 0, y: 20 });
+      });
+      gsap.set([l, r], { xPercent: 0, autoAlpha: 0 });
+      gsap.set(closing, { autoAlpha: 0 });
+      gsap.set(frame, { autoAlpha: 1, scale: 1 });
+      updateWave(REST_WAVE_SCALE);
+
+      const tl = gsap.timeline({
+        onComplete: () => startSearchlightOscillation(searchlights),
       });
 
+      tl.set(quote, { autoAlpha: 0 }, 0);
+      tl.to(quote, { autoAlpha: 1, duration: 0.8, ease: "power2.out" }, 0);
+      tl.add(() => audioManager.playSearchlight(), 1.0);
       tl.to(
         searchlights,
         {
           autoAlpha: 1,
-          duration: 1,
-          stagger: 0.1,
-          ease: "power1.out",
-        },
-        0,
-      );
-
-      tl.to(
-        quote,
-        {
-          autoAlpha: 1,
-          duration: 1,
+          y: 0,
+          duration: 1.2,
+          stagger: 0.15,
           ease: "power2.out",
         },
-        0,
+        1.0,
       );
+
       registerTimeline(tl);
     }
   }
-  // Step 2: Layer hitam "runtuh" ke bawah (y: 110vh, 0.9s, power3.in) → tirai merah tertutup terlihat
-  else if (step === 2) {
+  // Step 1: Layer hitam "runtuh" ke bawah (y: 110vh, 0.9s, power3.in) → tirai merah tertutup terlihat
+  else if (step === 1) {
     killSearchlights(searchlights);
     if (settled) {
       gsap.set(blackLayer, { y: "110vh", autoAlpha: 0 });
@@ -199,8 +178,8 @@ export function animateS1Step(
       registerTimeline(tl);
     }
   }
-  // Step 3: Tirai beludru membuka → YouTube aktif
-  else if (step === 3) {
+  // Step 2: Tirai beludru membuka → YouTube aktif
+  else if (step === 2) {
     killSearchlights(searchlights);
     if (settled) {
       gsap.set(blackLayer, { y: "110vh", autoAlpha: 0 });
@@ -218,8 +197,8 @@ export function animateS1Step(
       registerTimeline(tl);
     }
   }
-  // Step 4: Tirai menutup kembali + kalimat penutup tampil
-  else if (step === 4) {
+  // Step 3: Tirai menutup kembali + kalimat penutup tampil
+  else if (step === 3) {
     killSearchlights(searchlights);
     if (settled) {
       gsap.set(blackLayer, { y: "110vh", autoAlpha: 0 });

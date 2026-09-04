@@ -1313,4 +1313,43 @@ Verifikasi:
 Stage Summary:
 - Status: SELESAI & TERVERIFIKASI.
 
+---
+Task ID: 33
+Agent: main (Antigravity — Gemini 3.8 Flash High)
+Task: Konsolidasi Step 0 & Step 1 Section 1 (Otomatisasi Searchlight Reveal 1 Detik)
+
+Work Log:
+1. Analisis & Rencana:
+   - Menggabungkan Step 0 (layar hitam + quote) dan Step 1 (searchlight reveal) di Section 1 (GUEST LECTURER) menjadi satu langkah (Step 0) terpadu.
+   - Setelah masuk Section 1, quote narasumber muncul dan searchlight 20th Century Fox otomatis menyala setelah jeda 1 detik tanpa perlu menekan Space lagi.
+   - Spesifikasi animasi searchlight: animasi `y` dari 20px ke 0 bersamaan dengan fade in opacity (`autoAlpha: 1`), durasi 1.2 detik, easing `power2.out`, stagger 0.15 detik antar beam, disinkronkan dengan efek audio searchlight (`audioManager.playSearchlight()`). Setelah animasi selesai, berkas cahaya melanjutkan osilasi asinkron.
+   - Penekanan Space berikutnya langsung melangkah ke penyingkapan tirai teater (layer hitam runtuh ke bawah `y: 110vh`).
+   - Total langkah Section 1 berkurang dari 5 menjadi 4 langkah (Step 0: quote + auto searchlight, Step 1: layer hitam runtuh, Step 2: tirai terbuka & video aktif, Step 3: tirai tertutup & quote penutup).
+2. Perubahan Kode:
+   - `src/components/presentation/context.ts`: Mengubah `SECTIONS[1].steps` dari 5 menjadi 4.
+   - `src/lib/notes.ts`: Mengubah catatan Section 1 menjadi 4 langkah (menggabungkan intro gelap dan spotlight).
+   - `src/components/presentation/rehearsal.ts`: Menyesuaikan rencana durasi latihan Section 1 dari 5 langkah menjadi 4 langkah (`[30, 15, 645, 60]`).
+   - `src/components/presentation/sections/s1/QuoteLayers.tsx`: Menyederhanakan prompt teks OpeningQuote menjadi `PENGANTAR — DIBACAKAN · [SPACE] BUKA PANGGUNG · [SHIFT+S] LEWATI`.
+   - `src/components/presentation/sections/s1/VideoFrame.tsx`: Mengubah kondisi pemutaran iframe YouTube dari `step >= 3` ke `step >= 2`.
+   - `src/components/presentation/sections/s1/searchlightAnim.ts`: Mengatur kondisi inisialisasi awal searchlight pada `y: 20` dan `autoAlpha: 0`.
+   - `src/components/presentation/sections/s1/animations.ts`: Memperbarui `initS1State` dan `animateS1Step` untuk mengotomatisasi pemunculan beam searchlight pada delay 1.0s dengan timeline GSAP terintegrasi audio, serta menggeser nomor langkah 2->1, 3->2, 4->3.
+   - `src/components/presentation/sections/S1Video.tsx`: Memperbarui docstring dan menyinkronkan state `settled`.
+3. Verifikasi:
+   - `bun x tsc --noEmit`: 0 error.
+   - `npm run lint`: 0 error, 1 pre-existing warning (font layout).
+   - Pengujian visual browser (`browser_subagent`):
+     * Membuka presentasi di `http://localhost:3000/`.
+     * Masuk ke Section 1 Step 0 (`ACT.01 // STEP.00/03`).
+     * Tanpa menekan Space, dalam 1 detik berkas searchlight otomatis muncul dari bawah layar dengan elevasi halus dan fade in bertingkat (stagger 0.15s).
+     * Tombol `[N]` menampilkan 4 catatan langkah untuk Section 1 dengan judul "Pembuka narasumber — spotlight".
+     * Penekanan Space pertama langsung meruntuhkan layer hitam ke bawah dan menampilkan tirai merah tertutup (`STEP.01/03`).
+     * Penekanan Space kedua membuka tirai merah dan mengaktifkan video YouTube (`STEP.02/03`).
+     * Penekanan Space ketiga menutup tirai dengan quote penutup Prof. Wisnu Jatmiko (`STEP.03/03`).
+     * Penekanan Space keempat melangkah ke Section 2 LATAR BELAKANG (`ACT.02 // STEP.00/03`).
+   - Audit baris: Seluruh file termodifikasi tetap < 250 baris (maksimal 243 baris di `notes.ts`, `animations.ts` berkurang ke 216 baris).
+
+Stage Summary:
+- Status: SELESAI & TERVERIFIKASI.
+
+
 

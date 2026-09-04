@@ -28,7 +28,7 @@ export function usePres(): PresApi {
 /** Peta babak: jumlah langkah per section (indeks langkah 0..steps-1). */
 export const SECTIONS: { label: string; steps: number }[] = [
   { label: "OUVERTURE", steps: 2 },
-  { label: "GUEST LECTURER", steps: 5 },
+  { label: "GUEST LECTURER", steps: 4 },
   { label: "LATAR BELAKANG", steps: 4 },
   { label: "HAKIKAT & KARAKTERISTIK", steps: 8 },
   { label: "ANATOMY THEATER", steps: 9 },

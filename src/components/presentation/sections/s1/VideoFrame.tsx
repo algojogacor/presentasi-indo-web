@@ -13,7 +13,7 @@ export default function VideoFrame({ step }: VideoFrameProps) {
           <span>GUEST LECTURER</span>
         </div>
         <div className="relative aspect-video w-full overflow-hidden border border-ember/60 bg-black shadow-2xl">
-          {step >= 3 ? (
+          {step >= 2 ? (
             <iframe
               src="https://www.youtube.com/embed/E6pPlIvlrPs?autoplay=1&rel=0&modestbranding=1"
               title="BAB 5 Part 1 — Pentingnya Menulis dan Mempublikasikan Artikel Ilmiah"

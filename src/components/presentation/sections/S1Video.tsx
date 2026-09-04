@@ -12,12 +12,10 @@ import { initS1State, animateS1Step } from "./s1/animations";
 
 /**
  * Section 1 — Guest Lecturer (embed YouTube teatrikal dengan 20th Century Fox searchlight beams).
- * Step 0: Layar hitam penuh (#0A0A0F) + quote presenter redup.
- * Step 1: Tujuh searchlight beam tipis menyapu dari bawah ke atas layar, masing-masing
- *         dengan sudut dan durasi osilasi berbeda-beda (asinkron), mix-blend-mode screen.
- * Step 2: Layer hitam "runtuh" ke bawah (y: 0 -> 110vh, power3.in, 0.9s) → tirai merah beludru tertutup tersingkap (delay 0.1s).
- * Step 3: Tirai beludru membuka (2.4s, power3.inOut, asimetris 0.1s) → frame siaran YouTube aktif.
- * Step 4: Tirai menutup kembali (2.4s, power3.inOut) + kalimat penutup Prof. Wisnu Jatmiko.
+ * Step 0: Layar hitam penuh (#0A0A0F) + quote presenter; setelah delay 1s searchlight otomatis menyala (y: 20->0, stagger 0.15s).
+ * Step 1: Layer hitam "runtuh" ke bawah (y: 0 -> 110vh, power3.in, 0.9s) → tirai merah beludru tertutup tersingkap (delay 0.1s).
+ * Step 2: Tirai beludru membuka (2.4s, power3.inOut, asimetris 0.1s) → frame siaran YouTube aktif.
+ * Step 3: Tirai menutup kembali (2.4s, power3.inOut) + kalimat penutup Prof. Wisnu Jatmiko.
  * Shortcut Shift+S melewati section ini.
  */
 export default function S1Video({ step }: { step: number }) {
@@ -35,7 +33,7 @@ export default function S1Video({ step }: { step: number }) {
 
   // State awal instan pada mount
   useIsoLayoutEffect(() => {
-    initS1State(root.current, step);
+    initS1State(root.current, step, settled);
   }, []);
 
   // Mesin transisi langkah GSAP

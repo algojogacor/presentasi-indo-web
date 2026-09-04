@@ -19,9 +19,7 @@ export function OpeningQuote({ step }: OpeningQuoteProps) {
           dilahirkan dan dipublikasikan ke dunia&hellip;&rdquo;
         </p>
         <p className="mt-7 font-code text-[10px] tracking-[0.35em] text-ember drop-shadow-md">
-          {step === 0
-            ? "PENGANTAR — DIBACAKAN · [SPACE] NYALAKAN SEARCHLIGHT · [SHIFT+S] LEWATI"
-            : "SEARCHLIGHT AKTIF · [SPACE] BUKA PANGGUNG · [SHIFT+S] LEWATI"}
+          PENGANTAR — DIBACAKAN · [SPACE] BUKA PANGGUNG · [SHIFT+S] LEWATI
         </p>
       </div>
     </div>
