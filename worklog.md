@@ -1649,11 +1649,73 @@ Work Log:
 Stage Summary:
 - Status: SELESAI & TERVERIFIKASI LOKAL (tsc, lint, build).
 
+---
+Task ID: 42
+Agent: main (Antigravity — Gemini 3.8 Flash High)
+Task: Penyelarasan Pertanyaan Polling S5 (Q1 Makalah vs Jurnal, Q2 Proposal PKM) & Cue Presenter untuk Transisi Mulus ke Section 6 (Battle Cards)
 
+Work Log:
+1. Analisis & Evaluasi Pedagogis/Teatrikal:
+   - Mengidentifikasi ketidakselarasan alur pada pertanyaan polling S5 sebelumnya:
+     * Q1 lama menggunakan bahasa yang terlalu akademis/kaku ("kajian sistematika KTI", "orientasi mutlak pada novelty") dan opsi jawaban panjang timpang sehingga mudah ditebak tanpa melibatkan intuisi audiens.
+     * Q2 lama menanyakan letak kontribusi ilmiah di Bab IV Pembahasan (menoleh ke belakang ke Section 4), sehingga terputus dari babak berikutnya (Section 6: Variasi Jenis KTI).
+2. Perumusan Pertanyaan Baru Berbasis Makalah Asli:
+   - `src/lib/questions.ts`:
+     * Q1: Mengubah redaksi menjadi lebih kontekstual bagi mahasiswa: *"Kalian sering membuat makalah tugas kuliah. Jika makalah tersebut ingin diterbitkan menjadi artikel jurnal ilmiah bereputasi, perubahan apa yang paling mendasar?"* dengan opsi A–D yang seimbang panjangnya dan kunci IMRaD + novelty (Tabel 2 Fitriani et al., 2023).
+     * Q2: Mengubah topik menjadi jembatan langsung ke variasi genre KTI (Proposal PKM): *"Di antara jenis karya ilmiah berikut, mana yang memiliki aturan format administratif paling ketat dan langsung gugur jika melanggar batas halaman?"* dengan kunci Proposal PKM (pedoman Dikti 2023, batas 10 halaman isi inti).
+3. Sinkronisasi Catatan Cue Presenter (Papan Catatan [N]):
+   - `src/lib/notesData.ts`:
+     * Memperbarui cue pada langkah Q1 (pemadatan struktur IMRaD & novelty) dan Q2 (aturan mutlak 10 halaman Simbelmawa sebagai jembatan langsung ke Battle Cards).
+4. Verifikasi & Build:
+   - `bun x tsc --noEmit`: 0 error.
+   - Kepatuhan baris kode: `questions.ts` tetap 71 baris, `notesData.ts` tetap 231 baris (< 250 baris).
 
+Stage Summary:
+- Status: SELESAI & TERVERIFIKASI.
 
+---
+Task ID: 43
+Agent: main (Antigravity — Gemini 3.8 Flash High)
+Task: Variasi Posisi Kunci Jawaban Polling S5 (Q1 ke C, Q2 ke D)
 
+Work Log:
+1. Pemindahan Posisi Opsi Benar:
+   - `src/lib/questions.ts`:
+     * Q1: Kunci jawaban dipindahkan dari **B** ke **C** (*"Mengubahnya ke format IMRaD (tanpa bab Romawi) dan berorientasi pada novelty"*).
+     * Q2: Kunci jawaban dipindahkan dari **B** ke **D** (*"Proposal PKM (Program Kreativitas Mahasiswa)"*).
+     * Hasil: Posisi kunci tidak lagi monoton di opsi B, bervariasi secara diagonal pada grid 2x2 presenter dan layar voting mobile.
+2. Verifikasi:
+   - `bun x tsc --noEmit`: 0 error.
+   - Kepatuhan baris kode: `src/lib/questions.ts` tetap 71 baris (< 250 baris).
 
+Stage Summary:
+- Status: SELESAI & TERVERIFIKASI.
 
+---
+Task ID: 44
+Agent: main (Antigravity — Gemini 3.8 Flash High)
+Task: Implementasi Auto-Reset Sesi Voting untuk Seluruh HP Audiens & Deployment Azure VM
 
+Work Log:
+1. Penanganan Real-time Remote Reset di Halaman Audiens (/voting):
+   - `src/components/voting/VotingPage.tsx`:
+     * Menambahkan listener event `votes:reset` pada socket gateway `live-notify`.
+     * Membersihkan `localStorage` (`kti-vote-q1` dan `kti-vote-q2`) seketika saat presenter mereset sesi.
+     * Mengatur `resetTick` dinamis untuk me-remount `QuestionCard` secara instan dan bersih.
+     * Mengunci kembali `q2Open` ke false dan reset state `answered`.
+     * Menampilkan banner notifikasi elegan: `SESI DIRESET OLEH PRESENTER · SILAKAN VOTE ULANG`.
+   - `src/components/voting/QuestionCard.tsx`:
+     * Menambahkan handler `votes:reset` internal untuk membersihkan `chosen`, `state` ke `"idle"`, dan menghapus item `localStorage`.
+2. Verifikasi Lokal:
+   - `bun x tsc --noEmit`: 0 error.
+   - `npm run lint`: 0 error, 1 pre-existing warning (font layout).
+   - `bun run build`: Berhasil 100% (4.0s).
+   - Kepatuhan baris kode: Seluruh file < 250 baris (`VotingPage.tsx`: 163 baris, `QuestionCard.tsx`: 224 baris).
+3. Git Remote & Deployment Azure VM:
+   - Commit & push ke remote origin branch `main`.
+   - Eksekusi SSH ke Azure VM `azureuser@20.214.143.187`.
+   - `git pull origin main`, `bun run build`, dan reload proses PM2 `presentasi`.
+   - Verifikasi HTTPS live pada domain `presentasi.aryariap.my.id`.
 
+Stage Summary:
+- Status: IN PROGRESS (Deployment).

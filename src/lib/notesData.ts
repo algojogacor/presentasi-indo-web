@@ -158,19 +158,19 @@ export const NOTE_PLAN: StepNote[][] = [
     },
     {
       t: "Q1 — voting live",
-      c: "Perbedaan artikel jurnal vs makalah: struktur IMRaD & novelty vs tugas konseptual.",
+      c: "Perubahan makalah ke jurnal: transformasikan ke IMRaD & novelty (Tabel 2 Fitriani et al., 2023).",
     },
     {
       t: "Q1 — reveal",
-      c: "Bahas hasil voting dan kuatkan konsep format IMRaD dari Tabel 2.",
+      c: "Bahas hasil voting dan kuatkan konsep pemadatan struktur IMRaD tanpa bab Romawi.",
     },
     {
       t: "Q2 — voting live",
-      c: "Letak kontribusi ilmiah & orisinalitas utama peneliti (Pembahasan Bab IV).",
+      c: "Format paling ketat & risiko gugur batas halaman: uji insting audiens sebelum masuk variasi genre.",
     },
     {
       t: "Q2 — reveal & ekspor",
-      c: "Bongkar miskonsepsi bahwa tumpukan data mentah bukanlah kontribusi sebelum dibahas kritis.",
+      c: "Tegaskan batas mutlak 10 halaman PKM di Simbelmawa (Dikti, 2023) sebagai jembatan langsung ke Battle Cards.",
     },
   ],
   [

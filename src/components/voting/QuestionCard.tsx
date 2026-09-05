@@ -67,7 +67,16 @@ export default function QuestionCard({ qid, onVoted }: QuestionCardProps) {
         },
       );
       sock.on("votes:reset", () => {
-        if (!stopped) setLiveTotal(0);
+        if (!stopped) {
+          try {
+            window.localStorage.removeItem(storageKey(qid));
+          } catch {
+            /* ignore */
+          }
+          setChosen(null);
+          setState("idle");
+          setLiveTotal(0);
+        }
       });
       sock.on("presence", (p: { count: number }) => {
         if (!stopped) setPeers(p.count);

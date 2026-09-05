@@ -11,8 +11,9 @@ import VotingFooter from "./VotingFooter";
 export default function VotingPage() {
   const [q2Open, setQ2Open] = useState(false);
   const [answered, setAnswered] = useState({ q1: false, q2: false });
-  // Presence — berapa perangkat kelas tersambung
   const [online, setOnline] = useState(0);
+  const [resetTick, setResetTick] = useState(0);
+  const [showResetNotice, setShowResetNotice] = useState(false);
 
   useEffect(() => {
     let disposed = false;
@@ -30,6 +31,19 @@ export default function VotingPage() {
       sock.on("presence", (p: { count: number }) => {
         if (!disposed) setOnline(p.count);
       });
+      sock.on("votes:reset", () => {
+        if (disposed) return;
+        try {
+          window.localStorage.removeItem("kti-vote-q1");
+          window.localStorage.removeItem("kti-vote-q2");
+        } catch {
+          /* abaikan */
+        }
+        setResetTick((t) => t + 1);
+        setQ2Open(false);
+        setAnswered({ q1: false, q2: false });
+        setShowResetNotice(true);
+      });
       sock.on("disconnect", () => {
         if (!disposed) setOnline(0);
       });
@@ -42,6 +56,13 @@ export default function VotingPage() {
     };
   }, []);
 
+  // Notifikasi auto-tutup setelah 4 detik
+  useEffect(() => {
+    if (!showResetNotice) return;
+    const t = setTimeout(() => setShowResetNotice(false), 4000);
+    return () => clearTimeout(t);
+  }, [showResetNotice]);
+
   // Pertanyaan kedua terbuka setelah pertanyaan pertama dijawab;
   // kartu penyelesaian muncul saat keduanya terekam.
   useEffect(() => {
@@ -50,7 +71,7 @@ export default function VotingPage() {
       try {
         const hasQ1 = !!window.localStorage.getItem("kti-vote-q1");
         const hasQ2 = !!window.localStorage.getItem("kti-vote-q2");
-        if (hasQ1) setQ2Open(true);
+        setQ2Open(hasQ1);
         setAnswered((a) =>
           a.q1 === hasQ1 && a.q2 === hasQ2 ? a : { q1: hasQ1, q2: hasQ2 },
         );
@@ -65,12 +86,36 @@ export default function VotingPage() {
       if (check()) clearInterval(iv);
     }, 1500);
     return () => clearInterval(iv);
-  }, []);
+  }, [resetTick]);
 
   return (
     <div className="min-h-dvh bg-base text-paper">
       {/* Header */}
       <VotingHeader online={online} />
+
+      {/* Banner notifikasi reset */}
+      {showResetNotice && (
+        <div
+          role="status"
+          aria-live="polite"
+          className="fade-slide-in fixed top-20 left-1/2 z-50 flex w-[90vw] max-w-sm -translate-x-1/2 items-center justify-between rounded-[8px] border border-ember/60 bg-base/95 px-4 py-3 shadow-2xl backdrop-blur"
+        >
+          <div className="flex items-center gap-2.5">
+            <span className="h-2 w-2 rounded-full bg-ember animate-pulse" />
+            <span className="font-code text-[11px] tracking-[0.18em] text-ember">
+              SESI DIRESET OLEH PRESENTER
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setShowResetNotice(false)}
+            className="font-code text-[10px] text-mute hover:text-paper"
+            aria-label="Tutup notifikasi"
+          >
+            ✕
+          </button>
+        </div>
+      )}
 
       <main className="mx-auto max-w-md px-5 pt-20 pb-16">
         <p className="font-display text-[30px] italic leading-tight text-paper">
@@ -82,9 +127,13 @@ export default function VotingPage() {
         </p>
 
         <div className="mt-9 space-y-10">
-          <QuestionCard qid={1} onVoted={() => setQ2Open(true)} />
+          <QuestionCard
+            key={`q1-${resetTick}`}
+            qid={1}
+            onVoted={() => setQ2Open(true)}
+          />
           {q2Open ? (
-            <QuestionCard qid={2} />
+            <QuestionCard key={`q2-${resetTick}`} qid={2} />
           ) : (
             <p className="border-t border-edge pt-7 font-code text-[10px] tracking-[0.25em] text-mute">
               PERTANYAAN 02 TERBUKA SETELAH KAMU MENJAWAB PERTANYAAN 01

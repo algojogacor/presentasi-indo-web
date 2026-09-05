@@ -21,36 +21,36 @@ export const QUESTIONS: PollQuestion[] = [
   {
     id: 1,
     prompt:
-      "Menurut kajian sistematika KTI, apa perbedaan paling esensial antara artikel jurnal ilmiah dan makalah tugas perkuliahan?",
+      "Kalian sering membuat makalah tugas kuliah. Jika makalah tersebut ingin diterbitkan menjadi artikel jurnal ilmiah bereputasi, perubahan apa yang paling mendasar?",
     options: [
-      { key: "A", label: "Jumlah halaman fisik dan batas waktu pengumpulan tugas" },
+      { key: "A", label: "Mempertebal tinjauan pustaka dan menambah jumlah bab" },
+      { key: "B", label: "Mengganti istilah Indonesia ke bahasa asing agar terlihat lebih teknis" },
       {
-        key: "B",
-        label: "Format struktur IMRaD tanpa bab Romawi serta orientasi mutlak pada novelty",
+        key: "C",
+        label: "Mengubahnya ke format IMRaD (tanpa bab Romawi) dan berorientasi pada novelty",
         correct: true,
       },
-      { key: "C", label: "Penggunaan kosakata teknis dan bahasa asing yang jauh lebih dominan" },
-      { key: "D", label: "Topik bahasan yang diangkat oleh penulis di ruang kelas" },
+      { key: "D", label: "Menghapus pendahuluan dan langsung menyajikan data mentah" },
     ],
     answerNote:
-      "Berdasarkan Tabel 2 (Fitriani et al., 2023), artikel jurnal memadatkan struktur menjadi format IMRaD (Introduction, Methods, Results, Discussion) tanpa bab berangka Romawi dan sangat memprioritaskan keterbaruan (novelty) untuk publikasi bereputasi, berbeda dengan makalah kuliah yang menggunakan format 3 bab ringkas untuk kajian konseptual tugas.",
+      "Berdasarkan Tabel 2 makalah (Fitriani et al., 2023), artikel jurnal memadatkan struktur menjadi format IMRaD (Introduction, Methods, Results, Discussion) tanpa bab berangka Romawi dan sangat memprioritaskan keterbaruan (novelty) untuk publikasi bereputasi, berbeda dengan makalah kuliah yang menggunakan format 3 bab ringkas untuk kajian konseptual tugas.",
   },
   {
     id: 2,
     prompt:
-      "Di manakah letak pembuktian kontribusi ilmiah dan orisinalitas utama seorang peneliti dalam struktur karya ilmiah?",
+      "Di antara jenis karya ilmiah berikut, mana yang memiliki aturan format administratif paling ketat dan langsung gugur jika melanggar batas halaman?",
     options: [
-      { key: "A", label: "Kelengkapan sajian data mentah dan grafik pada deskripsi hasil (Bab IV)" },
+      { key: "A", label: "Skripsi / Tesis tugas akhir" },
+      { key: "B", label: "Makalah kajian konseptual tugas kuliah" },
+      { key: "C", label: "Artikel jurnal ilmiah nasional" },
       {
-        key: "B",
-        label: "Dialektika tafsir temuan dengan teori dan riset terdahulu di pembahasan (Bab IV)",
+        key: "D",
+        label: "Proposal PKM (Program Kreativitas Mahasiswa)",
         correct: true,
       },
-      { key: "C", label: "Banyaknya kutipan teori mutakhir yang dihimpun di tinjauan pustaka (Bab II)" },
-      { key: "D", label: "Keluasan ruang lingkup saran dan rekomendasi kebijakan di penutup (Bab V)" },
     ],
     answerNote:
-      "Sesuai sub-bab 2.2.2, Pembahasan (Discussion) adalah bagian paling kritis dalam karya ilmiah. Kontribusi ilmiah bukan sekadar memaparkan angka data mentah, melainkan kemampuan penulis menafsirkan temuan, mengonfrontasikannya dengan teori Bab II, membandingkannya dengan riset terdahulu, serta menjelaskan penyebab temuan tersebut (Widiyastuti et al., 2023).",
+      "Berdasarkan pedoman Dikti (2023) dan Tabel 2 makalah, Proposal PKM memiliki seleksi administratif awal yang sangat ketat di Simbelmawa dengan batasan maksimal 10 halaman isi inti. Pelanggaran format atau batas halaman akan langsung menggugurkan proposal pada tahap seleksi administrasi sebelum sempat dinilai substansinya.",
   },
 ];
 
