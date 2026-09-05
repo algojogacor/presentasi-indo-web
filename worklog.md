@@ -1712,10 +1712,14 @@ Work Log:
    - `bun run build`: Berhasil 100% (4.0s).
    - Kepatuhan baris kode: Seluruh file < 250 baris (`VotingPage.tsx`: 163 baris, `QuestionCard.tsx`: 224 baris).
 3. Git Remote & Deployment Azure VM:
-   - Commit & push ke remote origin branch `main`.
+   - Commit & push ke remote origin branch `main` (`88e2a0b`).
    - Eksekusi SSH ke Azure VM `azureuser@20.214.143.187`.
-   - `git pull origin main`, `bun run build`, dan reload proses PM2 `presentasi`.
-   - Verifikasi HTTPS live pada domain `presentasi.aryariap.my.id`.
+   - `git pull origin main`, `bun run build` sukses (48s), dan restart PM2 `presentasi` (id 6).
+   - Verifikasi HTTPS live pada domain `presentasi.aryariap.my.id`:
+     * `curl -I https://presentasi.aryariap.my.id` -> HTTP 200 OK.
+     * `/api/results?question=1` memuat opsi C sebagai kunci IMRaD & novelty.
+     * `/api/results?question=2` memuat opsi D sebagai kunci Proposal PKM.
+     * Uji siklus suara live via `POST /api/vote` (total: 1) -> `POST /api/reset` (total: 0) -> berjalan presisi.
 
 Stage Summary:
-- Status: IN PROGRESS (Deployment).
+- Status: SELESAI & TERVERIFIKASI LIVE.
