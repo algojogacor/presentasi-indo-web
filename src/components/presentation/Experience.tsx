@@ -51,7 +51,7 @@ export default function Experience() {
   const [helpSheet, setHelpSheet] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
   const [bibOpen, setBibOpen] = useState(false);
-  const [helpOn, setHelpOn] = useState(true);
+  const [helpOn, setHelpOn] = useState(false);
 
   const sectionRef = useRef<HTMLDivElement>(null);
 

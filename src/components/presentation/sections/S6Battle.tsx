@@ -57,10 +57,6 @@ export default function S6Battle({ step }: { step: number }) {
           />
         ))}
       </div>
-
-      <p className="absolute right-[6vw] bottom-[6vh] font-code text-[9px] tracking-[0.25em] text-mute">
-        [1–4] SPOTLIGHT · [B] KOMPARASI · [SPACE] BERURUTAN
-      </p>
     </div>
   );
 }

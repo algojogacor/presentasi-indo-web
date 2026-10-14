@@ -217,16 +217,7 @@ export default function S5Polling({ step }: { step: number }) {
 
           {/* Baris bawah: QR + hasil live */}
           <div className="mt-6 md:mt-auto flex flex-col sm:flex-row items-center sm:items-end justify-between gap-6">
-            <div className="flex flex-col items-center sm:items-start gap-2">
-              <PollingQrBox qid={qid} revealed={revealed} />
-
-              {/* Notifikasi threshold di bawah QR */}
-              {notice === liveKey && live && !fallback && (
-                <div className="border border-ember/40 bg-base/90 px-3 py-1.5 font-code text-[9.5px] sm:text-[10px] tracking-[0.16em] text-ember rounded-sm shadow-md">
-                  RESPONDEN &lt; 10 — FALLBACK TERSEDIA [ F ]
-                </div>
-              )}
-            </div>
+            <PollingQrBox qid={qid} revealed={revealed} />
 
             <PollingResultBars
               question={question}

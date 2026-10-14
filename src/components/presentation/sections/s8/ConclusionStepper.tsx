@@ -69,9 +69,9 @@ export default function ConclusionStepper({ step }: ConclusionStepperProps) {
         </div>
       </div>
 
-      {/* Navigasi Petunjuk Bawah */}
-      <p className="hidden md:block absolute bottom-[6vh] font-code text-[9.5px] tracking-[0.25em] text-mute/50">
-        {`SIMPULAN 0${step + 1} / 04 · TEKAN [SPACE] UNTUK LANJUT`}
+      {/* Label Sub-bab Bawah */}
+      <p className="hidden md:block absolute bottom-[6vh] font-code text-[9.5px] tracking-[0.25em] text-mute/40 uppercase">
+        {`SIMPULAN 0${step + 1} / 04 · INTISARI AKADEMIK`}
       </p>
     </div>
   );

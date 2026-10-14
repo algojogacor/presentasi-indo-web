@@ -152,7 +152,7 @@ export default function SessionRecap({ detail }: SessionRecapProps) {
         <span>{parts.join(" · ")}</span>
       </div>
       <p className="mt-2 font-code text-[9px] tracking-[0.22em] text-mute/50">
-        {`[V] ${detail ? "RINGKAS" : "RINCIAN"} · ARSIP LENGKAP → /#/RESULTS`}
+        ARSIP LENGKAP → /#/RESULTS
       </p>
     </div>
   );

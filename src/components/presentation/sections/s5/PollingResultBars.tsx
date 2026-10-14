@@ -104,11 +104,6 @@ export default function PollingResultBars({
       })}
 
       <PollingSparkline spark={spark} live={live} fallback={fallback} />
-
-      <p className="mt-[0.8vh] font-code text-[9px] tracking-[0.22em] text-mute/60">
-        {revealed && total > 0 ? "[P] PAPAN SKOR · " : ""}
-        [F] FALLBACK · [R] RESET · [E] EKSPOR CSV
-      </p>
     </div>
   );
 }

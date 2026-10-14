@@ -237,9 +237,9 @@ export default function VerdictCards({ active }: VerdictCardsProps) {
         </div>
       </div>
 
-      {/* Navigasi Petunjuk Bawah */}
-      <p className="mt-[3vh] text-center font-code text-[9.5px] tracking-[0.25em] text-mute/50">
-        PUTUSAN AKADEMIK · TEKAN [SPACE] MENUJU PREMIS AKHIR
+      {/* Label Kategori */}
+      <p className="mt-[3vh] text-center font-code text-[9.5px] tracking-[0.25em] text-mute/50 uppercase">
+        PUTUSAN AKADEMIK · REKOMENDASI &amp; SARAN (SUB-BAB 3.2)
       </p>
     </div>
   );

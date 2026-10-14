@@ -38,8 +38,8 @@ export default function PollingIntro({ settled }: PollingIntroProps) {
         className="font-display italic text-[3.2vw] text-paper"
         aria-label={INTRO_LINE}
       />
-      <p className="mt-6 font-code text-[10px] tracking-[0.4em] text-mute">
-        TANPA GOOGLE · TANPA BUKU — INSTING SAJA · [SPACE]
+      <p className="mt-6 font-code text-[10px] tracking-[0.4em] text-mute uppercase">
+        TANPA GOOGLE · TANPA BUKU — INSTING SAJA
       </p>
     </div>
   );

@@ -128,8 +128,8 @@ export default function ScoreboardOverlay({
         </div>
       </div>
 
-      <p className="mt-auto font-code text-[10px] tracking-[0.4em] text-mute">
-        [P] KEMBALI KE PEMBAHASAN · [SPACE] LANJUT
+      <p className="mt-auto font-code text-[10px] tracking-[0.3em] text-mute/50 uppercase">
+        REKAPITULASI DISTRIBUSI SUARA KELAS
       </p>
     </div>
   );
