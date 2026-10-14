@@ -18,30 +18,30 @@ export default function AppendixSlide() {
   const qrSrc = `/api/qr?data=${encodeURIComponent(fullUrl)}`;
 
   return (
-    <div className="fade-slide-in relative z-10 flex h-full flex-col justify-between px-[6vw] pt-[12vh] pb-[6vh] select-none">
+    <div className="fade-slide-in relative z-10 flex h-full flex-col justify-between px-4 sm:px-[6vw] pt-14 md:pt-[12vh] pb-24 md:pb-[6vh] overflow-y-auto select-none">
       {/* Header Slide */}
       <div>
         <div className="flex items-center gap-2 mb-2">
           <span className="h-1.5 w-1.5 rounded-full bg-[#E8A020] animate-pulse" />
-          <p className="font-code text-[11px] uppercase tracking-[0.3em] text-[#E8A020]">
+          <p className="font-code text-[10px] sm:text-[11px] uppercase tracking-[0.25em] sm:tracking-[0.3em] text-[#E8A020]">
             POSTLIMINARIES · LAMPIRAN &amp; DOKUMEN RESMI
           </p>
         </div>
 
-        <h2 className="font-display text-[3.2vw] font-bold leading-tight text-[#F0EDE8]">
+        <h2 className="font-display text-xl sm:text-2xl md:text-[3.2vw] font-bold leading-tight text-[#F0EDE8]">
           Akses Naskah Lengkap &amp; Berkas Asli
         </h2>
 
-        <p className="mt-2 max-w-[46vw] font-body text-[1.2vw] leading-relaxed text-paper/80">
+        <p className="mt-2 max-w-full md:max-w-[46vw] font-body text-xs sm:text-sm md:text-[1.2vw] leading-relaxed text-paper/80">
           Naskah ilmiah 20+ halaman berstandar akademik lengkap dengan tinjauan teoritis, metodologi, pembahasan mendalam, serta seluruh 12 sumber rujukan baku.
         </p>
       </div>
 
       {/* Grid Konten: Info Berkas di Kiri & QR Code di Kanan */}
-      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] items-center gap-[4vw] my-auto">
+      <div className="grid grid-cols-1 md:grid-cols-[1fr_auto] items-center gap-6 md:gap-[4vw] my-4 md:my-auto">
         {/* Kolom Kiri: Detail Naskah & Tombol Akses */}
-        <div className="space-y-4 max-w-[50vw]">
-          <div className="rounded-xl border border-white/10 bg-[#111118]/80 p-5 space-y-3">
+        <div className="space-y-4 w-full max-w-full md:max-w-[50vw]">
+          <div className="rounded-xl border border-white/10 bg-[#111118]/80 p-4 sm:p-5 space-y-3">
             <div className="flex items-center justify-between border-b border-white/5 pb-2">
               <span className="font-code text-[10px] tracking-wider text-[#E8A020] uppercase">
                 BERKAS TERVERIFIKASI · PDB 93
@@ -49,7 +49,7 @@ export default function AppendixSlide() {
               <span className="font-code text-[10px] text-mute">FORMAT .DOCX &amp; WEB</span>
             </div>
 
-            <h3 className="font-display text-[1.45vw] font-semibold text-paper leading-snug">
+            <h3 className="font-display text-sm sm:text-base md:text-[1.45vw] font-semibold text-paper leading-snug">
               {PAPER_META.title}
             </h3>
 
@@ -61,12 +61,12 @@ export default function AppendixSlide() {
           </div>
 
           {/* Tombol Aksi Langsung */}
-          <div className="flex flex-wrap items-center gap-3 pt-1">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 pt-1">
             <a
               href="/makalah"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg bg-[#E8A020] px-5 py-2.5 font-code text-[12px] font-bold text-black transition-all hover:bg-[#FFB740] shadow-[0_0_20px_rgba(232,160,32,0.3)]"
+              className="inline-flex items-center justify-center gap-2 rounded-lg bg-[#E8A020] px-4 py-2.5 font-code text-[11px] sm:text-[12px] font-bold text-black transition-all hover:bg-[#FFB740] shadow-[0_0_20px_rgba(232,160,32,0.3)] text-center"
             >
               <span>Buka Web Reader (/makalah)</span>
               <span className="text-[14px]">↗</span>
@@ -75,10 +75,10 @@ export default function AppendixSlide() {
             <a
               href={PAPER_META.downloadUrl}
               download
-              className="inline-flex items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-5 py-2.5 font-code text-[12px] font-semibold text-paper/90 transition-all hover:border-[#E8A020]/60 hover:text-[#E8A020]"
+              className="inline-flex items-center justify-center gap-2 rounded-lg border border-white/15 bg-white/5 px-4 py-2.5 font-code text-[11px] sm:text-[12px] font-semibold text-paper/90 transition-all hover:border-[#E8A020]/60 hover:text-[#E8A020] text-center"
             >
               <svg
-                className="w-4 h-4 text-[#E8A020]"
+                className="w-4 h-4 text-[#E8A020] shrink-0"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
@@ -94,9 +94,9 @@ export default function AppendixSlide() {
         </div>
 
         {/* Kolom Kanan: QR Code Box */}
-        <div className="flex flex-col items-center justify-center rounded-xl border border-[#E8A020]/40 bg-[#161410]/95 p-5 shadow-[0_0_40px_rgba(232,160,32,0.15)]">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-[#E8A020]/40 bg-[#161410]/95 p-4 sm:p-5 shadow-[0_0_40px_rgba(232,160,32,0.15)] w-full max-w-xs mx-auto md:w-auto">
           <div className="mb-2 text-center">
-            <p className="font-code text-[11px] font-bold text-[#E8A020] tracking-wider uppercase">
+            <p className="font-code text-[10px] sm:text-[11px] font-bold text-[#E8A020] tracking-wider uppercase">
               PINDAI DENGAN KAMERA HP
             </p>
             <p className="font-code text-[9px] text-mute/80">
@@ -109,7 +109,7 @@ export default function AppendixSlide() {
             <img
               src={qrSrc}
               alt="QR Code Makalah Lengkap"
-              className="h-[18vh] w-[18vh] md:h-[22vh] md:w-[22vh] object-contain rounded"
+              className="h-36 w-36 sm:h-[18vh] sm:w-[18vh] md:h-[22vh] md:w-[22vh] object-contain rounded"
             />
           </div>
 
@@ -120,7 +120,7 @@ export default function AppendixSlide() {
       </div>
 
       {/* Footer Navigasi */}
-      <div className="border-t border-edge/60 pt-[1.5vh] flex items-center justify-between font-code text-[10px] text-mute/60 tracking-widest">
+      <div className="border-t border-edge/60 pt-[1.5vh] flex flex-col sm:flex-row items-center justify-between gap-1 font-code text-[9px] sm:text-[10px] text-mute/60 tracking-widest text-center sm:text-left">
         <span>BAGIAN AKHIR (POSTLIMINARIES) · ANATOMI KTI SELESAI LENGKAP</span>
         <span>KELOMPOK 6 PDB 93 · UNIVERSITAS AIRLANGGA · 2026</span>
       </div>

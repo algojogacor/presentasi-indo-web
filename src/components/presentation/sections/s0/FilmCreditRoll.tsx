@@ -161,7 +161,7 @@ export default function FilmCreditRoll({
   return (
     <div
       ref={containerRef}
-      className={`s0-credit-roll mt-[2.8vh] flex flex-col items-center text-center transition-opacity ${
+      className={`s0-credit-roll mt-4 md:mt-[2.8vh] flex flex-col items-center text-center transition-opacity max-h-[62vh] md:max-h-none overflow-y-auto px-2 pb-6 md:pb-0 ${
         active ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
       }`}
     >
@@ -171,32 +171,32 @@ export default function FilmCreditRoll({
       </span>
 
       <div className="credit-item credit-dosen-box mt-[0.5vh] flex flex-col items-center">
-        <span className="credit-dosen-name credit-shimmer-dosen font-display italic font-medium text-[clamp(1.25rem,1.8vw,1.85rem)]">
+        <span className="credit-dosen-name credit-shimmer-dosen font-display italic font-medium text-[clamp(1.15rem,1.8vw,1.85rem)]">
           {DOSEN_PENGAMPU.name}
         </span>
-        <span className="font-code text-[11px] tracking-wider text-[#4A4A5A] mt-[0.2vh]">
+        <span className="font-code text-[10px] sm:text-[11px] tracking-wider text-[#4A4A5A] mt-[0.2vh]">
           {DOSEN_PENGAMPU.nip}
         </span>
       </div>
 
       {/* Garis Separator */}
-      <div className="credit-item credit-separator my-[1.8vh] h-[1px] w-[200px] bg-[rgba(232,160,32,0.2)] origin-center" />
+      <div className="credit-item credit-separator my-3 md:my-[1.8vh] h-[1px] w-[160px] md:w-[200px] bg-[rgba(232,160,32,0.2)] origin-center" />
 
       {/* Label Tim Penyusun */}
       <span className="credit-item credit-team-label font-code text-[10px] md:text-[11px] uppercase tracking-[0.35em] text-[#6B6B7A]">
         {TEAM_CREDIT_LABEL}
       </span>
 
-      {/* 6 Anggota dalam Dua Kolom (3 kiri, 3 kanan) */}
-      <div className="mt-[1.3vh] grid grid-cols-2 gap-x-[5vw] gap-y-[1.1vh] text-left">
+      {/* 6 Anggota dalam Dua Kolom */}
+      <div className="mt-3 md:mt-[1.3vh] grid grid-cols-1 sm:grid-cols-2 gap-x-[5vw] gap-y-2.5 sm:gap-y-[1.1vh] text-center sm:text-left w-full max-w-[500px]">
         {/* Kolom Kiri */}
-        <div className="flex flex-col gap-[1.1vh]">
+        <div className="flex flex-col gap-2.5 sm:gap-[1.1vh]">
           {MEMBERS_LEFT.map((m) => (
             <div
               key={m.nim}
               className="credit-item credit-member-item flex flex-col"
             >
-              <span className="credit-member-name credit-shimmer-member font-display text-[clamp(0.95rem,1.4vw,1.45rem)]">
+              <span className="credit-member-name credit-shimmer-member font-display text-[clamp(1rem,1.4vw,1.45rem)]">
                 {m.name}
               </span>
               <span className="font-code text-[10px] tracking-wider text-[#4A4A5A]">
@@ -207,13 +207,13 @@ export default function FilmCreditRoll({
         </div>
 
         {/* Kolom Kanan */}
-        <div className="flex flex-col gap-[1.1vh]">
+        <div className="flex flex-col gap-2.5 sm:gap-[1.1vh]">
           {MEMBERS_RIGHT.map((m) => (
             <div
               key={m.nim}
               className="credit-item credit-member-item flex flex-col"
             >
-              <span className="credit-member-name credit-shimmer-member font-display text-[clamp(0.95rem,1.4vw,1.45rem)]">
+              <span className="credit-member-name credit-shimmer-member font-display text-[clamp(1rem,1.4vw,1.45rem)]">
                 {m.name}
               </span>
               <span className="font-code text-[10px] tracking-wider text-[#4A4A5A]">
@@ -225,7 +225,7 @@ export default function FilmCreditRoll({
       </div>
 
       {/* Program Studi Footer */}
-      <p className="credit-item credit-prodi mt-[2.6vh] font-code text-[9px] md:text-[10px] tracking-[0.32em] text-[#4A4A5A] uppercase text-center max-w-[85vw]">
+      <p className="credit-item credit-prodi mt-4 md:mt-[2.6vh] font-code text-[9px] md:text-[10px] tracking-[0.25em] md:tracking-[0.32em] text-[#4A4A5A] uppercase text-center max-w-[90vw]">
         {PRODI_LABEL}
       </p>
     </div>

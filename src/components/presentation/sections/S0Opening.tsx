@@ -62,6 +62,13 @@ export default function S0Opening({ step }: { step: number }) {
     return false;
   });
 
+  // Pastikan audio ouverture mati saat berpindah dari step 0
+  useEffect(() => {
+    if (step !== 0) {
+      audioManager.fadeOutOuverture(0.8);
+    }
+  }, [step]);
+
   // State awal instan sebelum render
   useIsoLayoutEffect(() => {
     const q = root.current;
@@ -171,25 +178,25 @@ export default function S0Opening({ step }: { step: number }) {
   return (
     <div
       ref={root}
-      className="absolute inset-0 flex flex-col items-center justify-center px-[6vw]"
+      className="absolute inset-0 flex flex-col items-center justify-center px-4 sm:px-[6vw] overflow-y-auto md:overflow-hidden"
     >
       {step === 0 && (
         <div
           ref={ouvertureRef}
           onClick={startOuverture}
-          className="fixed inset-0 z-[75] flex cursor-pointer flex-col items-center justify-center bg-[#0A0A0F] select-none"
+          className="fixed inset-0 z-[75] flex cursor-pointer flex-col items-center justify-center bg-[#0A0A0F] px-4 select-none"
         >
-          <span className="ou-kicker font-code text-xs md:text-sm uppercase tracking-[0.5em] text-[#E8A020]">
+          <span className="ou-kicker font-code text-xs md:text-sm uppercase tracking-[0.5em] text-[#E8A020] text-center">
             ANATOMI KARYA TULIS ILMIAH
           </span>
           <div className="ou-line my-[2.5vh] h-[1px] w-[100px] bg-[#E8A020]" />
-          <h1 className="ou-title font-display text-[15vw] font-normal leading-[0.88] tracking-wide text-[#F0EDE8] text-center">
+          <h1 className="ou-title font-display text-[clamp(3.5rem,15vw,12rem)] font-normal leading-[0.88] tracking-wide text-[#F0EDE8] text-center">
             OUVERTURE
           </h1>
           {!ouStarted && (
-            <div className="ou-prompt mt-[4vh] flex items-center gap-2 rounded-full border border-[#E8A020]/30 bg-[#111118]/90 px-4 py-1.5 font-code text-xs tracking-wider text-[#E8A020]">
+            <div className="ou-prompt mt-[4vh] flex items-center gap-2 rounded-full border border-[#E8A020]/30 bg-[#111118]/90 px-4 py-2 font-code text-xs tracking-wider text-[#E8A020] shadow-lg">
               <span className="h-1.5 w-1.5 rounded-full bg-[#E8A020] animate-pulse" />
-              <span>TEKAN SPASI UNTUK MEMULAI</span>
+              <span>KETUK ATAU TEKAN SPASI UNTUK MEMULAI</span>
             </div>
           )}
         </div>
@@ -197,14 +204,14 @@ export default function S0Opening({ step }: { step: number }) {
 
       <p
         aria-label={SENTENCE}
-        className="s0-sentence absolute top-[38%] left-1/2 w-[72vw] -translate-x-1/2 text-center font-display text-[2.5vw] italic leading-snug text-paper/90 opacity-0"
+        className="s0-sentence absolute top-[38%] left-1/2 w-[88vw] md:w-[72vw] -translate-x-1/2 text-center font-display text-[clamp(1.15rem,2.5vw,2.5rem)] italic leading-snug text-paper/90 opacity-0"
       />
 
-      <h1 ref={titleRef} className="text-center leading-[0.95] transition-transform">
-        <span className="block font-display font-semibold text-[clamp(3.8rem,7.5vw,7.8rem)] tracking-[0.02em] text-paper">
+      <h1 ref={titleRef} className={`text-center leading-[0.95] transition-transform ${step === 2 ? "mt-4 md:mt-0" : ""}`}>
+        <span className="block font-display font-semibold text-[clamp(2.6rem,7.5vw,7.8rem)] tracking-[0.02em] text-paper">
           <SplitChars text="ANATOMI" />
         </span>
-        <span className="mt-[0.5vw] block font-display italic font-medium text-[clamp(1.6rem,2.7vw,2.9rem)] text-paper/85">
+        <span className="mt-[0.5vw] block font-display italic font-medium text-[clamp(1.3rem,2.7vw,2.9rem)] text-paper/85">
           <SplitChars text="Karya Tulis Ilmiah" />
         </span>
       </h1>

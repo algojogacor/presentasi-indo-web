@@ -68,29 +68,29 @@ export default function LatarFacts({ step }: LatarFactsProps) {
       <div
         ref={statementRef}
         data-step="0"
-        className="absolute top-[46%] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center text-center w-[68vw] pointer-events-none"
+        className="absolute top-[44%] sm:top-[46%] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center text-center w-[90vw] md:w-[68vw] pointer-events-none px-2"
       >
-        <p className="s2-statement font-display italic text-[clamp(1.6rem,2.7vw,2.9rem)] leading-[1.3] text-paper">
+        <p className="s2-statement font-display italic text-[clamp(1.3rem,2.7vw,2.9rem)] leading-[1.3] text-paper">
           &ldquo;{STATEMENT}&rdquo;
         </p>
-        <span className="mt-3 font-code text-[10px] tracking-[0.3em] text-ember/70 uppercase">
+        <span className="mt-2.5 sm:mt-3 font-code text-[9px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.3em] text-ember/70 uppercase">
           — SUB-BAB 1.1 · LATAR BELAKANG MASALAH
         </span>
       </div>
 
       {/* Tiga fakta urgensi sekuensial */}
-      <div className="absolute top-[50vh] left-1/2 -translate-x-1/2 w-[62vw] space-y-[1.3vw]">
+      <div className="absolute top-[48vh] sm:top-[50vh] left-1/2 -translate-x-1/2 w-[90vw] md:w-[62vw] space-y-2 sm:space-y-[1.3vw]">
         {FACTS.map((f, i) => (
           <div
             key={f.tag}
             data-step={i + 1}
             data-reveal="clip"
-            className="grid grid-cols-[16vw_1fr] items-baseline gap-[2vw] border-t border-edge pt-[1vw]"
+            className="grid grid-cols-1 sm:grid-cols-[16vw_1fr] items-baseline gap-1 sm:gap-[2vw] border-t border-edge pt-2 sm:pt-[1vw]"
           >
-            <span className="font-code text-[10px] tracking-[0.18em] text-ember whitespace-nowrap">
+            <span className="font-code text-[9.5px] sm:text-[10px] tracking-[0.16em] sm:tracking-[0.18em] text-ember whitespace-nowrap">
               {f.tag}
             </span>
-            <p className="font-body text-[clamp(0.95rem,1.22vw,1.3rem)] leading-snug text-paper/90">
+            <p className="font-body text-[clamp(0.85rem,1.22vw,1.3rem)] leading-snug text-paper/90">
               {f.text}
             </p>
           </div>

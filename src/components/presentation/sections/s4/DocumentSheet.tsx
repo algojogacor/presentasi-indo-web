@@ -10,7 +10,7 @@ export default function DocumentSheet({ sheetRef }: DocumentSheetProps) {
     <div className="relative flex flex-col items-center">
       <div
         ref={sheetRef}
-        className="relative h-[min(62vh,64vw)] border border-edge bg-[#0C0C13] opacity-0 shadow-[0_0_40px_rgba(0,0,0,0.8)]"
+        className="relative h-[min(36vh,52vw)] sm:h-[min(48vh,56vw)] md:h-[min(62vh,64vw)] border border-edge bg-[#0C0C13] opacity-0 shadow-[0_0_40px_rgba(0,0,0,0.8)] shrink-0"
         style={{ aspectRatio: "1 / 1.414" }}
       >
         {/* Tanda pojok bidang rontgen */}

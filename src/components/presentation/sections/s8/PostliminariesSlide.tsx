@@ -34,19 +34,19 @@ export default function PostliminariesSlide({
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 flex flex-col justify-center px-[6vw] py-[6vh] select-none z-20"
+      className="absolute inset-0 flex flex-col justify-start md:justify-center px-4 sm:px-[6vw] pt-14 md:pt-[6vh] pb-24 md:pb-[6vh] select-none z-20"
     >
       {/* Header Postliminaries */}
-      <div className="mb-[2vh] flex items-end justify-between border-b border-edge/80 pb-[1.2vh]">
+      <div className="mb-3 md:mb-[2vh] flex items-end justify-between border-b border-edge/80 pb-2 md:pb-[1.2vh]">
         <div>
-          <div className="inline-flex items-center gap-2 font-code text-[10px] tracking-[0.3em] text-[#E8A020] uppercase">
+          <div className="inline-flex items-center gap-2 font-code text-[9.5px] sm:text-[10px] tracking-[0.25em] sm:tracking-[0.3em] text-[#E8A020] uppercase">
             <span className="w-1.5 h-1.5 rounded-full bg-[#E8A020] animate-pulse" />
             <span>BAGIAN AKHIR (POSTLIMINARIES) · SUB-BAB 2.2.3</span>
           </div>
-          <h2 className="font-display italic text-[clamp(1.7rem,2.5vw,2.8rem)] text-paper leading-tight mt-0.5">
+          <h2 className="font-display italic text-[clamp(1.4rem,2.5vw,2.8rem)] text-paper leading-tight mt-0.5">
             Daftar Pustaka & Rujukan Akademik
           </h2>
-          <p className="font-code text-[10px] text-mute/80 tracking-wider">
+          <p className="font-code text-[9.5px] sm:text-[10px] text-mute/80 tracking-wider">
             Format Standar Baku APA Edisi Ke-7 · Landasan Teori, Metode & Etika Ilmiah
           </p>
         </div>

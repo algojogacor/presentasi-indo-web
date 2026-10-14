@@ -154,7 +154,7 @@ export default function S5Polling({ step }: { step: number }) {
 
       {/* ---- Pertanyaan live / reveal (tampilan standar) ---- */}
       {qid > 0 && !scoreOpen && (
-        <div className="absolute inset-0 flex flex-col px-[8vw] pt-[12vh] pb-[8vh]">
+        <div className="absolute inset-0 flex flex-col justify-start px-4 sm:px-[8vw] pt-14 md:pt-[12vh] pb-24 md:pb-[8vh] overflow-y-auto">
           <div className="flex items-baseline gap-4">
             <span className="font-code text-[10px] tracking-[0.3em] text-ember">
               PERTANYAAN 0{qid}
@@ -163,7 +163,7 @@ export default function S5Polling({ step }: { step: number }) {
               {live ? "BUKA /VOTING DI HP-MU" : "HASIL & PEMBAHASAN"}
             </span>
           </div>
-          <h2 className="mt-3 max-w-[62vw] font-display text-[2.5vw] leading-[1.15] text-paper">
+          <h2 className="mt-2 sm:mt-3 max-w-full md:max-w-[62vw] font-display text-[clamp(1.25rem,2.5vw,2.5rem)] leading-[1.15] text-paper">
             {question.prompt}
           </h2>
 
@@ -181,19 +181,19 @@ export default function S5Polling({ step }: { step: number }) {
           {revealed && total > 0 && (
             <div
               key={`stat-${qid}-${total}`}
-              className="reveal-stat mt-[2.4vh] flex items-baseline gap-[1.4vw]"
+              className="reveal-stat mt-4 sm:mt-[2.4vh] flex flex-col sm:flex-row items-start sm:items-baseline gap-2 sm:gap-[1.4vw]"
             >
               <span
-                className="font-display text-[4vw] leading-none text-ember"
+                className="font-display text-[clamp(2.5rem,4vw,4rem)] leading-none text-ember"
                 aria-label={`${correctPct} persen kelas menjawab benar`}
               >
                 {correctPct}%
               </span>
-              <div className="flex flex-col gap-1">
-                <span className="font-code text-[10px] tracking-[0.25em] text-mute">
+              <div className="flex flex-col gap-0.5 sm:gap-1">
+                <span className="font-code text-[9.5px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.25em] text-mute">
                   KELAS MENJAWAB BENAR · {correctCount}/{total} SUARA
                 </span>
-                <span className="font-display italic text-[1.25vw] leading-snug text-paper/80">
+                <span className="font-display italic text-xs sm:text-sm md:text-[1.25vw] leading-snug text-paper/80">
                   {verdict}
                 </span>
               </div>
@@ -204,19 +204,19 @@ export default function S5Polling({ step }: { step: number }) {
           {revealed && (
             <div
               key={`expl-${qid}`}
-              className="fade-slide-in mt-[2.6vh] max-w-[56vw] border-l-2 border-ember pl-[1.4vw]"
+              className="fade-slide-in mt-4 sm:mt-[2.6vh] max-w-full md:max-w-[56vw] border-l-2 border-ember pl-3 sm:pl-[1.4vw]"
             >
               <p className="font-code text-[10px] tracking-[0.3em] text-ember">
                 MENGAPA —
               </p>
-              <p className="mt-2 font-body text-[1.15vw] leading-relaxed text-paper/85">
+              <p className="mt-1.5 sm:mt-2 font-body text-xs sm:text-sm md:text-[1.15vw] leading-relaxed text-paper/85">
                 {question.answerNote}
               </p>
             </div>
           )}
 
           {/* Baris bawah: QR + hasil live */}
-          <div className="mt-auto flex items-end justify-between">
+          <div className="mt-6 md:mt-auto flex flex-col sm:flex-row items-center sm:items-end justify-between gap-6">
             <PollingQrBox qid={qid} revealed={revealed} />
 
             <PollingResultBars

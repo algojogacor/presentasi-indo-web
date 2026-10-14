@@ -8,7 +8,7 @@ interface RailTicksProps {
 export default function RailTicks({ section }: RailTicksProps) {
   return (
     <div
-      className="pointer-events-none fixed right-6 bottom-5 z-[70] flex items-end gap-[3px]"
+      className="pointer-events-none fixed right-6 bottom-5 z-[60] hidden sm:flex items-end gap-[3px]"
       aria-hidden="true"
     >
       {SECTIONS.map((_, i) => (

@@ -29,6 +29,8 @@ import PresenterHud from "./experience/PresenterHud";
 import ProgressBar from "./experience/ProgressBar";
 import RailTicks from "./experience/RailTicks";
 import ResumeGate from "./experience/ResumeGate";
+import MobileNav from "./experience/MobileNav";
+import { useTouchSwipe } from "./experience/useTouchSwipe";
 import { useExperienceKeyboard } from "./experience/useExperienceKeyboard";
 import { usePresentationState } from "./experience/usePresentationState";
 
@@ -115,6 +117,13 @@ export default function Experience() {
     keyHandlerRef,
   });
 
+  // Swipe gesture navigation for touch devices
+  useTouchSwipe({
+    onSwipeLeft: advance,
+    onSwipeRight: back,
+    disabled: mapOpen || helpSheet || notesOpen || bibOpen,
+  });
+
   const SectionComp = SECTION_COMPONENTS[section];
 
   // Pita progres
@@ -149,6 +158,7 @@ export default function Experience() {
               setMapOpen(false);
               goto(n, 0);
             }}
+            onClose={() => setMapOpen(false)}
           />
         )}
 
@@ -203,6 +213,16 @@ export default function Experience() {
           contrast={contrast}
           muted={muted}
           helpOn={helpOn}
+        />
+
+        {/* Kontrol Navigasi Layar Sentuh & Tombol Mobile */}
+        <MobileNav
+          section={section}
+          step={step}
+          onAdvance={advance}
+          onBack={back}
+          onOpenMap={() => setMapOpen((m) => !m)}
+          onOpenBib={() => setBibOpen((b) => !b)}
         />
       </div>
     </PresCtx.Provider>

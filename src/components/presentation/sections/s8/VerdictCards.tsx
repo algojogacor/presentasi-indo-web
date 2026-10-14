@@ -82,32 +82,32 @@ export default function VerdictCards({ active }: VerdictCardsProps) {
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 flex flex-col justify-center px-[8vw] select-none z-20"
+      className="absolute inset-0 flex flex-col justify-start md:justify-center px-4 sm:px-[8vw] pt-14 md:pt-0 pb-24 md:pb-0 overflow-y-auto select-none z-20"
       style={{ opacity: 0, visibility: "hidden" }}
     >
       {/* Header Putusan Saran */}
       <div
         ref={headerRef}
-        className="mb-[3vh] flex flex-col items-center text-center"
+        className="mb-3 sm:mb-[3vh] flex flex-col items-center text-center"
       >
-        <div className="inline-flex items-center gap-2 px-3 py-1 border border-edge/60 bg-surface/40 font-code text-[9.5px] tracking-[0.3em] text-[#E8A020] uppercase mb-1.5">
+        <div className="inline-flex items-center gap-2 px-3 py-1 border border-edge/60 bg-surface/40 font-code text-[9px] sm:text-[9.5px] tracking-[0.25em] sm:tracking-[0.3em] text-[#E8A020] uppercase mb-1.5">
           <span className="w-1.5 h-1.5 rounded-full bg-[#E8A020] animate-pulse" />
           <span>SUB-BAB 3.2 · PRESKRIPSI & REKOMENDASI AKADEMIK</span>
         </div>
-        <h2 className="font-display italic text-[clamp(1.8rem,2.7vw,3rem)] text-paper leading-tight">
+        <h2 className="font-display italic text-[clamp(1.4rem,2.7vw,3rem)] text-paper leading-tight">
           Putusan Akhir: Dua Rekomendasi Ilmiah
         </h2>
-        <p className="mt-1 font-code text-[11px] tracking-[0.2em] text-mute/80 uppercase">
+        <p className="mt-1 font-code text-[10px] sm:text-[11px] tracking-[0.16em] sm:tracking-[0.2em] text-mute/80 uppercase">
           Vonis strategis bagi subjek peneliti dan ekosistem keilmuan kampus
         </p>
       </div>
 
       {/* Grid Dua Kartu Rekomendasi Berdampingan */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-[2.4vw] max-w-[84vw] mx-auto w-full">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-[2.4vw] max-w-full md:max-w-[84vw] mx-auto w-full">
         {/* Kartu 1 — Untuk Mahasiswa Peneliti */}
         <div
           ref={card1Ref}
-          className="relative flex flex-col justify-between rounded-xl border border-[#E8A020]/40 bg-[#111118]/90 p-[2.6vh] px-[2.2vw] shadow-[0_0_35px_rgba(232,160,32,0.08)] backdrop-blur-md"
+          className="relative flex flex-col justify-between rounded-xl border border-[#E8A020]/40 bg-[#111118]/90 p-4 sm:p-[2.6vh] px-4 sm:px-[2.2vw] shadow-[0_0_35px_rgba(232,160,32,0.08)] backdrop-blur-md"
         >
           {/* Aksen Emas Sudut */}
           <div className="absolute top-0 left-0 h-8 w-[2px] bg-[#E8A020]" />

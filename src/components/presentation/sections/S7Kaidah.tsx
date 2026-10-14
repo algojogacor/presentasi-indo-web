@@ -114,7 +114,7 @@ export default function S7Kaidah({ step }: { step: number }) {
   useStepReveal(root, step);
 
   return (
-    <div ref={root} className="absolute inset-0 px-[9vw]" data-testid="kaidah">
+    <div ref={root} className="absolute inset-0 px-4 sm:px-[9vw]" data-testid="kaidah">
       <Kicker act="07">KAIDAH KEBAHASAAN &amp; ETIKA</Kicker>
       <BigNumeral>07</BigNumeral>
 
@@ -123,40 +123,40 @@ export default function S7Kaidah({ step }: { step: number }) {
           key={p.idx}
           data-step={i}
           data-exclusive
-          className="absolute inset-0 flex flex-col justify-center pt-[6vh]"
+          className="absolute inset-0 flex flex-col justify-start md:justify-center pt-14 md:pt-[6vh] pb-24 md:pb-0 overflow-y-auto px-2 sm:px-0"
         >
-          <p className="font-code text-[10px] tracking-[0.3em] text-ember">
+          <p className="font-code text-[10px] tracking-[0.25em] sm:tracking-[0.3em] text-ember">
             {p.idx} — {p.tag}
           </p>
-          <h2 className="mt-3 font-display text-[3.8vw] leading-[1.02] text-paper">
+          <h2 className="mt-2 sm:mt-3 font-display text-[clamp(1.5rem,3.8vw,3.8rem)] leading-[1.05] text-paper">
             {p.title}
           </h2>
-          <p className="mt-4 max-w-[44vw] font-body text-[1.2vw] leading-relaxed text-mute">
+          <p className="mt-2 sm:mt-4 max-w-full md:max-w-[44vw] font-body text-xs sm:text-sm md:text-[1.2vw] leading-relaxed text-mute">
             {p.desc}
           </p>
 
-          <div className="mt-[4vh] grid max-w-[76vw] grid-cols-2 gap-[2vw]">
-            <div className="rounded-r border-t-2 border-wrong/60 bg-wrong/[0.03] p-4 pt-3">
+          <div className="mt-4 sm:mt-[4vh] grid w-full max-w-full md:max-w-[76vw] grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-[2vw]">
+            <div className="rounded-r border-t-2 border-wrong/60 bg-wrong/[0.03] p-3.5 sm:p-4 pt-3">
               <div className="inline-flex items-center gap-1.5 rounded bg-wrong/15 px-2 py-0.5 font-code text-[8.5px] text-wrong mb-2 border border-wrong/30">
                 <span className="h-1.5 w-1.5 rounded-full bg-wrong" />
                 <span>KETIDAKBAKUAN TEKS</span>
               </div>
-              <p className="font-code text-[10px] tracking-[0.25em] text-wrong">
+              <p className="font-code text-[9.5px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.25em] text-wrong">
                 {p.before.label}
               </p>
-              <p className="mt-3 font-body text-[1.3vw] leading-relaxed text-paper/75">
+              <p className="mt-2.5 sm:mt-3 font-body text-xs sm:text-sm md:text-[1.3vw] leading-relaxed text-paper/75">
                 {p.before.body}
               </p>
             </div>
-            <div className="rounded-r border-t-2 border-ember bg-ember/[0.03] p-4 pt-3 shadow-[0_4px_25px_rgba(232,160,32,0.05)]">
+            <div className="rounded-r border-t-2 border-ember bg-ember/[0.03] p-3.5 sm:p-4 pt-3 shadow-[0_4px_25px_rgba(232,160,32,0.05)]">
               <div className="inline-flex items-center gap-1.5 rounded bg-ember/15 px-2 py-0.5 font-code text-[8.5px] text-ember mb-2 border border-ember/30">
                 <span className="h-1.5 w-1.5 rounded-full bg-ember animate-pulse" />
                 <span>STANDAR BAKU EYD V</span>
               </div>
-              <p className="font-code text-[10px] tracking-[0.25em] text-ember">
+              <p className="font-code text-[9.5px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.25em] text-ember">
                 {p.after.label}
               </p>
-              <p className="mt-3 font-body text-[1.3vw] leading-relaxed text-paper/95 font-medium">
+              <p className="mt-2.5 sm:mt-3 font-body text-xs sm:text-sm md:text-[1.3vw] leading-relaxed text-paper/95 font-medium">
                 {p.after.body}
               </p>
             </div>

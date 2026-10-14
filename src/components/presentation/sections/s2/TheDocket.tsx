@@ -102,15 +102,15 @@ export default function TheDocket({ step }: TheDocketProps) {
   return (
     <div
       ref={rootRef}
-      className="absolute inset-0 flex flex-col justify-center px-[8vw] pt-[7vh] pb-[4vh] select-none"
+      className="absolute inset-0 flex flex-col justify-start md:justify-center px-3 sm:px-[8vw] pt-14 md:pt-[7vh] pb-20 md:pb-[4vh] overflow-y-auto select-none"
     >
       {/* Header Dokumen Dakwaan */}
-      <div className="mb-[2.2vh] flex items-end justify-between border-b border-edge/60 pb-[1vh]">
+      <div className="mb-3 md:mb-[2.2vh] flex items-end justify-between border-b border-edge/60 pb-2 md:pb-[1vh]">
         <div>
-          <span className="font-code text-[10px] md:text-[11px] uppercase tracking-[0.3em] text-[#E8A020]">
+          <span className="font-code text-[10px] md:text-[11px] uppercase tracking-[0.25em] md:tracking-[0.3em] text-[#E8A020]">
             SUB-BAB 1.2 & 1.3 · DOKUMEN DAKWAAN RISET
           </span>
-          <h2 className="font-display italic text-[clamp(1.6rem,2.4vw,2.6rem)] text-paper leading-tight mt-0.5">
+          <h2 className="font-display italic text-[clamp(1.4rem,2.4vw,2.6rem)] text-paper leading-tight mt-0.5">
             Empat Pertanyaan Fundamental
           </h2>
         </div>
@@ -120,7 +120,7 @@ export default function TheDocket({ step }: TheDocketProps) {
       </div>
 
       {/* Stack Dimming 4 Rumusan Masalah */}
-      <div className="flex flex-col gap-[1.2vh]">
+      <div className="flex flex-col gap-2 md:gap-[1.2vh]">
         {DOCKET_ITEMS.map((item, idx) => {
           const targetStep = 4 + idx;
           const isActive = step === targetStep;
@@ -131,13 +131,13 @@ export default function TheDocket({ step }: TheDocketProps) {
               ref={(el) => {
                 itemsRef.current[idx] = el;
               }}
-              className={`rounded-lg border p-[1.4vh] px-[1.8vw] transition-colors duration-500 ${
+              className={`rounded-lg border p-2.5 sm:p-[1.4vh] px-3 sm:px-[1.8vw] transition-colors duration-500 ${
                 isActive
                   ? "border-[#E8A020]/60 bg-[#111118]/90 shadow-[0_0_30px_rgba(232,160,32,0.12)]"
                   : "border-white/5 bg-transparent"
               }`}
             >
-              <div className="flex items-start gap-[1.6vw]">
+              <div className="flex items-start gap-2.5 sm:gap-[1.6vw]">
                 {/* Lencana Romawi */}
                 <div
                   className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded border font-code text-xs font-semibold tracking-wider transition-colors duration-500 ${

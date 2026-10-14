@@ -20,7 +20,7 @@ export default function PollingOptionsGrid({
   onChoose,
 }: PollingOptionsGridProps) {
   return (
-    <div className="mt-[3.2vh] grid max-w-[56vw] grid-cols-2 gap-[1.1vw]">
+    <div className="mt-3 md:mt-[3.2vh] grid w-full max-w-full md:max-w-[56vw] grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-[1.1vw]">
       {question.options.map((o) => {
         const isCorrect = revealed && o.correct;
         const isWinner = revealed && winners.includes(o.key);
@@ -39,7 +39,7 @@ export default function PollingOptionsGrid({
             type="button"
             onClick={() => onChoose(o.key)}
             disabled={!live || !fallback || !!manualChoice}
-            className={`group flex items-start gap-[0.9vw] border p-[1.1vw] text-left transition-all duration-300 ${
+            className={`group flex items-start gap-2 sm:gap-[0.9vw] border p-3 sm:p-[1.1vw] text-left transition-all duration-300 ${
               isCorrect
                 ? "border-ember bg-ember/10"
                 : isWinner
@@ -55,14 +55,14 @@ export default function PollingOptionsGrid({
             aria-label={`Opsi ${o.key}: ${o.label}`}
           >
             <span
-              className={`pt-[0.35vw] font-code text-[11px] ${
+              className={`pt-0.5 sm:pt-[0.35vw] font-code text-[11px] ${
                 isWinner && !isCorrect ? "text-paper/80" : "text-ember"
               }`}
             >
               {o.key}
             </span>
             <span
-              className={`font-body text-[1.25vw] leading-snug ${
+              className={`font-body text-xs sm:text-sm md:text-[1.25vw] leading-snug ${
                 isWinner && !isCorrect
                   ? "text-paper/85"
                   : "text-paper/90"
