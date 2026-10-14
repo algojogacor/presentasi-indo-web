@@ -273,8 +273,16 @@ export default function Experience() {
     (plannedElapsed(section, step) / PLAN_TOTAL) * 100,
   );
 
+  const presApi = useMemo<PresApi>(
+    () => ({
+      ...api,
+      sessionCode,
+    }),
+    [api, sessionCode],
+  );
+
   return (
-    <PresCtx.Provider value={api}>
+    <PresCtx.Provider value={presApi}>
       <div className="fixed inset-0 overflow-hidden bg-base text-paper select-none">
         {/* Layar Pembuka Lobi & QR Code Audiens */}
         {stage === "lobby" && (

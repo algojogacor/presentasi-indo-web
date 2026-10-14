@@ -15,6 +15,7 @@ export interface PresApi {
   registerKeyHandler: (fn: KeyHandler | null) => void;
   registerTimeline: (tl: gsap.core.Timeline | null) => void;
   hud: (msg: string, tone?: "info" | "ember") => void;
+  sessionCode?: string;
 }
 
 export const PresCtx = createContext<PresApi | null>(null);

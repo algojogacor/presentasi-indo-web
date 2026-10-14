@@ -160,7 +160,7 @@ export default function S5Polling({ step }: { step: number }) {
               PERTANYAAN 0{qid}
             </span>
             <span className="font-code text-[10px] tracking-[0.2em] text-mute">
-              {live ? "BUKA /VOTING DI HP-MU" : "HASIL & PEMBAHASAN"}
+              {live ? "VOTING OTOMATIS AKTIF DI HP ANDA" : "HASIL & PEMBAHASAN"}
             </span>
           </div>
           <h2 className="mt-2 sm:mt-3 max-w-full md:max-w-[62vw] font-display text-[clamp(1.25rem,2.5vw,2.5rem)] leading-[1.15] text-paper">

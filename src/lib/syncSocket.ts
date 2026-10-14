@@ -1,5 +1,17 @@
 import { io, type Socket } from "socket.io-client";
 
+export interface PollingState {
+  status: "inactive" | "open" | "closed";
+  questionId: number | null;
+  step: number;
+}
+
+export interface SessionQuestionResults {
+  question: number;
+  total: number;
+  options: { key: string; label: string; count: number }[];
+}
+
 export interface PublicSessionSnapshot {
   code: string;
   stage: "lobby" | "live" | "ended";
@@ -7,6 +19,8 @@ export interface PublicSessionSnapshot {
   step: number;
   revision: number;
   updatedAt: number;
+  polling?: PollingState;
+  pollResults?: SessionQuestionResults | null;
 }
 
 export interface SessionCreateResponse {
@@ -21,6 +35,15 @@ export interface SessionJoinResponse {
   ok: boolean;
   session?: PublicSessionSnapshot;
   audienceCount?: number;
+  myVotes?: Record<number, string>;
+  error?: string;
+}
+
+export interface SessionVoteResponse {
+  ok: boolean;
+  question?: number;
+  option?: string;
+  total?: number;
   error?: string;
 }
 
@@ -90,13 +113,16 @@ export async function initPresenterSession(
   });
 }
 
-/** Audiens: Bergabung ke sesi presentasi dengan kode */
-export async function joinAudienceSession(code: string): Promise<SessionJoinResponse> {
+/** Audiens: Bergabung ke sesi presentasi dengan kode dan identitas pemilih */
+export async function joinAudienceSession(
+  code: string,
+  voterId?: string,
+): Promise<SessionJoinResponse> {
   const socket = getSyncSocket();
 
   return new Promise((resolve) => {
     const doJoin = () => {
-      socket.emit("session:join", { code }, (res: SessionJoinResponse) => {
+      socket.emit("session:join", { code, voterId }, (res: SessionJoinResponse) => {
         resolve(res);
       });
     };
@@ -130,6 +156,26 @@ export function sendPresenterUpdate(
       "session:update",
       { code, presenterToken, ...state },
       (res: { ok: boolean; revision?: number; error?: string }) => {
+        resolve(res);
+      },
+    );
+  });
+}
+
+/** Audiens: Berikan suara pada polling pertanyaan aktif */
+export function sendAudienceVote(
+  code: string,
+  question: number,
+  option: string,
+  voterId: string,
+  idempotencyKey?: string,
+): Promise<SessionVoteResponse> {
+  const socket = getSyncSocket();
+  return new Promise((resolve) => {
+    socket.emit(
+      "session:vote",
+      { code, question, option, voterId, idempotencyKey },
+      (res: SessionVoteResponse) => {
         resolve(res);
       },
     );

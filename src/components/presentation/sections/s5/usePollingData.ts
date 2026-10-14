@@ -140,6 +140,19 @@ export function usePollingData({
         scheduleSpark(qid);
       },
     );
+    sock.on(
+      "session:poll_results",
+      (res: { question: number; total: number; options: { key: string; count: number }[] }) => {
+        if (disposed || res?.question !== qid) return;
+        const map: Counts = {};
+        for (const o of res.options) map[o.key] = o.count;
+        setCounts(map);
+        setTotal(res.total);
+        totalRef.current = res.total;
+        audio.chime();
+        scheduleSpark(qid);
+      },
+    );
     sock.on("votes:reset", () => {
       if (disposed) return;
       setCounts({});

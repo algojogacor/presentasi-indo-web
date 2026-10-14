@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo, useRef, use } from "react";
+import { useEffect, useState, useMemo, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
@@ -21,19 +21,44 @@ import { SECTION_COMPONENTS } from "@/components/presentation/sections";
 import {
   getSyncSocket,
   joinAudienceSession,
+  sendAudienceVote,
   type PublicSessionSnapshot,
   type SessionJoinResponse,
+  type SessionVoteResponse,
 } from "@/lib/syncSocket";
 import { Grain } from "@/components/presentation/atoms";
+import AudienceVotingCard from "@/components/presentation/audience/AudienceVotingCard";
 
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
-type ConnectionStatus = "connecting" | "connected" | "reconnecting" | "disconnected" | "ended" | "error";
+type ConnectionStatus =
+  | "connecting"
+  | "connected"
+  | "reconnecting"
+  | "disconnected"
+  | "ended"
+  | "error";
 
 export default function AudienceViewPage() {
   const params = useParams<{ sessionCode: string }>();
   const rawCode = params?.sessionCode;
   const sessionCode = Array.isArray(rawCode) ? rawCode[0] : (rawCode ?? "");
+
+  // Persistent Voter ID per device (disimpan di localStorage)
+  const [voterId] = useState<string>(() => {
+    if (typeof window !== "undefined") {
+      let id = localStorage.getItem("presentation_voter_id");
+      if (!id) {
+        id =
+          "vtr_" +
+          Math.random().toString(36).substring(2, 9) +
+          Date.now().toString(36);
+        localStorage.setItem("presentation_voter_id", id);
+      }
+      return id;
+    }
+    return "vtr_guest";
+  });
 
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("connecting");
   const [errorMessage, setErrorMessage] = useState<string>("");
@@ -46,6 +71,14 @@ export default function AudienceViewPage() {
     revision: 0,
     updatedAt: Date.now(),
   });
+
+  // State voting lokal: pilihan jawaban per pertanyaan
+  const [myVotes, setMyVotes] = useState<Record<number, string>>({});
+  const [isSubmittingVote, setIsSubmittingVote] = useState(false);
+  const [voteNotice, setVoteNotice] = useState<{
+    type: "success" | "error";
+    msg: string;
+  } | null>(null);
 
   const isMountedRef = useRef(true);
 
@@ -63,18 +96,21 @@ export default function AudienceViewPage() {
     const handleJoin = async () => {
       setConnectionStatus("connecting");
       try {
-        const res: SessionJoinResponse = await joinAudienceSession(sessionCode);
+        const res: SessionJoinResponse = await joinAudienceSession(sessionCode, voterId);
         if (!isMountedRef.current) return;
 
         if (res.ok && res.session) {
           setSessionData(res.session);
           setAudienceCount(res.audienceCount ?? 1);
+          if (res.myVotes) {
+            setMyVotes(res.myVotes);
+          }
           setConnectionStatus("connected");
         } else {
           setConnectionStatus("error");
           setErrorMessage(res.error || "Sesi presentasi tidak ditemukan atau telah berakhir");
         }
-      } catch (err: unknown) {
+      } catch {
         if (!isMountedRef.current) return;
         setConnectionStatus("error");
         setErrorMessage("Gagal menghubungkan ke server sinkronisasi");
@@ -88,14 +124,21 @@ export default function AudienceViewPage() {
       if (!isMountedRef.current) return;
       setConnectionStatus("connected");
       // Ambil snapshot terbaru begitu tersambung kembali
-      socket.emit("session:join", { code: sessionCode }, (res: SessionJoinResponse) => {
-        if (res?.ok && res.session && isMountedRef.current) {
-          setSessionData(res.session);
-          if (typeof res.audienceCount === "number") {
-            setAudienceCount(res.audienceCount);
+      socket.emit(
+        "session:join",
+        { code: sessionCode, voterId },
+        (res: SessionJoinResponse) => {
+          if (res?.ok && res.session && isMountedRef.current) {
+            setSessionData(res.session);
+            if (typeof res.audienceCount === "number") {
+              setAudienceCount(res.audienceCount);
+            }
+            if (res.myVotes) {
+              setMyVotes((prev) => ({ ...prev, ...res.myVotes }));
+            }
           }
-        }
-      });
+        },
+      );
     };
 
     const onDisconnect = () => {
@@ -147,29 +190,89 @@ export default function AudienceViewPage() {
       socket.off("session:presence", onSessionPresence);
       socket.off("session:ended", onSessionEnded);
     };
-  }, [sessionCode]);
+  }, [sessionCode, voterId]);
 
-  // Read-only PresApi: Mengunci seluruh kontrol agar tidak memengaruhi slide master presenter
+  // Handler kirim suara ke server
+  const handleVote = useCallback(
+    async (optionKey: string) => {
+      const qid = sessionData.polling?.questionId;
+      if (!qid || sessionData.polling?.status !== "open") {
+        setVoteNotice({
+          type: "error",
+          msg: "Voting untuk pertanyaan ini sedang ditutup",
+        });
+        return;
+      }
+
+      setIsSubmittingVote(true);
+      setVoteNotice(null);
+
+      // Kunci idempoten per perangkat dan opsi untuk keamanan retry jaringan
+      const idempotencyKey = `idem_${sessionCode}_q${qid}_${voterId}_${optionKey}`;
+
+      try {
+        const res: SessionVoteResponse = await sendAudienceVote(
+          sessionCode,
+          qid,
+          optionKey,
+          voterId,
+          idempotencyKey,
+        );
+
+        if (res.ok) {
+          setMyVotes((prev) => ({ ...prev, [qid]: optionKey }));
+          setVoteNotice({
+            type: "success",
+            msg: `Pilihan Anda (Opsi ${optionKey}) berhasil tercatat di server!`,
+          });
+        } else {
+          setVoteNotice({
+            type: "error",
+            msg: res.error || "Gagal mencatat suara. Silakan coba lagi.",
+          });
+        }
+      } catch {
+        setVoteNotice({
+          type: "error",
+          msg: "Koneksi terganggu saat mengirim suara. Coba kembali.",
+        });
+      } finally {
+        setIsSubmittingVote(false);
+      }
+    },
+    [sessionCode, sessionData.polling, voterId],
+  );
+
+  // Bersihkan notifikasi saat pertanyaan berganti
+  useEffect(() => {
+    setVoteNotice(null);
+  }, [sessionData.polling?.questionId]);
+
+  // Read-only PresApi untuk slide mirror normal
   const readOnlyPresApi = useMemo<PresApi>(
     () => ({
       section: sessionData.section,
       step: sessionData.step,
       settled: true,
-      setStep: () => {
-        // Read-only: audiens dilarang mengubah langkah
-      },
-      goto: () => {
-        // Read-only: audiens dilarang mengubah babak
-      },
+      setStep: () => {},
+      goto: () => {},
       registerKeyHandler: () => {},
       registerTimeline: () => {},
       hud: () => {},
+      sessionCode,
     }),
-    [sessionData.section, sessionData.step],
+    [sessionData.section, sessionData.step, sessionCode],
   );
 
   const CurrentSectionComp =
     SECTION_COMPONENTS[sessionData.section] ?? SECTION_COMPONENTS[0];
+
+  // Cek apakah mode polling aktif (open atau closed)
+  const isPollingActive =
+    sessionData.stage === "live" &&
+    sessionData.polling &&
+    sessionData.polling.status !== "inactive" &&
+    sessionData.polling.questionId !== null;
 
   // 1. Tampilan Error / Kode Tidak Valid
   if (connectionStatus === "error") {
@@ -276,7 +379,7 @@ export default function AudienceViewPage() {
               </span>
             </div>
             <p className="font-body text-xs text-paper/70 leading-relaxed">
-              Layar ponsel Anda akan otomatis berpindah slide secara real-time mengikuti kendali pemateri di layar proyektor. Anda tidak perlu menyegarkan (refresh) halaman ini.
+              Layar ponsel Anda akan otomatis berpindah slide secara real-time mengikuti kendali pemateri di layar proyektor. Saat sesi polling tiba, lembar voting interaktif akan muncul otomatis di ponsel Anda tanpa perlu scan ulang.
             </p>
           </div>
 
@@ -291,7 +394,7 @@ export default function AudienceViewPage() {
               <div>02 · Latar Belakang</div>
               <div>03 · Hakikat & Karakter</div>
               <div>04 · Anatomi Theater</div>
-              <div>05 · Live Polling</div>
+              <div>05 · Live Polling Interaktif</div>
               <div>06 · Variasi KTI</div>
               <div>07 · Kaidah & Etika</div>
             </div>
@@ -300,13 +403,13 @@ export default function AudienceViewPage() {
 
         {/* Footer */}
         <div className="border-t border-white/10 pt-4 text-center font-code text-[11px] text-mute">
-          Audience View · Mode Sinkronisasi Real-Time
+          Audience View · Mode Sinkronisasi Real-Time & Live Polling
         </div>
       </div>
     );
   }
 
-  // 4. Tampilan Slide Live Terhubung (Live Stage)
+  // 4. Tampilan Live (Slide Mirroring ATAU Live Polling Otomatis)
   return (
     <div className="fixed inset-0 overflow-hidden bg-base text-paper select-none flex flex-col">
       <Grain />
@@ -320,7 +423,9 @@ export default function AudienceViewPage() {
           </span>
           <span className="text-mute">·</span>
           <span>
-            {SECTIONS[sessionData.section]?.label ?? "MATERI"}
+            {isPollingActive
+              ? `POLLING 0${sessionData.polling?.questionId}`
+              : SECTIONS[sessionData.section]?.label ?? "MATERI"}
           </span>
           <span className="text-mute">·</span>
           <span className="text-paper/75">
@@ -353,12 +458,26 @@ export default function AudienceViewPage() {
         </div>
       </header>
 
-      {/* Konten Slide Presentasi: Read-only */}
-      <div className="relative flex-1 w-full h-full overflow-hidden">
-        <PresCtx.Provider value={readOnlyPresApi}>
-          <CurrentSectionComp step={sessionData.step} />
-        </PresCtx.Provider>
-      </div>
+      {/* Konten Utama: Live Polling ATAU Slide Mirroring Biasa */}
+      {isPollingActive && sessionData.polling?.questionId ? (
+        <div className="relative flex-1 w-full h-full overflow-y-auto px-4 pt-16 sm:pt-20 pb-12 z-20">
+          <AudienceVotingCard
+            sessionCode={sessionCode}
+            questionId={sessionData.polling.questionId}
+            status={sessionData.polling.status === "open" ? "open" : "closed"}
+            selectedOption={myVotes[sessionData.polling.questionId]}
+            isSubmitting={isSubmittingVote}
+            notice={voteNotice}
+            onVote={handleVote}
+          />
+        </div>
+      ) : (
+        <div className="relative flex-1 w-full h-full overflow-hidden">
+          <PresCtx.Provider value={readOnlyPresApi}>
+            <CurrentSectionComp step={sessionData.step} />
+          </PresCtx.Provider>
+        </div>
+      )}
 
       {/* Cinematic Vignette */}
       <div className="vignette pointer-events-none" aria-hidden="true" />

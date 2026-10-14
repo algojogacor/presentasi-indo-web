@@ -10,12 +10,38 @@
 //     Presenter membuat sesi (`session:create`), memegang `presenterToken` rahasia.
 //     Audiens bergabung (`session:join`) hanya dengan `sessionCode` publik.
 //     Perubahan slide diverifikasi dengan `presenterToken` dan disiarkan via room `session:${code}`.
+//   - Polling Terintegrasi:
+//     Section 5 Step 1: Pertanyaan 1 DIBUKA (open)
+//     Section 5 Step 2: Pertanyaan 1 DITUTUP (closed, pembahasan)
+//     Section 5 Step 3: Pertanyaan 2 DIBUKA (open)
+//     Section 5 Step 4: Pertanyaan 2 DIBUKA (closed, pembahasan)
+//     Section lainnya : Polling NONAKTIF (inactive)
 
 import { createServer, type IncomingMessage, type ServerResponse } from "http";
 import { Server, type Socket } from "socket.io";
 import { randomUUID } from "crypto";
 
 const PORT = 3030;
+
+export interface PollingState {
+  status: "inactive" | "open" | "closed";
+  questionId: number | null;
+  step: number;
+}
+
+export interface SessionVoteRecord {
+  voterId: string;
+  question: number;
+  option: string;
+  at: number;
+  idempotencyKey?: string;
+}
+
+export interface SessionQuestionResults {
+  question: number;
+  total: number;
+  options: { key: string; label: string; count: number }[];
+}
 
 export interface PresentationSession {
   code: string;
@@ -26,6 +52,9 @@ export interface PresentationSession {
   revision: number;
   updatedAt: number;
   createdAt: number;
+  polling: PollingState;
+  votes: Map<string, SessionVoteRecord>; // key: `${question}:${voterId}`
+  idempotency: Map<string, { ok: boolean; question: number; option: string; total: number }>;
 }
 
 export interface PublicSessionSnapshot {
@@ -35,6 +64,95 @@ export interface PublicSessionSnapshot {
   step: number;
   revision: number;
   updatedAt: number;
+  polling: PollingState;
+  pollResults?: SessionQuestionResults | null;
+}
+
+const QUESTIONS_MAP: Record<
+  number,
+  {
+    id: number;
+    prompt: string;
+    options: { key: string; label: string; correct?: boolean }[];
+    answerNote: string;
+  }
+> = {
+  1: {
+    id: 1,
+    prompt:
+      "Kalian sering membuat makalah tugas kuliah. Jika makalah tersebut ingin diterbitkan menjadi artikel jurnal ilmiah bereputasi, perubahan apa yang paling mendasar?",
+    options: [
+      { key: "A", label: "Mempertebal tinjauan pustaka dan menambah jumlah bab" },
+      { key: "B", label: "Mengganti istilah Indonesia ke bahasa asing agar terlihat lebih teknis" },
+      {
+        key: "C",
+        label: "Mengubahnya ke format IMRaD (tanpa bab Romawi) dan berorientasi pada novelty",
+        correct: true,
+      },
+      { key: "D", label: "Menghapus pendahuluan dan langsung menyajikan data mentah" },
+    ],
+    answerNote:
+      "Berdasarkan Tabel 2 makalah (Fitriani et al., 2023), artikel jurnal memadatkan struktur menjadi format IMRaD (Introduction, Methods, Results, Discussion) tanpa bab berangka Romawi dan sangat memprioritaskan keterbaruan (novelty) untuk publikasi bereputasi, berbeda dengan makalah kuliah yang menggunakan format 3 bab ringkas untuk kajian konseptual tugas.",
+  },
+  2: {
+    id: 2,
+    prompt:
+      "Di antara jenis karya ilmiah berikut, mana yang memiliki aturan format administratif paling ketat dan langsung gugur jika melanggar batas halaman?",
+    options: [
+      { key: "A", label: "Skripsi / Tesis tugas akhir" },
+      { key: "B", label: "Makalah kajian konseptual tugas kuliah" },
+      { key: "C", label: "Artikel jurnal ilmiah nasional" },
+      {
+        key: "D",
+        label: "Proposal PKM (Program Kreativitas Mahasiswa)",
+        correct: true,
+      },
+    ],
+    answerNote:
+      "Berdasarkan pedoman Dikti (2023) dan Tabel 2 makalah, Proposal PKM memiliki seleksi administratif awal yang sangat ketat di Simbelmawa dengan batasan maksimal 10 halaman isi inti. Pelanggaran format atau batas halaman akan langsung menggugurkan proposal pada tahap seleksi administrasi sebelum sempat dinilai substansinya.",
+  },
+};
+
+function isOptionValid(qid: number, opt: string): boolean {
+  const q = QUESTIONS_MAP[qid];
+  return !!q && q.options.some((o) => o.key === opt);
+}
+
+function computePollingState(section: number, step: number): PollingState {
+  if (section === 5) {
+    if (step === 1) return { status: "open", questionId: 1, step: 1 };
+    if (step === 2) return { status: "closed", questionId: 1, step: 2 };
+    if (step === 3) return { status: "open", questionId: 2, step: 3 };
+    if (step === 4) return { status: "closed", questionId: 2, step: 4 };
+  }
+  return { status: "inactive", questionId: null, step };
+}
+
+function getSessionQuestionResults(
+  session: PresentationSession,
+  qid: number | null,
+): SessionQuestionResults | null {
+  if (!qid || !QUESTIONS_MAP[qid]) return null;
+  const q = QUESTIONS_MAP[qid];
+  const counts: Record<string, number> = { A: 0, B: 0, C: 0, D: 0 };
+  let total = 0;
+
+  for (const v of session.votes.values()) {
+    if (v.question === qid && counts[v.option] !== undefined) {
+      counts[v.option] += 1;
+      total += 1;
+    }
+  }
+
+  return {
+    question: qid,
+    total,
+    options: q.options.map((opt) => ({
+      key: opt.key,
+      label: opt.label,
+      count: counts[opt.key] ?? 0,
+    })),
+  };
 }
 
 const sessions = new Map<string, PresentationSession>();
@@ -61,6 +179,8 @@ function getPublicSnapshot(s: PresentationSession): PublicSessionSnapshot {
     step: s.step,
     revision: s.revision,
     updatedAt: s.updatedAt,
+    polling: s.polling,
+    pollResults: getSessionQuestionResults(s, s.polling.questionId),
   };
 }
 
@@ -79,29 +199,11 @@ const httpServer = createServer((req: IncomingMessage, res: ServerResponse) => {
     return;
   }
 
-  if (url.pathname === "/api/session-info") {
-    const code = sanitizeCode(url.searchParams.get("code"));
-    const session = sessions.get(code);
-    if (!session || session.stage === "ended") {
-      res.writeHead(404, { "Content-Type": "application/json" });
-      res.end(JSON.stringify({ ok: false, error: "Sesi tidak ditemukan atau telah berakhir" }));
-      return;
-    }
-    const count = getSessionAudienceCount(code);
-    res.writeHead(200, { "Content-Type": "application/json" });
-    res.end(JSON.stringify({ ok: true, session: getPublicSnapshot(session), audienceCount: count }));
-    return;
-  }
-
   if (url.pathname === "/health") {
     res.writeHead(200, { "Content-Type": "application/json" });
     res.end(JSON.stringify({ ok: true, sessions: sessions.size, clients: io.engine.clientsCount }));
     return;
   }
-
-  // Default fallback
-  res.writeHead(200, { "Content-Type": "text/plain" });
-  res.end("live-notify server running");
 });
 
 const io = new Server(httpServer, {
@@ -142,7 +244,7 @@ function broadcastPresence(): void {
 
 function broadcastSessionPresence(code: string): void {
   const count = getSessionAudienceCount(code);
-  io.to(`session:${code}`).emit("session:presence", { code, count, at: Date.now() });
+  io.to(`session:${code}`).emit("session:presence", { code, audienceCount: count, at: Date.now() });
   console.log(`[session:${code}] presence: ${count} audiens`);
 }
 
@@ -177,6 +279,9 @@ io.on("connection", (socket: Socket) => {
       revision: 1,
       updatedAt: Date.now(),
       createdAt: Date.now(),
+      polling: { status: "inactive", questionId: null, step: 0 },
+      votes: new Map(),
+      idempotency: new Map(),
     };
 
     sessions.set(code, session);
@@ -230,30 +335,45 @@ io.on("connection", (socket: Socket) => {
   // ========================================================
   // 3. AUDIENS: Bergabung ke Sesi (session:join)
   // ========================================================
-  socket.on("session:join", (payload: { code: string }, ack?: (res: unknown) => void) => {
-    const code = sanitizeCode(payload?.code);
-    const session = sessions.get(code);
+  socket.on(
+    "session:join",
+    (payload: { code: string; voterId?: string }, ack?: (res: unknown) => void) => {
+      const code = sanitizeCode(payload?.code);
+      const voterId = payload?.voterId ? String(payload.voterId).trim().slice(0, 64) : undefined;
+      const session = sessions.get(code);
 
-    if (!session || session.stage === "ended") {
-      ack?.({ ok: false, error: "Sesi tidak ditemukan atau telah berakhir" });
-      return;
-    }
+      if (!session || session.stage === "ended") {
+        ack?.({ ok: false, error: "Sesi tidak ditemukan atau telah berakhir" });
+        return;
+      }
 
-    socket.join(`session:${code}`);
-    socket.data.sessionCode = code;
-    socket.data.isAudience = true;
+      socket.join(`session:${code}`);
+      socket.data.sessionCode = code;
+      socket.data.isAudience = true;
 
-    const count = getSessionAudienceCount(code);
-    console.log(`[session] Audiens bergabung ke ${code} (total ${count})`);
+      const count = getSessionAudienceCount(code);
+      console.log(`[session] Audiens bergabung ke ${code} (total ${count})`);
 
-    ack?.({
-      ok: true,
-      session: getPublicSnapshot(session),
-      audienceCount: count,
-    });
+      // Kumpulkan suara yang pernah diberikan oleh voterId ini pada sesi ini
+      const myVotes: Record<number, string> = {};
+      if (voterId) {
+        for (const v of session.votes.values()) {
+          if (v.voterId === voterId) {
+            myVotes[v.question] = v.option;
+          }
+        }
+      }
 
-    broadcastSessionPresence(code);
-  });
+      ack?.({
+        ok: true,
+        session: getPublicSnapshot(session),
+        audienceCount: count,
+        myVotes,
+      });
+
+      broadcastSessionPresence(code);
+    },
+  );
 
   // ========================================================
   // 4. PRESENTER ONLY: Update State Slide (session:update)
@@ -297,6 +417,8 @@ io.on("connection", (socket: Socket) => {
         session.step = payload.step;
       }
 
+      // Hitung dan mutakhirkan siklus hidup polling
+      session.polling = computePollingState(session.section, session.step);
       session.revision += 1;
       session.updatedAt = Date.now();
 
@@ -305,12 +427,173 @@ io.on("connection", (socket: Socket) => {
       // Siarkan snapshot terbaru ke semua audiens di sesi ini
       io.to(`session:${code}`).emit("session:sync", snapshot);
 
+      // Jika slide mengarah ke polling aktif/reveal, siarkan juga agregasi suara terkini
+      if (session.polling.questionId) {
+        const results = getSessionQuestionResults(session, session.polling.questionId);
+        if (results) {
+          io.to(`session:${code}`).emit("session:poll_results", results);
+        }
+      }
+
       ack?.({ ok: true, revision: session.revision });
     },
   );
 
   // ========================================================
-  // 5. PRESENTER ONLY: Akhiri Sesi (session:end)
+  // 5. AUDIENS: Berikan Suara (session:vote)
+  // ========================================================
+  socket.on(
+    "session:vote",
+    async (
+      payload: {
+        code: string;
+        question: number;
+        option: string;
+        voterId: string;
+        idempotencyKey?: string;
+      },
+      ack?: (res: unknown) => void,
+    ) => {
+      const code = sanitizeCode(payload?.code);
+      const session = sessions.get(code);
+
+      if (!session || session.stage === "ended") {
+        ack?.({ ok: false, error: "Sesi tidak ditemukan atau telah berakhir" });
+        return;
+      }
+
+      if (session.stage !== "live") {
+        ack?.({ ok: false, error: "Presentasi belum memasuki mode live" });
+        return;
+      }
+
+      const qid = Number(payload?.question);
+      const option = String(payload?.option ?? "").toUpperCase().trim();
+      const voterId = String(payload?.voterId ?? "").trim().slice(0, 64);
+      const idempotencyKey = payload?.idempotencyKey
+        ? String(payload.idempotencyKey).trim().slice(0, 128)
+        : undefined;
+
+      if (!voterId) {
+        ack?.({ ok: false, error: "Identitas pemilih (voterId) diperlukan" });
+        return;
+      }
+
+      // 1. Validasi status polling
+      if (session.polling.status !== "open") {
+        ack?.({ ok: false, error: "Voting untuk pertanyaan ini sedang ditutup oleh pemateri" });
+        return;
+      }
+
+      // 2. Validasi kesesuaian pertanyaan aktif
+      if (session.polling.questionId !== qid) {
+        ack?.({ ok: false, error: `Pertanyaan 0${qid} sedang tidak aktif untuk voting` });
+        return;
+      }
+
+      // 3. Validasi opsi jawaban sah
+      if (!isOptionValid(qid, option)) {
+        ack?.({ ok: false, error: `Opsi "${option}" tidak valid untuk pertanyaan ${qid}` });
+        return;
+      }
+
+      // 4. Idempotency check: jika request ini hasil retry jaringan, kembalikan respon terdahulu
+      if (idempotencyKey && session.idempotency.has(idempotencyKey)) {
+        const cached = session.idempotency.get(idempotencyKey);
+        ack?.(cached);
+        return;
+      }
+
+      // 5. Catat suara unik per pemilih per pertanyaan (1 suara per peserta)
+      const voteKey = `${qid}:${voterId}`;
+      session.votes.set(voteKey, {
+        voterId,
+        question: qid,
+        option,
+        at: Date.now(),
+        idempotencyKey,
+      });
+
+      // 6. Teruskan ke database SQLite Next.js (fire-and-forget) untuk arsip & ekspor CSV
+      try {
+        fetch("http://localhost:3002/api/vote", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            question: qid,
+            option,
+            sessionCode: code,
+            voterId,
+          }),
+        }).catch(() => {});
+      } catch (_) {}
+
+      // 7. Hitung agregasi hasil terkini untuk sesi ini
+      const results = getSessionQuestionResults(session, qid);
+      const total = results?.total ?? 0;
+
+      const resPayload = {
+        ok: true,
+        question: qid,
+        option,
+        total,
+      };
+
+      if (idempotencyKey) {
+        session.idempotency.set(idempotencyKey, resPayload);
+      }
+
+      // 8. Siarkan hasil pembaruan langsung ke ruangan sesi ini
+      io.to(`session:${code}`).emit("session:poll_results", results);
+
+      // Siarkan legacy event vote:new agar presenter hook / audio chime berbunyi
+      io.emit("vote:new", { question: qid, total, at: Date.now() });
+
+      console.log(
+        `[session:${code}] Suara dicatat: Q${qid} = Opsi ${option} (voter: ${voterId.slice(0, 8)}, total: ${total})`,
+      );
+
+      ack?.(resPayload);
+    },
+  );
+
+  // ========================================================
+  // 6. PRESENTER ONLY: Reset Polling Sesi (session:poll_reset)
+  // ========================================================
+  socket.on(
+    "session:poll_reset",
+    (payload: { code: string; presenterToken: string }, ack?: (res: unknown) => void) => {
+      const code = sanitizeCode(payload?.code);
+      const token = payload?.presenterToken;
+      const session = sessions.get(code);
+
+      if (!session || session.presenterToken !== token) {
+        ack?.({ ok: false, error: "Unauthorized" });
+        return;
+      }
+
+      session.votes.clear();
+      session.idempotency.clear();
+
+      io.to(`session:${code}`).emit("session:poll_results", {
+        question: session.polling.questionId ?? 1,
+        total: 0,
+        options: QUESTIONS_MAP[session.polling.questionId ?? 1]?.options.map((o) => ({
+          key: o.key,
+          label: o.label,
+          count: 0,
+        })) ?? [],
+      });
+
+      io.emit("votes:reset", { at: Date.now() });
+      console.log(`[session:${code}] Polling di-reset oleh presenter`);
+
+      ack?.({ ok: true });
+    },
+  );
+
+  // ========================================================
+  // 7. PRESENTER ONLY: Akhiri Sesi (session:end)
   // ========================================================
   socket.on(
     "session:end",
@@ -336,7 +619,7 @@ io.on("connection", (socket: Socket) => {
   );
 
   // ========================================================
-  // 6. BACKEND NEXT.JS (Live Polling Legacy Events)
+  // 8. BACKEND NEXT.JS (Live Polling Legacy Events)
   // ========================================================
   if (trusted) {
     socket.on("notify:vote", (raw: VotePayload) => {
@@ -349,12 +632,16 @@ io.on("connection", (socket: Socket) => {
     });
 
     socket.on("notify:reset", () => {
+      for (const s of sessions.values()) {
+        s.votes.clear();
+        s.idempotency.clear();
+      }
       io.emit("votes:reset", { at: Date.now() });
     });
   }
 
   // ========================================================
-  // 7. Disconnect Handler
+  // 9. Disconnect Handler
   // ========================================================
   socket.on("disconnect", () => {
     const code = socket.data?.sessionCode;
@@ -371,5 +658,5 @@ io.on("connection", (socket: Socket) => {
 });
 
 httpServer.listen(PORT, () => {
-  console.log(`live-notify (with audience sync) berjalan di port ${PORT}`);
+  console.log(`live-notify (with audience sync & live polling) berjalan di port ${PORT}`);
 });
