@@ -10,6 +10,7 @@ interface MobileNavProps {
   onBack: () => void;
   onOpenMap: () => void;
   onOpenBib: () => void;
+  onOpenLobby?: () => void;
 }
 
 const pad2 = (n: number) => String(n).padStart(2, "0");
@@ -21,8 +22,10 @@ export default function MobileNav({
   onBack,
   onOpenMap,
   onOpenBib,
+  onOpenLobby,
 }: MobileNavProps) {
-  const isFirst = section === 0 && step === 0;
+  const isFirst = !onOpenLobby && section === 0 && step === 0;
+  const isAtStart = section === 0 && step === 0;
   const isLast =
     section === SECTIONS.length - 1 &&
     step === SECTIONS[section].steps - 1;
@@ -61,15 +64,15 @@ export default function MobileNav({
       {/* Tombol Mundur (Previous) */}
       <button
         type="button"
-        onClick={onBack}
+        onClick={isAtStart && onOpenLobby ? onOpenLobby : onBack}
         disabled={isFirst}
         className={`flex h-11 w-11 items-center justify-center rounded-full transition-all active:scale-95 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ember ${
           isFirst
             ? "cursor-not-allowed opacity-25 text-mute"
             : "cursor-pointer text-paper/85 hover:bg-white/8 hover:text-ember"
         }`}
-        aria-label="Langkah sebelumnya"
-        title="Sebelumnya (←)"
+        aria-label={isAtStart && onOpenLobby ? "Kembali ke Lobi QR" : "Langkah sebelumnya"}
+        title={isAtStart && onOpenLobby ? "Kembali ke Lobi QR" : "Sebelumnya (←)"}
       >
         <ChevronLeft className="h-5 w-5" />
       </button>

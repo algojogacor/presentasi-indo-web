@@ -26,6 +26,9 @@ interface PresenterHudProps {
   contrast: boolean;
   muted: boolean;
   helpOn: boolean;
+  sessionCode?: string;
+  audienceCount?: number;
+  onOpenLobby?: () => void;
 }
 
 export default function PresenterHud({
@@ -45,9 +48,28 @@ export default function PresenterHud({
   contrast,
   muted,
   helpOn,
+  sessionCode,
+  audienceCount = 0,
+  onOpenLobby,
 }: PresenterHudProps) {
   return (
     <div className="pointer-events-none fixed bottom-3 left-4 sm:bottom-4 sm:left-8 md:left-[3.5vw] z-[70] select-none font-code text-[10px] sm:text-[11px] tracking-wider text-mute/80 space-y-0.5 max-w-[55vw] sm:max-w-none">
+      {sessionCode && (
+        <div className="text-emerald-400 font-semibold flex items-center gap-1.5 pointer-events-auto">
+          <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span>SESI {sessionCode} · {audienceCount} AUDIENS</span>
+          {onOpenLobby && (
+            <button
+              type="button"
+              onClick={onOpenLobby}
+              className="ml-1 text-paper/70 hover:text-ember underline text-[9px] uppercase tracking-wider"
+              title="Kembali ke layar QR Lobi"
+            >
+              [LOBI QR]
+            </button>
+          )}
+        </div>
+      )}
       {huds.map((h) => (
         <div
           key={h.id}

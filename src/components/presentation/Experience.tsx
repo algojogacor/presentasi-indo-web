@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { gsap } from "@/lib/gsap";
 import { PresCtx, SECTIONS } from "./context";
 import { useIsoLayoutEffect } from "./hooks";
@@ -9,6 +9,7 @@ import MapOverlay from "./MapOverlay";
 import HelpOverlay from "./HelpOverlay";
 import NotesPanel from "./NotesPanel";
 import BibliographyModal from "./BibliographyModal";
+import LobbyScreen from "./LobbyScreen";
 import { visitedActs } from "./session";
 import {
   plannedElapsed,
@@ -16,15 +17,7 @@ import {
   TOTAL_STEPS,
   cumStepsBefore,
 } from "./rehearsal";
-import S0Opening from "./sections/S0Opening";
-import S1Video from "./sections/S1Video";
-import S2Latar from "./sections/S2Latar";
-import S3Hakikat from "./sections/S3Hakikat";
-import S4Anatomy from "./sections/S4Anatomy";
-import S5Polling from "./sections/S5Polling";
-import S6Battle from "./sections/S6Battle";
-import S7Kaidah from "./sections/S7Kaidah";
-import S8Closing from "./sections/S8Closing";
+import { SECTION_COMPONENTS } from "./sections";
 import PresenterHud from "./experience/PresenterHud";
 import ProgressBar from "./experience/ProgressBar";
 import RailTicks from "./experience/RailTicks";
@@ -33,20 +26,25 @@ import MobileNav from "./experience/MobileNav";
 import { useTouchSwipe } from "./experience/useTouchSwipe";
 import { useExperienceKeyboard } from "./experience/useExperienceKeyboard";
 import { usePresentationState } from "./experience/usePresentationState";
-
-const SECTION_COMPONENTS = [
-  S0Opening,
-  S1Video,
-  S2Latar,
-  S3Hakikat,
-  S4Anatomy,
-  S5Polling,
-  S6Battle,
-  S7Kaidah,
-  S8Closing,
-];
+import {
+  getSyncSocket,
+  initPresenterSession,
+  sendPresenterUpdate,
+  type SessionCreateResponse,
+} from "@/lib/syncSocket";
 
 export default function Experience() {
+  const [stage, setStage] = useState<"lobby" | "live">(() => {
+    if (typeof window !== "undefined") {
+      const s = sessionStorage.getItem("presentation_stage");
+      if (s === "live") return "live";
+    }
+    return "lobby";
+  });
+  const [sessionCode, setSessionCode] = useState<string>("");
+  const [presenterToken, setPresenterToken] = useState<string>("");
+  const [audienceCount, setAudienceCount] = useState<number>(0);
+
   const [mapOpen, setMapOpen] = useState(false);
   const [helpSheet, setHelpSheet] = useState(false);
   const [notesOpen, setNotesOpen] = useState(false);
@@ -78,6 +76,144 @@ export default function Experience() {
     api,
   } = usePresentationState(mapOpen);
 
+  // Inisialisasi & langganan sesi presenter
+  useEffect(() => {
+    let isMounted = true;
+    const storedCode =
+      typeof window !== "undefined"
+        ? localStorage.getItem("presentation_session_code")
+        : null;
+    const storedToken =
+      typeof window !== "undefined"
+        ? localStorage.getItem("presentation_presenter_token")
+        : null;
+
+    initPresenterSession(storedCode, storedToken).then((res) => {
+      if (!isMounted) return;
+      if (res.ok && res.session) {
+        setSessionCode(res.session.code);
+        const token = res.presenterToken || storedToken || "";
+        setPresenterToken(token);
+        setAudienceCount(res.audienceCount ?? 0);
+        localStorage.setItem("presentation_session_code", res.session.code);
+        if (token) {
+          localStorage.setItem("presentation_presenter_token", token);
+        }
+      }
+    });
+
+    const socket = getSyncSocket();
+    const onSessionPresence = (payload: { code: string; audienceCount: number }) => {
+      if (payload && (!sessionCode || payload.code === sessionCode)) {
+        setAudienceCount(payload.audienceCount);
+      }
+    };
+
+    socket.on("session:presence", onSessionPresence);
+
+    return () => {
+      isMounted = false;
+      socket.off("session:presence", onSessionPresence);
+    };
+  }, [sessionCode]);
+
+  // Siarkan perubahan slide aktif ke audiens jika dalam mode live
+  useEffect(() => {
+    if (stage === "live" && sessionCode && presenterToken) {
+      sendPresenterUpdate(sessionCode, presenterToken, {
+        stage: "live",
+        section,
+        step,
+      });
+    }
+  }, [stage, section, step, sessionCode, presenterToken]);
+
+  // Mulai presentasi dari lobi
+  const handleStart = useCallback(() => {
+    setStage("live");
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("presentation_stage", "live");
+    }
+    goto(0, 0);
+    if (sessionCode && presenterToken) {
+      sendPresenterUpdate(sessionCode, presenterToken, {
+        stage: "live",
+        section: 0,
+        step: 0,
+      });
+    }
+    hud("PRESENTASI DIMULAI — ACT.00 OUVERTURE", "ember");
+  }, [goto, sessionCode, presenterToken, hud]);
+
+  // Kembali ke lobi (QR Screen)
+  const handleOpenLobby = useCallback(() => {
+    setStage("lobby");
+    if (typeof window !== "undefined") {
+      sessionStorage.setItem("presentation_stage", "lobby");
+    }
+    if (sessionCode && presenterToken) {
+      sendPresenterUpdate(sessionCode, presenterToken, {
+        stage: "lobby",
+        section,
+        step,
+      });
+    }
+    hud("KEMBALI KE LOBI QR AUDIENS", "info");
+  }, [section, step, sessionCode, presenterToken, hud]);
+
+  // Buat sesi baru jika diminta presenter
+  const handleNewSession = useCallback(async () => {
+    try {
+      const socket = getSyncSocket();
+      socket.emit("session:create", {}, (res: SessionCreateResponse) => {
+        if (res?.ok && res.session) {
+          setSessionCode(res.session.code);
+          const token = res.presenterToken || "";
+          setPresenterToken(token);
+          setAudienceCount(0);
+          localStorage.setItem("presentation_session_code", res.session.code);
+          if (token) {
+            localStorage.setItem("presentation_presenter_token", token);
+          }
+          hud(`SESI BARU: ${res.session.code}`, "ember");
+        }
+      });
+    } catch (err) {
+      console.error("Gagal membuat sesi baru:", err);
+    }
+  }, [hud]);
+
+  // Keyboard shortcut di lobi (Space, Enter, ArrowRight memulai presentasi)
+  useEffect(() => {
+    if (stage !== "lobby") return;
+    const onLobbyKey = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+      if (e.key === " " || e.key === "Enter" || e.key === "ArrowRight") {
+        e.preventDefault();
+        handleStart();
+      }
+    };
+    window.addEventListener("keydown", onLobbyKey);
+    return () => window.removeEventListener("keydown", onLobbyKey);
+  }, [stage, handleStart]);
+
+  // Handlers untuk navigasi saat di slide pertama
+  const handleBack = useCallback(() => {
+    if (section === 0 && step === 0) {
+      handleOpenLobby();
+      return;
+    }
+    back();
+  }, [section, step, handleOpenLobby, back]);
+
   // Fade masuk saat ganti babak
   useIsoLayoutEffect(() => {
     const el = sectionRef.current;
@@ -103,7 +239,7 @@ export default function Experience() {
     bibOpen,
     savedPos,
     advance,
-    back,
+    back: handleBack,
     goto,
     resume,
     toggleContrast,
@@ -120,8 +256,8 @@ export default function Experience() {
   // Swipe gesture navigation for touch devices
   useTouchSwipe({
     onSwipeLeft: advance,
-    onSwipeRight: back,
-    disabled: mapOpen || helpSheet || notesOpen || bibOpen,
+    onSwipeRight: handleBack,
+    disabled: stage === "lobby" || mapOpen || helpSheet || notesOpen || bibOpen,
   });
 
   const SectionComp = SECTION_COMPONENTS[section];
@@ -140,6 +276,16 @@ export default function Experience() {
   return (
     <PresCtx.Provider value={api}>
       <div className="fixed inset-0 overflow-hidden bg-base text-paper select-none">
+        {/* Layar Pembuka Lobi & QR Code Audiens */}
+        {stage === "lobby" && (
+          <LobbyScreen
+            sessionCode={sessionCode}
+            audienceCount={audienceCount}
+            onStart={handleStart}
+            onNewSession={handleNewSession}
+          />
+        )}
+
         <div key={section} ref={sectionRef} className="absolute inset-0 opacity-0">
           <SectionComp step={step} />
         </div>
@@ -213,6 +359,9 @@ export default function Experience() {
           contrast={contrast}
           muted={muted}
           helpOn={helpOn}
+          sessionCode={sessionCode}
+          audienceCount={audienceCount}
+          onOpenLobby={handleOpenLobby}
         />
 
         {/* Kontrol Navigasi Layar Sentuh & Tombol Mobile */}
@@ -220,9 +369,10 @@ export default function Experience() {
           section={section}
           step={step}
           onAdvance={advance}
-          onBack={back}
+          onBack={handleBack}
           onOpenMap={() => setMapOpen((m) => !m)}
           onOpenBib={() => setBibOpen((b) => !b)}
+          onOpenLobby={handleOpenLobby}
         />
       </div>
     </PresCtx.Provider>
