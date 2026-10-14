@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import { useRef, useState, useEffect, useCallback, useMemo } from "react";
 import { gsap } from "@/lib/gsap";
 import { PresCtx, SECTIONS } from "./context";
 import { useIsoLayoutEffect } from "./hooks";
