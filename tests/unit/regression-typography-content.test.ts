@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 import { QUESTIONS } from "../../src/lib/questions";
 import { REFERENCES } from "../../src/data/bibliography";
 import { PAPER_META } from "../../src/data/paperContent";
-import { BATTLE_PAIRS } from "../../src/components/presentation/sections/s6/battleData";
+import { CARDS } from "../../src/data/battle";
 
 describe("Regression: Typography Pass Content & Layout Integrity", () => {
   describe("1. Data & Text Content Preservation", () => {
@@ -40,24 +40,22 @@ describe("Regression: Typography Pass Content & Layout Integrity", () => {
       });
     });
 
-    it("memastikan data kartu battle (Act 06) lengkap dengan 4 baris perbandingan dan catatan", () => {
-      expect(BATTLE_PAIRS.length).toBe(2); // KTI vs Populer, KTI vs Fiksi
+    it("memastikan data kartu battle (Act 06) lengkap dengan 4 jenis KTI, 4 baris kriteria, dan catatan", () => {
+      expect(CARDS.length).toBe(4); // Makalah, Artikel Jurnal, Skripsi/Tesis, Proposal PKM
 
-      BATTLE_PAIRS.forEach((pair) => {
-        expect(pair.left.title.length).toBeGreaterThan(0);
-        expect(pair.right.title.length).toBeGreaterThan(0);
+      CARDS.forEach((card) => {
+        expect(card.title.length).toBeGreaterThan(0);
+        expect(card.sub.length).toBeGreaterThan(0);
 
         // Setiap kartu memiliki 4 baris perbandingan
-        expect(pair.left.rows.length).toBe(4);
-        expect(pair.right.rows.length).toBe(4);
+        expect(card.rows.length).toBe(4);
 
-        pair.left.rows.forEach((row) => {
-          expect(row.label.length).toBeGreaterThan(0);
-          expect(row.value.length).toBeGreaterThan(0);
+        card.rows.forEach((row) => {
+          expect(row.k.length).toBeGreaterThan(0);
+          expect(row.v.length).toBeGreaterThan(0);
         });
 
-        expect(pair.left.note.length).toBeGreaterThan(5);
-        expect(pair.right.note.length).toBeGreaterThan(5);
+        expect(card.note.length).toBeGreaterThan(5);
       });
     });
   });
