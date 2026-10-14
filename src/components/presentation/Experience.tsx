@@ -81,14 +81,24 @@ export default function Experience() {
   // Inisialisasi & langganan sesi presenter
   useEffect(() => {
     let isMounted = true;
-    const storedCode =
+    const urlParams =
       typeof window !== "undefined"
-        ? localStorage.getItem("presentation_session_code")
+        ? new URLSearchParams(window.location.search)
+        : null;
+    const forceNew = urlParams?.has("new");
+
+    const storedCode =
+      typeof window !== "undefined" && !forceNew
+        ? sessionStorage.getItem("presentation_session_code")
         : null;
     const storedToken =
-      typeof window !== "undefined"
-        ? localStorage.getItem("presentation_presenter_token")
+      typeof window !== "undefined" && !forceNew
+        ? sessionStorage.getItem("presentation_presenter_token")
         : null;
+
+    if (forceNew && typeof window !== "undefined" && window.history.replaceState) {
+      window.history.replaceState({}, "", window.location.pathname);
+    }
 
     initPresenterSession(storedCode, storedToken).then((res) => {
       if (!isMounted) return;
@@ -97,9 +107,9 @@ export default function Experience() {
         const token = res.presenterToken || storedToken || "";
         setPresenterToken(token);
         setAudienceCount(res.audienceCount ?? 0);
-        localStorage.setItem("presentation_session_code", res.session.code);
+        sessionStorage.setItem("presentation_session_code", res.session.code);
         if (token) {
-          localStorage.setItem("presentation_presenter_token", token);
+          sessionStorage.setItem("presentation_presenter_token", token);
         }
       }
     });
@@ -188,9 +198,9 @@ export default function Experience() {
           const token = res.presenterToken || "";
           setPresenterToken(token);
           setAudienceCount(0);
-          localStorage.setItem("presentation_session_code", res.session.code);
+          sessionStorage.setItem("presentation_session_code", res.session.code);
           if (token) {
-            localStorage.setItem("presentation_presenter_token", token);
+            sessionStorage.setItem("presentation_presenter_token", token);
           }
           hud(`SESI BARU: ${res.session.code}`, "ember");
         }

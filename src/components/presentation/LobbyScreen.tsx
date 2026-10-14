@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Copy, Check, ExternalLink, Users, Sparkles } from "lucide-react";
+import { Copy, Check, ExternalLink, Users, Sparkles, Smartphone, ArrowRight } from "lucide-react";
 
 interface LobbyScreenProps {
   sessionCode: string;
@@ -23,6 +23,7 @@ export default function LobbyScreen({
   const [copiedUrl, setCopiedUrl] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
   const [fullAudienceUrl, setFullAudienceUrl] = useState("");
+  const [joinInput, setJoinInput] = useState("");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -164,6 +165,48 @@ export default function LobbyScreen({
                 <span>{copiedCode ? "Kode Tersalin" : "Salin Kode"}</span>
               </button>
             </div>
+          </div>
+
+          {/* Kotak Gabung Sebagai Audiens (Untuk peserta yang membuka halaman utama di HP) */}
+          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3.5 sm:p-4 space-y-2.5">
+            <div className="flex items-center justify-between">
+              <span className="font-code text-[11px] font-semibold text-paper/90 uppercase tracking-wider flex items-center gap-2">
+                <Smartphone className="w-3.5 h-3.5 text-[#E8A020]" />
+                Bukan Pemateri? Masuk Sesi Audiens
+              </span>
+            </div>
+            <p className="font-body text-xs text-mute leading-relaxed">
+              Jika Anda peserta/audiens di ruangan, masukkan 4 karakter kode sesi yang tampil di proyektor:
+            </p>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                const code = joinInput.trim().toUpperCase().replace(/[^A-Z0-9-]/g, "");
+                if (code) {
+                  window.location.href = `/audience/${code}`;
+                }
+              }}
+              className="flex items-center gap-2"
+            >
+              <input
+                type="text"
+                value={joinInput}
+                onChange={(e) =>
+                  setJoinInput(e.target.value.toUpperCase().replace(/[^A-Z0-9-]/g, ""))
+                }
+                placeholder="MISAL: ABCD"
+                maxLength={8}
+                className="flex-1 bg-black/60 border border-edge rounded-lg px-3 py-2 font-code text-xs sm:text-sm text-paper placeholder:text-mute/50 focus:outline-none focus:border-[#E8A020] uppercase tracking-widest"
+              />
+              <button
+                type="submit"
+                disabled={!joinInput.trim()}
+                className="inline-flex items-center gap-1.5 rounded-lg bg-[#E8A020] hover:bg-[#FFB740] px-3.5 py-2 font-code text-xs font-bold text-black transition-all disabled:opacity-30 disabled:cursor-not-allowed shrink-0"
+              >
+                <span>Ikuti Sesi</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </form>
           </div>
 
           {/* Tombol Aksi Utama Presenter */}

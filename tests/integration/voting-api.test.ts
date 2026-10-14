@@ -275,5 +275,72 @@ describe("Integration: Voting Engine & API Contracts", () => {
       const snapB = gateway.instance.sessions.get(codeB);
       expect(snapB?.votes.size).toBe(0);
     });
+
+    it("Reset polling pada Sesi A tidak mereset atau memengaruhi suara di Sesi B", async () => {
+      const presA = await getClient();
+      const resA = await presA.emitAck<SessionCreateResponse>("session:create", {});
+      const codeA = resA.session!.code;
+      const tokenA = resA.presenterToken!;
+
+      const presB = await getClient();
+      const resB = await presB.emitAck<SessionCreateResponse>("session:create", {});
+      const codeB = resB.session!.code;
+      const tokenB = resB.presenterToken!;
+
+      await presA.emitAck("session:update", {
+        code: codeA,
+        presenterToken: tokenA,
+        stage: "live",
+        section: 5,
+        step: 1,
+      });
+      await presB.emitAck("session:update", {
+        code: codeB,
+        presenterToken: tokenB,
+        stage: "live",
+        section: 5,
+        step: 1,
+      });
+
+      const audA = await getClient();
+      await audA.emitAck("session:join", { code: codeA, voterId: "voter_a1" });
+      const audB = await getClient();
+      await audB.emitAck("session:join", { code: codeB, voterId: "voter_b1" });
+
+      await audA.emitAck("session:vote", {
+        code: codeA,
+        question: 1,
+        option: "A",
+        voterId: "voter_a1",
+      });
+      await audB.emitAck("session:vote", {
+        code: codeB,
+        question: 1,
+        option: "B",
+        voterId: "voter_b1",
+      });
+
+      expect(gateway.instance.sessions.get(codeA)?.votes.size).toBe(1);
+      expect(gateway.instance.sessions.get(codeB)?.votes.size).toBe(1);
+
+      let audBGotReset = false;
+      audB.socket.on("votes:reset", () => {
+        audBGotReset = true;
+      });
+
+      // Reset hanya Sesi A
+      const resetRes = await presA.emitAck<{ ok: boolean }>("session:poll_reset", {
+        code: codeA,
+        presenterToken: tokenA,
+      });
+      expect(resetRes.ok).toBe(true);
+
+      await new Promise((r) => setTimeout(r, 100));
+
+      // Sesi A kosong, tapi Sesi B tetap memiliki suaranya dan audB tidak menerima votes:reset
+      expect(gateway.instance.sessions.get(codeA)?.votes.size).toBe(0);
+      expect(gateway.instance.sessions.get(codeB)?.votes.size).toBe(1);
+      expect(audBGotReset).toBe(false);
+    });
   });
 });

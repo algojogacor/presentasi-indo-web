@@ -18,7 +18,7 @@ import PollingIntro from "./s5/PollingIntro";
  * F = fallback manual (klik opsi) · R = reset polling.
  */
 export default function S5Polling({ step }: { step: number }) {
-  const { setStep, hud, settled } = usePres();
+  const { setStep, hud, settled, sessionCode } = usePres();
   const root = useRef<HTMLDivElement>(null);
 
   const qid = step === 1 || step === 2 ? 1 : step === 3 || step === 4 ? 2 : 0;
@@ -44,6 +44,7 @@ export default function S5Polling({ step }: { step: number }) {
     fallback,
     liveKey,
     hud,
+    sessionCode,
   });
 
   const question = QUESTIONS.find((q) => q.id === qid) ?? QUESTIONS[0];

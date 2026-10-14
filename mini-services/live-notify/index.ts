@@ -599,8 +599,8 @@ export function createLiveNotifyServer(
         // 8. Siarkan hasil pembaruan langsung ke ruangan sesi ini
         io.to(`session:${code}`).emit("session:poll_results", results);
 
-        // Siarkan legacy event vote:new agar presenter hook / audio chime berbunyi
-        io.emit("vote:new", { question: qid, total, at: Date.now() });
+        // Siarkan event vote:new hanya ke ruangan sesi ini
+        io.to(`session:${code}`).emit("vote:new", { question: qid, total, at: Date.now() });
 
         ack?.(resPayload);
       },
@@ -634,7 +634,7 @@ export function createLiveNotifyServer(
           })) ?? [],
         });
 
-        io.emit("votes:reset", { at: Date.now() });
+        io.to(`session:${code}`).emit("votes:reset", { at: Date.now() });
         ack?.({ ok: true });
       },
     );
@@ -677,10 +677,6 @@ export function createLiveNotifyServer(
       });
 
       socket.on("notify:reset", () => {
-        for (const s of sessions.values()) {
-          s.votes.clear();
-          s.idempotency.clear();
-        }
         io.emit("votes:reset", { at: Date.now() });
       });
     }
