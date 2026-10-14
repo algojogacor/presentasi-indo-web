@@ -24,6 +24,10 @@ import { SECTIONS } from "@/components/presentation/context";
 import { SPEAKER_NOTES, getSpeakerNote, type SpeakerNoteItem } from "@/data/speakerNotes";
 import { Grain } from "@/components/presentation/atoms";
 import SlidePreviewBox from "@/components/presentation/SlidePreviewBox";
+import {
+  getNextPresenterLocation,
+  getPrevPresenterLocation,
+} from "@/lib/presenterWorkspace";
 
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
@@ -63,23 +67,22 @@ export default function PresenterWorkspacePage() {
 
   // Navigasi langkah independen (hanya lokal di halaman ini)
   const handlePrevStep = useCallback(() => {
-    if (selectedStep > 0) {
-      setSelectedStep((s) => s - 1);
-    } else if (selectedSection > 0) {
-      const prevSec = selectedSection - 1;
-      setSelectedSection(prevSec);
-      setSelectedStep(SECTIONS[prevSec].steps - 1);
-    }
+    const prevLoc = getPrevPresenterLocation(
+      { section: selectedSection, step: selectedStep },
+      SECTIONS,
+    );
+    setSelectedSection(prevLoc.section);
+    setSelectedStep(prevLoc.step);
   }, [selectedSection, selectedStep]);
 
   const handleNextStep = useCallback(() => {
-    if (selectedStep < maxSteps - 1) {
-      setSelectedStep((s) => s + 1);
-    } else if (selectedSection < SECTIONS.length - 1) {
-      setSelectedSection((s) => s + 1);
-      setSelectedStep(0);
-    }
-  }, [selectedSection, selectedStep, maxSteps]);
+    const nextLoc = getNextPresenterLocation(
+      { section: selectedSection, step: selectedStep },
+      SECTIONS,
+    );
+    setSelectedSection(nextLoc.section);
+    setSelectedStep(nextLoc.step);
+  }, [selectedSection, selectedStep]);
 
   // Lompat ke babak tertentu
   const handleSelectSection = (secIdx: number) => {
