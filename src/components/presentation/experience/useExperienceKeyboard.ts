@@ -29,6 +29,7 @@ interface UseExperienceKeyboardProps {
   keyHandlerRef: React.MutableRefObject<
     ((k: string, e: KeyboardEvent) => boolean | void) | null
   >;
+  disabled?: boolean;
 }
 
 export function useExperienceKeyboard({
@@ -52,12 +53,14 @@ export function useExperienceKeyboard({
   setBibOpen,
   setHelpOn,
   keyHandlerRef,
+  disabled = false,
 }: UseExperienceKeyboardProps) {
   const [gShow, setGShow] = useState(false);
   const gArmedRef = useRef(false);
   const gTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    if (disabled) return;
     const onKey = (e: KeyboardEvent) => {
       const target = e.target as HTMLElement | null;
       if (
@@ -238,6 +241,7 @@ export function useExperienceKeyboard({
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [
+    disabled,
     section, step, mapOpen, helpSheet, notesOpen, bibOpen, savedPos,
     advance, back, goto, hud, resume, toggleContrast, toggleMute,
     setHelpSheet, setMapOpen, setNotesOpen, setBibOpen, setHelpOn, keyHandlerRef,

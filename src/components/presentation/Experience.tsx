@@ -34,13 +34,15 @@ import {
 } from "@/lib/syncSocket";
 
 export default function Experience() {
-  const [stage, setStage] = useState<"lobby" | "live">(() => {
+  const [stage, setStage] = useState<"lobby" | "live">("lobby");
+
+  // Bersihkan stage lama dari sessionStorage agar QR screen selalu tampil saat buka / reload
+  useEffect(() => {
     if (typeof window !== "undefined") {
-      const s = sessionStorage.getItem("presentation_stage");
-      if (s === "live") return "live";
+      sessionStorage.removeItem("presentation_stage");
     }
-    return "lobby";
-  });
+  }, []);
+
   const [sessionCode, setSessionCode] = useState<string>("");
   const [presenterToken, setPresenterToken] = useState<string>("");
   const [audienceCount, setAudienceCount] = useState<number>(0);
@@ -128,12 +130,9 @@ export default function Experience() {
     }
   }, [stage, section, step, sessionCode, presenterToken]);
 
-  // Mulai presentasi dari lobi
+  // Mulai presentasi dari lobi (dari awal: Babak 0 Langkah 0)
   const handleStart = useCallback(() => {
     setStage("live");
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("presentation_stage", "live");
-    }
     goto(0, 0);
     if (sessionCode && presenterToken) {
       sendPresenterUpdate(sessionCode, presenterToken, {
@@ -145,12 +144,30 @@ export default function Experience() {
     hud("PRESENTASI DIMULAI — ACT.00 OUVERTURE", "ember");
   }, [goto, sessionCode, presenterToken, hud]);
 
+  // Lanjutkan presentasi ke posisi tersimpan sebelumnya
+  const handleResume = useCallback(() => {
+    if (!savedPos) {
+      handleStart();
+      return;
+    }
+    setStage("live");
+    goto(savedPos.section, savedPos.step);
+    if (sessionCode && presenterToken) {
+      sendPresenterUpdate(sessionCode, presenterToken, {
+        stage: "live",
+        section: savedPos.section,
+        step: savedPos.step,
+      });
+    }
+    hud(
+      `MELANJUTKAN KE ACT.${String(savedPos.section).padStart(2, "0")} · STEP.${String(savedPos.step + 1).padStart(2, "0")}`,
+      "ember",
+    );
+  }, [savedPos, handleStart, goto, sessionCode, presenterToken, hud]);
+
   // Kembali ke lobi (QR Screen)
   const handleOpenLobby = useCallback(() => {
     setStage("lobby");
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("presentation_stage", "lobby");
-    }
     if (sessionCode && presenterToken) {
       sendPresenterUpdate(sessionCode, presenterToken, {
         stage: "lobby",
@@ -231,6 +248,7 @@ export default function Experience() {
 
   // Keyboard navigation hook
   const { gShow } = useExperienceKeyboard({
+    disabled: stage === "lobby",
     section,
     step,
     mapOpen,
@@ -291,6 +309,8 @@ export default function Experience() {
             audienceCount={audienceCount}
             onStart={handleStart}
             onNewSession={handleNewSession}
+            savedPos={savedPos}
+            onResume={handleResume}
           />
         )}
 

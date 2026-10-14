@@ -8,6 +8,8 @@ interface LobbyScreenProps {
   audienceCount: number;
   onStart: () => void;
   onNewSession?: () => void;
+  savedPos?: { section: number; step: number } | null;
+  onResume?: () => void;
 }
 
 export default function LobbyScreen({
@@ -15,6 +17,8 @@ export default function LobbyScreen({
   audienceCount,
   onStart,
   onNewSession,
+  savedPos,
+  onResume,
 }: LobbyScreenProps) {
   const [copiedUrl, setCopiedUrl] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
@@ -173,6 +177,17 @@ export default function LobbyScreen({
               <span className="text-xs px-2 py-0.5 rounded bg-black/20 font-code">[Spasi / Enter]</span>
               <span>→</span>
             </button>
+
+            {savedPos && (savedPos.section > 0 || savedPos.step > 0) && onResume && (
+              <button
+                type="button"
+                onClick={onResume}
+                className="inline-flex items-center justify-center gap-2 rounded-xl border border-emerald-500/50 bg-emerald-950/40 px-5 py-3.5 font-code text-xs sm:text-sm font-bold text-emerald-300 shadow-[0_0_20px_rgba(16,185,129,0.2)] hover:bg-emerald-900/50 active:scale-[0.99] transition-all"
+              >
+                <span>Lanjutkan ke Act.{String(savedPos.section).padStart(2, "0")} · Step {String(savedPos.step + 1).padStart(2, "0")}</span>
+                <span>↻</span>
+              </button>
+            )}
 
             <a
               href="/presenter"
