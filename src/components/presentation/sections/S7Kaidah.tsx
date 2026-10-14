@@ -144,7 +144,7 @@ export default function S7Kaidah({ step }: { step: number }) {
               <p className="font-code text-xs sm:text-sm tracking-[0.2em] text-wrong font-semibold">
                 {p.before.label}
               </p>
-              <p className="mt-3 font-body text-sm sm:text-base md:text-[1.45vw] leading-relaxed text-paper/80">
+              <p className="mt-3 font-body text-sm md:text-[1.45vw] leading-relaxed text-paper/85">
                 {p.before.body}
               </p>
             </div>
@@ -156,7 +156,7 @@ export default function S7Kaidah({ step }: { step: number }) {
               <p className="font-code text-xs sm:text-sm tracking-[0.2em] text-ember font-semibold">
                 {p.after.label}
               </p>
-              <p className="mt-3 font-body text-sm sm:text-base md:text-[1.45vw] leading-relaxed text-paper/95 font-medium">
+              <p className="mt-3 font-body text-sm md:text-[1.45vw] leading-relaxed text-paper/95 font-medium">
                 {p.after.body}
               </p>
             </div>

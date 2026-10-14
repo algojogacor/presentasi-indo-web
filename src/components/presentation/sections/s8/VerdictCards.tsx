@@ -164,7 +164,7 @@ export default function VerdictCards({ active }: VerdictCardsProps) {
               </div>
             </div>
 
-            <p className="font-body text-sm sm:text-base md:text-[1.25vw] leading-relaxed text-paper/90 mt-3 pl-2 border-l-2 border-[#E8A020]/50">
+            <p className="font-body text-sm md:text-[1.25vw] leading-relaxed text-paper/90 mt-3 pl-2 border-l-2 border-[#E8A020]/50">
               Mahasiswa wajib memastikan rumusan fenomena di Bab I terjawab tuntas pada analisis dialektika Bab IV, serta ditarik menjadi simpulan substantif di Bab V tanpa bias opini pribadi.
             </p>
           </div>
@@ -225,7 +225,7 @@ export default function VerdictCards({ active }: VerdictCardsProps) {
               </div>
             </div>
 
-            <p className="font-body text-sm sm:text-base md:text-[1.25vw] leading-relaxed text-paper/90 mt-3 pl-2 border-l-2 border-white/40">
+            <p className="font-body text-sm md:text-[1.25vw] leading-relaxed text-paper/90 mt-3 pl-2 border-l-2 border-white/40">
               Pembelajaran MKWU Bahasa Indonesia di perguruan tinggi didorong memperbanyak porsi latihan praktis aplikatif dalam mengonstruksi artikel ilmiah jurnal bereputasi dan proposal PKM sesuai standar pedoman resmi.
             </p>
           </div>

@@ -127,7 +127,7 @@
    ================================================================ */
 
 @theme inline {
-  --color-base: #0a0a0f;
+  --color-canvas: #0a0a0f;
   --color-surface: #111118;
   --color-paper: #f0ede8;
   --color-mute: var(--mute);
@@ -138,6 +138,23 @@
   --font-display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
   --font-body: "IBM Plex Sans", "Helvetica Neue", Arial, sans-serif;
   --font-code: "IBM Plex Mono", "SFMono-Regular", Menlo, Consolas, monospace;
+}
+
+/* Background canvas utilities (menghindari tabrakan nama dengan utility typography font-size text-base di Tailwind v4) */
+.bg-base {
+  background-color: #0a0a0f;
+}
+.bg-base\/95 {
+  background-color: rgba(10, 10, 15, 0.95);
+}
+.bg-base\/92 {
+  background-color: rgba(10, 10, 15, 0.92);
+}
+.bg-base\/90 {
+  background-color: rgba(10, 10, 15, 0.90);
+}
+.bg-base\/88 {
+  background-color: rgba(10, 10, 15, 0.88);
 }
 
 :root {

@@ -140,7 +140,7 @@ export default function TheDocket({ step }: TheDocketProps) {
               <div className="flex items-start gap-3 sm:gap-[1.8vw]">
                 {/* Lencana Romawi */}
                 <div
-                  className={`mt-0.5 flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded border font-code text-sm sm:text-base font-bold tracking-wider transition-colors duration-500 ${
+                  className={`mt-0.5 flex h-8 w-8 sm:h-9 sm:w-9 shrink-0 items-center justify-center rounded border font-code text-sm md:text-base font-bold tracking-wider transition-colors duration-500 ${
                     isActive
                       ? "border-[#E8A020] bg-[#E8A020]/15 text-[#E8A020]"
                       : "border-mute/30 bg-transparent text-mute"
@@ -153,7 +153,7 @@ export default function TheDocket({ step }: TheDocketProps) {
                 <div className="flex-1">
                   <div className="flex flex-wrap items-baseline justify-between gap-2">
                     <span
-                      className={`font-code text-xs sm:text-sm font-semibold uppercase tracking-[0.2em] transition-colors ${
+                      className={`font-code text-xs md:text-sm font-semibold uppercase tracking-[0.2em] transition-colors ${
                         isActive ? "text-[#E8A020]" : "text-mute/70"
                       }`}
                     >
@@ -180,7 +180,7 @@ export default function TheDocket({ step }: TheDocketProps) {
 
                   {/* Mandat Tujuan Penulisan */}
                   <div
-                    className={`mt-[0.8vh] border-l-2 pl-3 font-code text-xs sm:text-sm md:text-base leading-relaxed transition-colors duration-500 ${
+                    className={`mt-[0.8vh] border-l-2 pl-3 font-code text-xs md:text-sm leading-relaxed transition-colors duration-500 ${
                       isActive
                         ? "border-[#E8A020] text-paper/90"
                         : "border-mute/30 text-mute/50"
@@ -214,7 +214,7 @@ export default function TheDocket({ step }: TheDocketProps) {
             <span className="font-code text-xs text-mute/90 uppercase tracking-wider font-semibold block mb-0.5">
               {MANFAAT_DATA.teoritis.title}
             </span>
-            <p className="font-body text-xs sm:text-sm md:text-base leading-relaxed text-paper/85">
+            <p className="font-body text-xs md:text-sm leading-relaxed text-paper/85">
               {MANFAAT_DATA.teoritis.desc}
             </p>
           </div>
@@ -222,7 +222,7 @@ export default function TheDocket({ step }: TheDocketProps) {
             <span className="font-code text-xs text-mute/90 uppercase tracking-wider font-semibold block mb-0.5">
               {MANFAAT_DATA.praktis.title}
             </span>
-            <p className="font-body text-xs sm:text-sm md:text-base leading-relaxed text-paper/85">
+            <p className="font-body text-xs md:text-sm leading-relaxed text-paper/85">
               {MANFAAT_DATA.praktis.desc}
             </p>
           </div>

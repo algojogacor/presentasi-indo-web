@@ -55,14 +55,14 @@ export default function PollingOptionsGrid({
             aria-label={`Opsi ${o.key}: ${o.label}`}
           >
             <span
-              className={`pt-0.5 font-code text-sm sm:text-base font-bold ${
+              className={`pt-0.5 font-code text-sm md:text-base font-bold ${
                 isWinner && !isCorrect ? "text-paper/85" : "text-ember"
               }`}
             >
               {o.key}
             </span>
             <span
-              className={`font-body text-sm sm:text-base md:text-[1.35vw] font-medium leading-snug ${
+              className={`font-body text-sm md:text-[1.35vw] font-medium leading-snug ${
                 isWinner && !isCorrect
                   ? "text-paper/90"
                   : "text-paper"

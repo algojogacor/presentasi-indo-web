@@ -59,7 +59,7 @@ export default function S3Hakikat({ step }: { step: number }) {
             <blockquote className="pl-5 sm:pl-[3.4vw] font-display italic text-[clamp(1.55rem,3.1vw,3.3rem)] leading-[1.35] text-paper">
               {d.text}
             </blockquote>
-            <figcaption className="mt-3.5 sm:mt-[2vw] pl-5 sm:pl-[3.4vw] font-code text-xs sm:text-sm md:text-base tracking-[0.25em] sm:tracking-[0.32em] text-ember font-semibold">
+            <figcaption className="mt-3.5 sm:mt-[2vw] pl-5 sm:pl-[3.4vw] font-code text-xs md:text-sm tracking-[0.25em] md:tracking-[0.32em] text-ember font-semibold">
               — {d.by}
             </figcaption>
           </figure>
@@ -71,7 +71,7 @@ export default function S3Hakikat({ step }: { step: number }) {
         <div className="absolute inset-0 flex flex-col justify-center px-[9vw]">
           <p
             data-step="3"
-            className="mb-[1.4vw] border-t border-edge pt-4 font-code text-xs sm:text-sm tracking-[0.32em] text-mute/90 font-medium"
+            className="mb-[1.4vw] border-t border-edge pt-4 font-code text-xs md:text-sm tracking-[0.32em] text-mute/90 font-medium"
           >
             LIMA KARAKTERISTIK KARYA TULIS ILMIAH
           </p>
@@ -84,10 +84,10 @@ export default function S3Hakikat({ step }: { step: number }) {
               <span className="font-display text-[clamp(1.8rem,2.8vw,3rem)] leading-none text-ember/85">
                 {c[0]}
               </span>
-              <span className="font-body text-sm sm:text-base md:text-[1.4vw] font-semibold uppercase tracking-[0.12em] text-paper">
+              <span className="font-body text-sm md:text-[1.4vw] font-semibold uppercase tracking-[0.12em] text-paper">
                 {c[1]}
               </span>
-              <span className="font-body text-xs sm:text-sm md:text-[1.25vw] leading-relaxed text-paper/85">
+              <span className="font-body text-xs md:text-[1.25vw] leading-relaxed text-paper/85">
                 {c[2]}
               </span>
             </div>

@@ -161,7 +161,7 @@ export default function QuestionCard({ qid, onVoted }: QuestionCardProps) {
               <span
                 className={`flex h-8 w-8 shrink-0 items-center justify-center border font-code text-[12px] ${
                   isChosen
-                    ? "border-ember bg-ember text-base"
+                    ? "border-ember bg-ember text-[#0A0A0F] font-bold"
                     : "border-edge text-ember"
                 }`}
                 aria-hidden
