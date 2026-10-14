@@ -12,6 +12,16 @@ export interface SessionQuestionResults {
   options: { key: string; label: string; count: number }[];
 }
 
+export interface MediaPlaybackState {
+  mediaId: string;
+  section: number;
+  status: "unstarted" | "playing" | "paused" | "ended" | "buffering" | "stopped";
+  currentTime: number;
+  playbackRate?: number;
+  timestamp: number;
+  revision?: number;
+}
+
 export interface PublicSessionSnapshot {
   code: string;
   stage: "lobby" | "live" | "ended";
@@ -21,6 +31,7 @@ export interface PublicSessionSnapshot {
   updatedAt: number;
   polling?: PollingState;
   pollResults?: SessionQuestionResults | null;
+  media?: MediaPlaybackState | null;
 }
 
 export interface SessionCreateResponse {
@@ -181,3 +192,22 @@ export function sendAudienceVote(
     );
   });
 }
+
+/** Presenter: Siarkan pembaruan pemutaran video / YouTube ke seluruh audiens */
+export function sendPresenterMediaUpdate(
+  code: string,
+  presenterToken: string,
+  media: MediaPlaybackState | null,
+): Promise<{ ok: boolean; media?: MediaPlaybackState | null; error?: string }> {
+  const socket = getSyncSocket();
+  return new Promise((resolve) => {
+    socket.emit(
+      "session:media_update",
+      { code, presenterToken, media },
+      (res: { ok: boolean; media?: MediaPlaybackState | null; error?: string }) => {
+        resolve(res);
+      },
+    );
+  });
+}
+

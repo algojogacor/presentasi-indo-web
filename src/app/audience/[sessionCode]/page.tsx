@@ -15,9 +15,15 @@ import {
   Info,
   CheckCircle2,
   AlertTriangle,
+  Smartphone,
 } from "lucide-react";
 import { SECTIONS, PresCtx, type PresApi } from "@/components/presentation/context";
 import { SECTION_COMPONENTS } from "@/components/presentation/sections";
+import {
+  calculateCanvasScale,
+  BASE_CANVAS_WIDTH,
+  BASE_CANVAS_HEIGHT,
+} from "@/lib/canvasScale";
 import {
   getSyncSocket,
   joinAudienceSession,
@@ -248,20 +254,83 @@ export default function AudienceViewPage() {
     setVoteNotice(null);
   }, [sessionData.polling?.questionId]);
 
-  // Read-only PresApi untuk slide mirror normal
+  // Pantau ukuran viewport untuk perhitungan contain scale kanvas 16:9
+  const [viewport, setViewport] = useState({
+    width: typeof window !== "undefined" ? window.innerWidth : BASE_CANVAS_WIDTH,
+    height: typeof window !== "undefined" ? window.innerHeight : BASE_CANVAS_HEIGHT,
+  });
+
+  useEffect(() => {
+    const handleResize = () => {
+      setViewport({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    window.addEventListener("orientationchange", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("orientationchange", handleResize);
+    };
+  }, []);
+
+  const scaleResult = useMemo(
+    () =>
+      calculateCanvasScale(viewport, {
+        width: BASE_CANVAS_WIDTH,
+        height: BASE_CANVAS_HEIGHT,
+      }),
+    [viewport],
+  );
+
+  // Dynamic settled state: Beri kesempatan timeline GSAP berjalan saat ganti slide/step
+  const [settled, setSettled] = useState(true);
+  const prevSlidePosRef = useRef({
+    section: sessionData.section,
+    step: sessionData.step,
+  });
+
+  useEffect(() => {
+    if (
+      sessionData.section !== prevSlidePosRef.current.section ||
+      sessionData.step !== prevSlidePosRef.current.step
+    ) {
+      prevSlidePosRef.current = {
+        section: sessionData.section,
+        step: sessionData.step,
+      };
+      // Masuk langkah/babak baru: aktifkan animasi entrance
+      setSettled(false);
+      const timer = setTimeout(() => {
+        setSettled(true);
+      }, 1600);
+      return () => clearTimeout(timer);
+    }
+  }, [sessionData.section, sessionData.step]);
+
+  // Read-only PresApi untuk slide mirror normal (identik dengan master, tapi read-only)
   const readOnlyPresApi = useMemo<PresApi>(
     () => ({
       section: sessionData.section,
       step: sessionData.step,
-      settled: true,
+      settled,
       setStep: () => {},
       goto: () => {},
       registerKeyHandler: () => {},
-      registerTimeline: () => {},
+      registerTimeline: (tl) => {
+        if (tl) {
+          tl.eventCallback("onComplete", () => {
+            setSettled(true);
+          });
+        }
+      },
       hud: () => {},
       sessionCode,
+      isAudience: true,
     }),
-    [sessionData.section, sessionData.step, sessionCode],
+    [sessionData.section, sessionData.step, settled, sessionCode],
   );
 
   const CurrentSectionComp =
@@ -472,10 +541,34 @@ export default function AudienceViewPage() {
           />
         </div>
       ) : (
-        <div className="relative flex-1 w-full h-full overflow-hidden">
-          <PresCtx.Provider value={readOnlyPresApi}>
-            <CurrentSectionComp step={sessionData.step} />
-          </PresCtx.Provider>
+        <div className="relative flex-1 w-full h-full flex items-center justify-center overflow-hidden bg-[#0A0A0F]">
+          {/* Proportional Scaling Canvas: 16:9 BASE_CANVAS_WIDTH x BASE_CANVAS_HEIGHT centered and letterboxed */}
+          <div
+            style={{
+              width: `${BASE_CANVAS_WIDTH}px`,
+              height: `${BASE_CANVAS_HEIGHT}px`,
+              transform: `scale(${scaleResult.scale})`,
+              transformOrigin: "center center",
+              flexShrink: 0,
+            }}
+            className="relative overflow-hidden bg-base text-paper select-none shadow-2xl"
+          >
+            <div key={sessionData.section} className="absolute inset-0">
+              <PresCtx.Provider value={readOnlyPresApi}>
+                <CurrentSectionComp step={sessionData.step} />
+              </PresCtx.Provider>
+            </div>
+          </div>
+
+          {/* Orientation Hint on Portrait Devices */}
+          {scaleResult.isPortrait && (
+            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
+              <div className="flex items-center gap-2 rounded-full border border-amber-500/40 bg-black/90 backdrop-blur px-3.5 py-1.5 font-code text-[10.5px] text-paper shadow-2xl">
+                <Smartphone className="w-3.5 h-3.5 text-[#E8A020] animate-pulse" />
+                <span>Putar layar ke landscape untuk tampilan penuh</span>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

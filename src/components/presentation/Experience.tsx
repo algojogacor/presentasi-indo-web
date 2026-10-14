@@ -305,8 +305,10 @@ export default function Experience() {
     () => ({
       ...api,
       sessionCode,
+      presenterToken,
+      isAudience: false,
     }),
-    [api, sessionCode],
+    [api, sessionCode, presenterToken],
   );
 
   return (

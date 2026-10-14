@@ -8,61 +8,33 @@ export function animateBattleCards(
 ) {
   if (!root) return;
   const cards = Array.from(root.querySelectorAll<HTMLElement>(".battle-card"));
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
-
   cards.forEach((el, i) => {
     let xPct: number;
     let scale: number;
     let opacity: number;
     let z = 1;
 
-    if (isMobile) {
-      if (selIdx >= 0) {
-        if (i === selIdx) {
-          xPct = -50;
-          scale = 1;
-          opacity = 1;
-          z = 10;
-        } else {
-          xPct = (i < selIdx ? -140 : 140) - 50;
-          scale = 0.8;
-          opacity = 0;
-          z = 1;
-        }
-      } else if (compare) {
-        xPct = (i - 1.5) * 16 - 50;
-        scale = 0.88;
-        opacity = 0.95;
-        z = i + 1;
+    if (compare) {
+      xPct = (i - 1.5) * 112 - 50;
+      scale = 0.86;
+      opacity = 1;
+    } else if (selIdx >= 0) {
+      if (i === selIdx) {
+        xPct = -50;
+        scale = 1.42;
+        opacity = 1;
+        z = 10;
       } else {
-        xPct = (i - 1.5) * 16 - 50;
-        scale = 0.9;
-        opacity = 0.9;
-        z = i + 1;
+        const d = i - selIdx;
+        const mag = Math.min(Math.abs(d), 2.2) * 108;
+        xPct = (d < 0 ? -mag : mag) - 50;
+        scale = 0.55;
+        opacity = 0.28;
       }
     } else {
-      if (compare) {
-        xPct = (i - 1.5) * 112 - 50;
-        scale = 0.86;
-        opacity = 1;
-      } else if (selIdx >= 0) {
-        if (i === selIdx) {
-          xPct = -50;
-          scale = 1.42;
-          opacity = 1;
-          z = 10;
-        } else {
-          const d = i - selIdx;
-          const mag = Math.min(Math.abs(d), 2.2) * 108;
-          xPct = (d < 0 ? -mag : mag) - 50;
-          scale = 0.55;
-          opacity = 0.28;
-        }
-      } else {
-        xPct = (i - 1.5) * 108 - 50;
-        scale = 1;
-        opacity = 1;
-      }
+      xPct = (i - 1.5) * 108 - 50;
+      scale = 1;
+      opacity = 1;
     }
 
     gsap.to(el, {

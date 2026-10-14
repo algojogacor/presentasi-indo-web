@@ -43,6 +43,16 @@ export interface SessionQuestionResults {
   options: { key: string; label: string; count: number }[];
 }
 
+export interface MediaPlaybackState {
+  mediaId: string;
+  section: number;
+  status: "unstarted" | "playing" | "paused" | "ended" | "buffering" | "stopped";
+  currentTime: number;
+  playbackRate?: number;
+  timestamp: number;
+  revision?: number;
+}
+
 export interface PresentationSession {
   code: string;
   presenterToken: string;
@@ -55,6 +65,7 @@ export interface PresentationSession {
   polling: PollingState;
   votes: Map<string, SessionVoteRecord>; // key: `${question}:${voterId}`
   idempotency: Map<string, { ok: boolean; question: number; option: string; total: number }>;
+  media?: MediaPlaybackState | null;
 }
 
 export interface PublicSessionSnapshot {
@@ -66,6 +77,7 @@ export interface PublicSessionSnapshot {
   updatedAt: number;
   polling: PollingState;
   pollResults?: SessionQuestionResults | null;
+  media?: MediaPlaybackState | null;
 }
 
 export const QUESTIONS_MAP: Record<
@@ -179,6 +191,7 @@ export function getPublicSnapshot(s: PresentationSession): PublicSessionSnapshot
     updatedAt: s.updatedAt,
     polling: s.polling,
     pollResults: getSessionQuestionResults(s, s.polling.questionId),
+    media: s.media ?? null,
   };
 }
 
@@ -298,6 +311,7 @@ export function createLiveNotifyServer(
         polling: { status: "inactive", questionId: null, step: 0 },
         votes: new Map(),
         idempotency: new Map(),
+        media: null,
       };
 
       sessions.set(code, session);
@@ -461,10 +475,16 @@ export function createLiveNotifyServer(
         }
 
         if (payload.section !== undefined) {
+          if (payload.section !== 1) {
+            session.media = null;
+          }
           session.section = payload.section;
         }
 
         if (payload.step !== undefined) {
+          if (session.section === 1 && (payload.step < 2 || payload.step > 3)) {
+            session.media = null;
+          }
           session.step = payload.step;
         }
 
@@ -487,6 +507,69 @@ export function createLiveNotifyServer(
         }
 
         ack?.({ ok: true, revision: session.revision });
+      },
+    );
+
+    // ========================================================
+    // 4b. PRESENTER ONLY: Update State Media/YouTube (session:media_update)
+    // ========================================================
+    socket.on(
+      "session:media_update",
+      (
+        payload: {
+          code: string;
+          presenterToken: string;
+          media?: MediaPlaybackState | null;
+        },
+        ack?: (res: unknown) => void,
+      ) => {
+        const code = sanitizeCode(payload?.code);
+        const token = payload?.presenterToken;
+        const session = sessions.get(code);
+
+        if (!session) {
+          ack?.({ ok: false, error: "Sesi tidak ditemukan" });
+          return;
+        }
+
+        if (session.presenterToken !== token) {
+          ack?.({ ok: false, error: "Tidak memiliki hak kontrol presenter" });
+          return;
+        }
+
+        if (!payload.media) {
+          session.media = null;
+        } else {
+          const m = payload.media;
+          const status = [
+            "unstarted",
+            "playing",
+            "paused",
+            "ended",
+            "buffering",
+            "stopped",
+          ].includes(m.status)
+            ? m.status
+            : "unstarted";
+          const currentTime =
+            typeof m.currentTime === "number" && !Number.isNaN(m.currentTime)
+              ? Math.max(0, m.currentTime)
+              : 0;
+
+          session.media = {
+            mediaId: String(m.mediaId || "E6pPlIvlrPs").slice(0, 64),
+            section: Number(m.section ?? 1),
+            status,
+            currentTime,
+            playbackRate: typeof m.playbackRate === "number" ? m.playbackRate : 1,
+            timestamp: typeof m.timestamp === "number" ? m.timestamp : Date.now(),
+            revision: (session.media?.revision ?? 0) + 1,
+          };
+        }
+
+        session.updatedAt = Date.now();
+        io.to(`session:${code}`).emit("session:media_sync", session.media);
+        ack?.({ ok: true, media: session.media });
       },
     );
 

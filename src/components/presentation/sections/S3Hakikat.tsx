@@ -68,10 +68,10 @@ export default function S3Hakikat({ step }: { step: number }) {
 
       {/* Lima karakteristik — kartu horizontal, kumulatif */}
       {step >= 3 && (
-        <div className="absolute inset-0 flex flex-col justify-start md:justify-center pt-14 md:pt-0 pb-20 md:pb-0 overflow-y-auto px-6 sm:px-[9vw]">
+        <div className="absolute inset-0 flex flex-col justify-center px-[9vw]">
           <p
             data-step="3"
-            className="mb-2 sm:mb-[1.2vw] border-t border-edge pt-4 font-code text-[10px] tracking-[0.25em] sm:tracking-[0.32em] text-mute"
+            className="mb-[1.2vw] border-t border-edge pt-4 font-code text-[10px] tracking-[0.32em] text-mute"
           >
             LIMA KARAKTERISTIK KARYA TULIS ILMIAH
           </p>
@@ -79,20 +79,15 @@ export default function S3Hakikat({ step }: { step: number }) {
             <div
               key={c[0]}
               data-step={i + 3}
-              className="grid grid-cols-1 sm:grid-cols-[5.5vw_15vw_1fr] items-start sm:items-baseline gap-1 sm:gap-[2vw] border-t border-edge py-2.5 sm:py-[1.05vw]"
+              className="grid grid-cols-[5.5vw_15vw_1fr] items-baseline gap-[2vw] border-t border-edge py-[1.05vw]"
             >
-              <div className="flex items-center gap-2 sm:block">
-                <span className="font-display text-[clamp(1.2rem,2.7vw,2.7rem)] leading-none text-ember/85">
-                  {c[0]}
-                </span>
-                <span className="font-body text-xs sm:text-[1.25vw] font-semibold uppercase tracking-[0.13em] text-paper sm:hidden">
-                  {c[1]}
-                </span>
-              </div>
-              <span className="font-body text-[1.25vw] font-semibold uppercase tracking-[0.13em] text-paper hidden sm:inline">
+              <span className="font-display text-[2.7vw] leading-none text-ember/85">
+                {c[0]}
+              </span>
+              <span className="font-body text-[1.25vw] font-semibold uppercase tracking-[0.13em] text-paper">
                 {c[1]}
               </span>
-              <span className="font-body text-xs sm:text-[1.12vw] leading-snug text-mute">
+              <span className="font-body text-[1.12vw] leading-snug text-mute">
                 {c[2]}
               </span>
             </div>

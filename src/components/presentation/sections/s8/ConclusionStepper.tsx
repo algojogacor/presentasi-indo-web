@@ -8,16 +8,16 @@ export default function ConclusionStepper({ step }: ConclusionStepperProps) {
   if (step > 3) return null;
 
   return (
-    <div className="absolute inset-0 flex flex-col items-center justify-start md:justify-center px-4 sm:px-[10vw] pt-14 md:pt-0 pb-24 md:pb-0 overflow-y-auto select-none z-10">
+    <div className="absolute inset-0 flex flex-col items-center justify-center px-[10vw] select-none z-10">
       {/* Stepper Indikator 4 Poin Simpulan */}
-      <div className="mb-4 sm:mb-[4.5vh] flex flex-wrap items-center justify-center gap-2 sm:gap-2.5">
+      <div className="mb-[4.5vh] flex flex-wrap items-center justify-center gap-2.5">
         {SIMPULAN_METAS.map((m, i) => {
           const isActive = step === i;
           const isPast = step > i;
           return (
             <div
               key={m.num}
-              className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3.5 py-1 sm:py-1.5 border transition-all duration-300 ${
+              className={`flex items-center gap-2 px-3.5 py-1.5 border transition-all duration-300 ${
                 isActive
                   ? "border-ember/80 bg-ember/10 text-ember shadow-[0_0_15px_rgba(232,160,32,0.15)]"
                   : isPast
@@ -36,7 +36,7 @@ export default function ConclusionStepper({ step }: ConclusionStepperProps) {
               >
                 {m.num}
               </span>
-              <span className="font-code text-[9px] sm:text-[9.5px] tracking-[0.14em] sm:tracking-[0.16em] uppercase">
+              <span className="font-code text-[9.5px] tracking-[0.16em] uppercase">
                 {m.tag}
               </span>
               {isActive && (
@@ -50,27 +50,27 @@ export default function ConclusionStepper({ step }: ConclusionStepperProps) {
       {/* Kotak Simpulan Aktif */}
       <div
         key={step}
-        className="fade-slide-in flex flex-col items-center text-center max-w-[92vw] md:max-w-[72vw]"
+        className="fade-slide-in flex flex-col items-center text-center max-w-[72vw]"
       >
-        <div className="mb-3 sm:mb-4 inline-flex items-center gap-2 px-3 py-1 border border-edge/60 bg-surface/40 font-code text-[9px] tracking-[0.25em] sm:tracking-[0.3em] text-ember uppercase">
+        <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 border border-edge/60 bg-surface/40 font-code text-[9px] tracking-[0.3em] text-ember uppercase">
           <span>SIMPULAN EKSEKUTIF</span>
           <span>·</span>
           <span>POIN {SIMPULAN_METAS[step]?.num ?? "01"} / 04</span>
         </div>
 
-        <p className="font-display italic text-[clamp(1.15rem,2.2vw,2.2rem)] leading-[1.38] text-paper max-w-[90vw] md:max-w-[68vw]">
+        <p className="font-display italic text-[2.2vw] leading-[1.38] text-paper max-w-[68vw]">
           &ldquo;{SIMPULAN[step]}&rdquo;
         </p>
 
-        <div className="mt-4 sm:mt-[3.5vh] flex items-center gap-3 font-code text-[9.5px] sm:text-[10px] tracking-[0.18em] sm:tracking-[0.22em] text-mute/80">
-          <span className="w-6 sm:w-8 h-[1px] bg-ember/40" />
+        <div className="mt-[3.5vh] flex items-center gap-3 font-code text-[10px] tracking-[0.22em] text-mute/80">
+          <span className="w-8 h-[1px] bg-ember/40" />
           <span>{SIMPULAN_METAS[step]?.sub.toUpperCase()}</span>
-          <span className="w-6 sm:w-8 h-[1px] bg-ember/40" />
+          <span className="w-8 h-[1px] bg-ember/40" />
         </div>
       </div>
 
       {/* Label Sub-bab Bawah */}
-      <p className="hidden md:block absolute bottom-[6vh] font-code text-[9.5px] tracking-[0.25em] text-mute/40 uppercase">
+      <p className="absolute bottom-[6vh] font-code text-[9.5px] tracking-[0.25em] text-mute/40 uppercase">
         {`SIMPULAN 0${step + 1} / 04 · INTISARI AKADEMIK`}
       </p>
     </div>

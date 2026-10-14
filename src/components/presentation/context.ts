@@ -16,6 +16,8 @@ export interface PresApi {
   registerTimeline: (tl: gsap.core.Timeline | null) => void;
   hud: (msg: string, tone?: "info" | "ember") => void;
   sessionCode?: string;
+  isAudience?: boolean;
+  presenterToken?: string;
 }
 
 export const PresCtx = createContext<PresApi | null>(null);

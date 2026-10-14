@@ -12,7 +12,7 @@ export default function BattleCard({ card: c, index: i, compare }: BattleCardPro
   return (
     <article
       data-card={i}
-      className="battle-card absolute top-1/2 left-1/2 h-[58vh] sm:h-[54vh] w-[84vw] sm:w-[48vw] md:w-[20vw] overflow-y-auto sm:overflow-hidden rounded-[3px] border border-edge bg-surface/85 p-4 sm:p-[1.3vw] opacity-0 backdrop-blur-[2px] shadow-[0_4px_25px_rgba(0,0,0,0.5)]"
+      className="battle-card absolute top-1/2 left-1/2 h-[54vh] w-[20vw] overflow-hidden rounded-[3px] border border-edge bg-surface/85 p-[1.3vw] opacity-0 backdrop-blur-[2px] shadow-[0_4px_25px_rgba(0,0,0,0.5)]"
       style={{ willChange: "transform" }}
       aria-label={`Kartu ${c.title}`}
     >
@@ -30,20 +30,20 @@ export default function BattleCard({ card: c, index: i, compare }: BattleCardPro
               0{i + 1}/04
             </span>
           </div>
-          <h3 className="mt-1.5 sm:mt-2 font-display text-[clamp(1.2rem,1.95vw,1.95rem)] leading-none text-paper">
+          <h3 className="mt-2 font-display text-[1.95vw] leading-none text-paper">
             {c.title}
           </h3>
         </div>
         <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded border border-white/5 bg-white/[0.02]">
           <IconComp
-            className="h-4 w-4 sm:h-[1.4vw] sm:w-[1.4vw] text-ember/80"
+            className="h-[1.4vw] w-[1.4vw] text-ember/80"
             strokeWidth={1.5}
             aria-hidden
           />
         </div>
       </header>
 
-      <div className="mt-3 sm:mt-[1.2vw] space-y-2 sm:space-y-[0.75vw]">
+      <div className="mt-[1.2vw] space-y-[0.75vw]">
         {c.rows.map((r) => (
           <div
             key={r.k}
@@ -62,7 +62,7 @@ export default function BattleCard({ card: c, index: i, compare }: BattleCardPro
               </p>
             </div>
             <p
-              className={`mt-1 font-body text-xs sm:text-[0.98vw] leading-snug ${
+              className={`mt-1 font-body text-[0.98vw] leading-snug ${
                 r.hot && compare ? "text-ember font-medium" : "text-paper/80"
               }`}
             >
@@ -72,7 +72,7 @@ export default function BattleCard({ card: c, index: i, compare }: BattleCardPro
         ))}
       </div>
 
-      <p className="card-note absolute right-4 sm:right-[1.3vw] bottom-3 sm:bottom-[1.2vw] left-4 sm:left-[1.3vw] border-t border-edge pt-2.5 sm:pt-3 font-display text-xs sm:text-[1.05vw] italic text-paper/70 opacity-0">
+      <p className="card-note absolute right-[1.3vw] bottom-[1.2vw] left-[1.3vw] border-t border-edge pt-3 font-display text-[1.05vw] italic text-paper/70 opacity-0">
         {c.note}
       </p>
     </article>

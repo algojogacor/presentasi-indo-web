@@ -47,6 +47,13 @@ describe("Unit: Session State & Management", () => {
         polling: { status: "inactive", questionId: null, step: 3 },
         votes: new Map(),
         idempotency: new Map(),
+        media: {
+          mediaId: "E6pPlIvlrPs",
+          section: 1,
+          status: "playing",
+          currentTime: 10.5,
+          timestamp: 1700000000000,
+        },
       };
 
       const snapshot = getPublicSnapshot(session);
@@ -57,6 +64,29 @@ describe("Unit: Session State & Management", () => {
       expect(snapshot.step).toBe(3);
       expect(snapshot.revision).toBe(5);
       expect(snapshot.polling.status).toBe("inactive");
+      expect(snapshot.media?.mediaId).toBe("E6pPlIvlrPs");
+      expect(snapshot.media?.status).toBe("playing");
+      expect(snapshot.media?.currentTime).toBe(10.5);
+    });
+
+    it("snapshot publik mengembalikan media null jika media tidak aktif", () => {
+      const session: PresentationSession = {
+        code: "KTI-NOMEDIA",
+        presenterToken: "token-123",
+        stage: "live",
+        section: 0,
+        step: 0,
+        revision: 1,
+        updatedAt: 1000,
+        createdAt: 1000,
+        polling: { status: "inactive", questionId: null, step: 0 },
+        votes: new Map(),
+        idempotency: new Map(),
+        media: null,
+      };
+
+      const snapshot = getPublicSnapshot(session);
+      expect(snapshot.media).toBeNull();
     });
   });
 
