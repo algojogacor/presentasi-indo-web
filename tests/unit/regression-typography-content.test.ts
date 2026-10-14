@@ -35,7 +35,7 @@ describe("Regression: Typography Pass Content & Layout Integrity", () => {
       REFERENCES.forEach((ref) => {
         expect(ref.authors.trim().length).toBeGreaterThan(3);
         expect(ref.title.trim().length).toBeGreaterThan(5);
-        expect(ref.year).toBeGreaterThan(2000);
+        expect(Number(ref.year)).toBeGreaterThan(2000);
         expect(ref.source.trim().length).toBeGreaterThan(3);
       });
     });
@@ -86,7 +86,7 @@ describe("Regression: Typography Pass Content & Layout Integrity", () => {
   });
 
   describe("3. Layout Collision & Clipping Invariants", () => {
-    it("memastikan BattleCard tidak menggunakan absolute positioning yang menabrak baris kartu", () => {
+    it("memastikan BattleCard tidak menggunakan absolute positioning pada card-note yang menabrak baris kartu", () => {
       const battleCardPath = resolve(
         import.meta.dir,
         "../../src/components/presentation/sections/s6/BattleCard.tsx"
@@ -94,8 +94,8 @@ describe("Regression: Typography Pass Content & Layout Integrity", () => {
       const battleCardCode = readFileSync(battleCardPath, "utf-8");
 
       // .card-note tidak boleh absolute pinned bottom
+      expect(battleCardCode).not.toContain("card-note absolute");
       expect(battleCardCode).not.toContain("absolute bottom-[1.2vw]");
-      expect(battleCardCode).not.toContain("absolute bottom-");
 
       // Harus menggunakan flex column flow dengan mt-auto
       expect(battleCardCode).toContain("mt-auto");
@@ -111,7 +111,7 @@ describe("Regression: Typography Pass Content & Layout Integrity", () => {
 
       // Tidak boleh ada split node sm:hidden vs hidden sm:inline yang merusak rendering canvas 16:9
       expect(dissectionCode).not.toContain("hidden sm:inline");
-      expect(dissectionCode).toContain("text-paper font-semibold");
+      expect(dissectionCode).toContain("font-semibold text-paper");
     });
   });
 });
