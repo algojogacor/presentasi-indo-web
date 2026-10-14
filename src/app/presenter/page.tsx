@@ -20,10 +20,10 @@ import {
   FileText,
   HelpCircle,
 } from "lucide-react";
-import { SECTIONS, PresCtx, type PresApi } from "@/components/presentation/context";
-import { SECTION_COMPONENTS } from "@/components/presentation/sections";
+import { SECTIONS } from "@/components/presentation/context";
 import { SPEAKER_NOTES, getSpeakerNote, type SpeakerNoteItem } from "@/data/speakerNotes";
 import { Grain } from "@/components/presentation/atoms";
+import SlidePreviewBox from "@/components/presentation/SlidePreviewBox";
 
 const pad2 = (n: number) => String(n).padStart(2, "0");
 
@@ -137,27 +137,6 @@ export default function PresenterWorkspacePage() {
       }
     );
   }, [selectedSection, selectedStep]);
-
-  // Mock PresApi untuk pratinjau slide di dalam workspace
-  // TIDAK mengubah state sesi live dan TIDAK memancarkan socket event
-  const mockPresApi = useMemo<PresApi>(
-    () => ({
-      section: selectedSection,
-      step: selectedStep,
-      settled: true,
-      setStep: (s) => setSelectedStep(s),
-      goto: (sec, st = 0) => {
-        setSelectedSection(sec);
-        setSelectedStep(st);
-      },
-      registerKeyHandler: () => {},
-      registerTimeline: () => {},
-      hud: () => {},
-    }),
-    [selectedSection, selectedStep],
-  );
-
-  const CurrentSectionComp = SECTION_COMPONENTS[selectedSection] ?? SECTION_COMPONENTS[0];
 
   const formatTimer = (sec: number) => {
     const m = Math.floor(sec / 60);
@@ -324,19 +303,12 @@ export default function PresenterWorkspacePage() {
             mobileTab === "slide" ? "flex" : "hidden lg:flex"
           }`}
         >
-          {/* Pratinjau Frame Slide */}
-          <div className="relative rounded-2xl border border-white/15 bg-black overflow-hidden shadow-2xl aspect-[16/10] sm:aspect-[16/9] w-full flex flex-col">
-            <PresCtx.Provider value={mockPresApi}>
-              <div className="absolute inset-0 overflow-hidden pointer-events-auto">
-                <CurrentSectionComp step={selectedStep} />
-              </div>
-            </PresCtx.Provider>
-
-            {/* Overlay Indikator Slide */}
-            <div className="absolute top-3 left-3 z-30 pointer-events-none rounded-md bg-black/70 backdrop-blur px-2.5 py-1 font-code text-[11px] text-[#E8A020] border border-[#E8A020]/30">
-              Pratinjau: Babak {pad2(selectedSection)} · Langkah {selectedStep + 1}/{maxSteps}
-            </div>
-          </div>
+          {/* Pratinjau Frame Slide Virtual Auto-Scaled */}
+          <SlidePreviewBox
+            section={selectedSection}
+            step={selectedStep}
+            maxSteps={maxSteps}
+          />
 
           {/* Navigator Langkah & Tombol Cepat */}
           <div className="rounded-xl border border-white/10 bg-white/[0.03] p-3 sm:p-4 space-y-3">
