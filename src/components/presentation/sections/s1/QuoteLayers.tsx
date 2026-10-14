@@ -18,9 +18,6 @@ export function OpeningQuote({ step }: OpeningQuoteProps) {
           Indonesia, Prof. Wisnu Jatmiko, mengenai mengapa tubuh ilmiah ini harus
           dilahirkan dan dipublikasikan ke dunia&hellip;&rdquo;
         </p>
-        <p className="mt-5 md:mt-7 font-code text-[10px] tracking-[0.25em] md:tracking-[0.35em] text-ember drop-shadow-md">
-          PENGANTAR — DIBACAKAN · [SPACE] BUKA PANGGUNG · [SHIFT+S] LEWATI
-        </p>
       </div>
     </div>
   );
@@ -34,8 +31,8 @@ export function ClosingQuote() {
           &ldquo;Gagasan ilmiah tidak akan pernah hidup tanpa sebuah tubuh
           tulisan yang baku.&rdquo;
         </p>
-        <p className="mt-5 md:mt-7 font-code text-[10px] tracking-[0.25em] md:tracking-[0.35em] text-ember drop-shadow-md">
-          PROF. WISNU JATMIKO — PARAFRASE · [SPACE] MENUJU ANATOMI
+        <p className="mt-4 sm:mt-5 font-code text-[10px] sm:text-[11px] tracking-[0.25em] sm:tracking-[0.3em] text-ember drop-shadow-md uppercase">
+          — PROF. WISNU JATMIKO
         </p>
       </div>
     </div>
