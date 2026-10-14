@@ -47,7 +47,7 @@ export default function PresenterHud({
   helpOn,
 }: PresenterHudProps) {
   return (
-    <div className="pointer-events-none fixed bottom-3 left-3 sm:bottom-4 sm:left-6 z-[70] select-none font-code text-[10px] sm:text-[11px] tracking-wider text-mute/80 space-y-0.5 max-w-[55vw] sm:max-w-none">
+    <div className="pointer-events-none fixed bottom-3 left-4 sm:bottom-4 sm:left-8 md:left-[3.5vw] z-[70] select-none font-code text-[10px] sm:text-[11px] tracking-wider text-mute/80 space-y-0.5 max-w-[55vw] sm:max-w-none">
       {huds.map((h) => (
         <div
           key={h.id}

@@ -37,12 +37,12 @@ export default function S3Hakikat({ step }: { step: number }) {
   useStepReveal(root, step);
 
   return (
-    <div ref={root} className="absolute inset-0 px-4 sm:px-[9vw]">
+    <div ref={root} className="absolute inset-0 px-6 sm:px-[9vw]">
       <Kicker act="03">HAKIKAT &amp; KARAKTERISTIK</Kicker>
       <BigNumeral>03</BigNumeral>
 
       {/* Layar definisi — satu per satu, momen penuh */}
-      <div className="absolute inset-0 flex items-center px-4 sm:px-0">
+      <div className="absolute inset-0 flex items-center px-6 sm:px-[9vw]">
         {DEFINITIONS.map((d, i) => (
           <figure
             key={d.by}
@@ -68,7 +68,7 @@ export default function S3Hakikat({ step }: { step: number }) {
 
       {/* Lima karakteristik — kartu horizontal, kumulatif */}
       {step >= 3 && (
-        <div className="absolute inset-0 flex flex-col justify-start md:justify-center pt-14 md:pt-0 pb-20 md:pb-0 overflow-y-auto px-4 sm:px-[9vw]">
+        <div className="absolute inset-0 flex flex-col justify-start md:justify-center pt-14 md:pt-0 pb-20 md:pb-0 overflow-y-auto px-6 sm:px-[9vw]">
           <p
             data-step="3"
             className="mb-2 sm:mb-[1.2vw] border-t border-edge pt-4 font-code text-[10px] tracking-[0.25em] sm:tracking-[0.32em] text-mute"

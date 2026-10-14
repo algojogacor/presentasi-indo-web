@@ -114,7 +114,7 @@ export default function S7Kaidah({ step }: { step: number }) {
   useStepReveal(root, step);
 
   return (
-    <div ref={root} className="absolute inset-0 px-4 sm:px-[9vw]" data-testid="kaidah">
+    <div ref={root} className="absolute inset-0 px-6 sm:px-[9vw]" data-testid="kaidah">
       <Kicker act="07">KAIDAH KEBAHASAAN &amp; ETIKA</Kicker>
       <BigNumeral>07</BigNumeral>
 
@@ -123,7 +123,7 @@ export default function S7Kaidah({ step }: { step: number }) {
           key={p.idx}
           data-step={i}
           data-exclusive
-          className="absolute inset-0 flex flex-col justify-start md:justify-center pt-14 md:pt-[6vh] pb-24 md:pb-0 overflow-y-auto px-2 sm:px-0"
+          className="absolute inset-0 flex flex-col justify-start md:justify-center pt-14 md:pt-[6vh] pb-24 md:pb-0 overflow-y-auto px-6 sm:px-[9vw]"
         >
           <p className="font-code text-[10px] tracking-[0.25em] sm:tracking-[0.3em] text-ember">
             {p.idx} — {p.tag}

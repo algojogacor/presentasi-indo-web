@@ -94,7 +94,7 @@ export default function AppendixSlide() {
         </div>
 
         {/* Kolom Kanan: QR Code Box */}
-        <div className="flex flex-col items-center justify-center rounded-xl border border-[#E8A020]/40 bg-[#161410]/95 p-4 sm:p-5 shadow-[0_0_40px_rgba(232,160,32,0.15)] w-full max-w-xs mx-auto md:w-auto">
+        <div className="flex flex-col items-center justify-center rounded-xl border border-[#E8A020]/40 bg-[#161410]/95 p-4 sm:p-5 shadow-[0_0_40px_rgba(232,160,32,0.15)] w-full max-w-sm mx-auto md:w-auto">
           <div className="mb-2 text-center">
             <p className="font-code text-[10px] sm:text-[11px] font-bold text-[#E8A020] tracking-wider uppercase">
               PINDAI DENGAN KAMERA HP
@@ -109,7 +109,7 @@ export default function AppendixSlide() {
             <img
               src={qrSrc}
               alt="QR Code Makalah Lengkap"
-              className="h-36 w-36 sm:h-[18vh] sm:w-[18vh] md:h-[22vh] md:w-[22vh] object-contain rounded"
+              className="h-44 w-44 sm:h-52 sm:w-52 md:h-[26vh] md:w-[26vh] md:min-h-[200px] md:min-w-[200px] object-contain rounded"
             />
           </div>
 

@@ -131,7 +131,7 @@ export default function S5Polling({ step }: { step: number }) {
   };
 
   return (
-    <div ref={root} className="absolute inset-0 px-[7vw]">
+    <div ref={root} className="absolute inset-0 px-6 sm:px-[8vw]">
       <Kicker act="05">SESI INTERAKTIF</Kicker>
       <BigNumeral>05</BigNumeral>
 
@@ -154,7 +154,7 @@ export default function S5Polling({ step }: { step: number }) {
 
       {/* ---- Pertanyaan live / reveal (tampilan standar) ---- */}
       {qid > 0 && !scoreOpen && (
-        <div className="absolute inset-0 flex flex-col justify-start px-4 sm:px-[8vw] pt-14 md:pt-[12vh] pb-24 md:pb-[8vh] overflow-y-auto">
+        <div className="absolute inset-0 flex flex-col justify-start px-6 sm:px-[8vw] pt-14 md:pt-[12vh] pb-24 md:pb-[8vh] overflow-y-auto">
           <div className="flex items-baseline gap-4">
             <span className="font-code text-[10px] tracking-[0.3em] text-ember">
               PERTANYAAN 0{qid}
@@ -217,7 +217,16 @@ export default function S5Polling({ step }: { step: number }) {
 
           {/* Baris bawah: QR + hasil live */}
           <div className="mt-6 md:mt-auto flex flex-col sm:flex-row items-center sm:items-end justify-between gap-6">
-            <PollingQrBox qid={qid} revealed={revealed} />
+            <div className="flex flex-col items-center sm:items-start gap-2">
+              <PollingQrBox qid={qid} revealed={revealed} />
+
+              {/* Notifikasi threshold di bawah QR */}
+              {notice === liveKey && live && !fallback && (
+                <div className="border border-ember/40 bg-base/90 px-3 py-1.5 font-code text-[9.5px] sm:text-[10px] tracking-[0.16em] text-ember rounded-sm shadow-md">
+                  RESPONDEN &lt; 10 — FALLBACK TERSEDIA [ F ]
+                </div>
+              )}
+            </div>
 
             <PollingResultBars
               question={question}
@@ -232,13 +241,6 @@ export default function S5Polling({ step }: { step: number }) {
               spark={spark}
             />
           </div>
-        </div>
-      )}
-
-      {/* Notifikasi threshold di area HUD presenter */}
-      {notice === liveKey && live && !fallback && (
-        <div className="absolute bottom-[7vh] left-[6vw] z-30 border border-ember/40 bg-base/85 px-4 py-2.5 font-code text-[10px] tracking-[0.18em] text-ember">
-          RESPONDEN &lt; 10 — FALLBACK TERSEDIA [ F ]
         </div>
       )}
     </div>

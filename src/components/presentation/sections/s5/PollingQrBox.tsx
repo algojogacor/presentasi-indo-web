@@ -17,36 +17,36 @@ export default function PollingQrBox({ qid, revealed }: PollingQrBoxProps) {
   }, [qid]);
 
   return (
-    <div className={revealed ? "invisible" : ""}>
-      <div className="relative">
+    <div className={`flex flex-col items-center sm:items-start ${revealed ? "invisible" : ""}`}>
+      <div className="relative p-1.5 rounded-lg border border-ember/30 bg-[#0A0A0F]/90 shadow-[0_0_25px_rgba(232,160,32,0.12)]">
         <img
           ref={qrImgRef}
           alt="QR code menuju halaman voting"
-          className="h-[13vh] w-[13vh]"
-          width={160}
-          height={160}
+          className="h-44 w-44 sm:h-52 sm:w-52 md:h-[23vh] md:w-[23vh] md:min-h-[190px] md:min-w-[190px] object-contain rounded"
+          width={240}
+          height={240}
           data-testid="poll-qr"
         />
         {/* Bingkai bidik — bracket sudut amber */}
         <span
           aria-hidden
-          className="absolute -top-1 -left-1 h-3 w-3 border-t border-l border-ember/60"
+          className="absolute -top-1.5 -left-1.5 h-4 w-4 border-t-2 border-l-2 border-ember"
         />
         <span
           aria-hidden
-          className="absolute -top-1 -right-1 h-3 w-3 border-t border-r border-ember/60"
+          className="absolute -top-1.5 -right-1.5 h-4 w-4 border-t-2 border-r-2 border-ember"
         />
         <span
           aria-hidden
-          className="absolute -bottom-1 -left-1 h-3 w-3 border-b border-l border-ember/60"
+          className="absolute -bottom-1.5 -left-1.5 h-4 w-4 border-b-2 border-l-2 border-ember"
         />
         <span
           aria-hidden
-          className="absolute -bottom-1 -right-1 h-3 w-3 border-b border-r border-ember/60"
+          className="absolute -bottom-1.5 -right-1.5 h-4 w-4 border-b-2 border-r-2 border-ember"
         />
       </div>
-      <p className="mt-2 font-code text-[9px] tracking-[0.2em] text-mute">
-        PINDAI → /VOTING
+      <p className="mt-2.5 font-code text-[10px] sm:text-[11px] font-semibold tracking-[0.22em] text-[#E8A020]">
+        PINDAI DENGAN HP → /VOTING
       </p>
     </div>
   );
