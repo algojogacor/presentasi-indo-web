@@ -20,7 +20,7 @@ export default function PollingOptionsGrid({
   onChoose,
 }: PollingOptionsGridProps) {
   return (
-    <div className="mt-3 md:mt-[3.2vh] grid w-full max-w-full md:max-w-[56vw] grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-[1.1vw]">
+    <div className="mt-3.5 md:mt-[3.2vh] grid w-full max-w-full md:max-w-[62vw] grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-[1.2vw]">
       {question.options.map((o) => {
         const isCorrect = revealed && o.correct;
         const isWinner = revealed && winners.includes(o.key);
@@ -39,11 +39,11 @@ export default function PollingOptionsGrid({
             type="button"
             onClick={() => onChoose(o.key)}
             disabled={!live || !fallback || !!manualChoice}
-            className={`group flex items-start gap-2 sm:gap-[0.9vw] border p-3 sm:p-[1.1vw] text-left transition-all duration-300 ${
+            className={`group flex items-start gap-2.5 sm:gap-[1vw] border p-3.5 sm:p-[1.2vw] text-left transition-all duration-300 ${
               isCorrect
-                ? "border-ember bg-ember/10"
+                ? "border-ember bg-ember/15"
                 : isWinner
-                  ? "border-paper/55 bg-paper/8"
+                  ? "border-paper/60 bg-paper/10"
                   : revealed
                     ? "border-edge opacity-35"
                     : "border-edge hover:border-ember/50"
@@ -55,26 +55,26 @@ export default function PollingOptionsGrid({
             aria-label={`Opsi ${o.key}: ${o.label}`}
           >
             <span
-              className={`pt-0.5 sm:pt-[0.35vw] font-code text-[11px] ${
-                isWinner && !isCorrect ? "text-paper/80" : "text-ember"
+              className={`pt-0.5 font-code text-sm sm:text-base font-bold ${
+                isWinner && !isCorrect ? "text-paper/85" : "text-ember"
               }`}
             >
               {o.key}
             </span>
             <span
-              className={`font-body text-xs sm:text-sm md:text-[1.25vw] leading-snug ${
+              className={`font-body text-sm sm:text-base md:text-[1.35vw] font-medium leading-snug ${
                 isWinner && !isCorrect
-                  ? "text-paper/85"
-                  : "text-paper/90"
+                  ? "text-paper/90"
+                  : "text-paper"
               }`}
             >
               {o.label}
             </span>
             {tag && (
               <span
-                className={`ml-auto font-code text-[9px] tracking-[0.25em] ${
+                className={`ml-auto font-code text-xs tracking-[0.2em] font-semibold whitespace-nowrap ${
                   isWinner && !isCorrect
-                    ? "text-paper/70"
+                    ? "text-paper/80"
                     : "text-ember"
                 }`}
               >

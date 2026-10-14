@@ -116,28 +116,28 @@ export default function SessionRecap({ detail }: SessionRecapProps) {
             return (
               <div
                 key={q.id}
-                className="rekap-card fade-slide-in border border-edge/90 bg-base/88 backdrop-blur-[3px] p-4"
+                className="rekap-card fade-slide-in border border-edge/90 bg-base/88 backdrop-blur-[3px] p-4 rounded"
               >
                 <div className="flex items-baseline justify-between gap-3">
-                  <span className="font-code text-[9px] tracking-[0.28em] text-ember">
+                  <span className="font-code text-xs font-bold tracking-[0.2em] text-ember">
                     {`PERTANYAAN 0${q.id}`}
                   </span>
-                  <span className="font-code text-[9px] tracking-[0.18em] text-mute/80">
+                  <span className="font-code text-xs font-medium tracking-[0.16em] text-mute/90">
                     {`${total} SUARA`}
                   </span>
                 </div>
                 <div className="mt-2.5 flex items-baseline gap-3">
                   <span
-                    className="font-display text-[2.3vw] leading-none text-ember"
+                    className="font-display text-[clamp(1.8rem,2.6vw,2.8rem)] leading-none text-ember font-bold"
                     aria-label={`${correctPct} persen kelas menjawab benar`}
                   >
                     {total > 0 ? `${correctPct}%` : "—"}
                   </span>
                   <div className="min-w-0">
-                    <p className="font-code text-[8.5px] tracking-[0.2em] text-mute">
+                    <p className="font-code text-xs tracking-[0.18em] text-mute/90 font-medium">
                       KETEPATAN KELAS
                     </p>
-                    <p className="truncate font-body text-[0.92vw] text-paper/80">
+                    <p className="truncate font-body text-xs sm:text-sm text-paper/90 font-medium">
                       {winnerText}
                     </p>
                   </div>
@@ -147,11 +147,11 @@ export default function SessionRecap({ detail }: SessionRecapProps) {
           })}
         </div>
       )}
-      <div className="flex items-center justify-center gap-3 font-code text-[10px] tracking-[0.24em] text-mute">
+      <div className="flex items-center justify-center gap-3 font-code text-xs sm:text-sm tracking-[0.24em] text-mute/90 font-medium">
         <span className="dot-live inline-block" aria-hidden />
         <span>{parts.join(" · ")}</span>
       </div>
-      <p className="mt-2 font-code text-[9px] tracking-[0.22em] text-mute/50">
+      <p className="mt-2 font-code text-xs tracking-[0.22em] text-mute/60">
         ARSIP LENGKAP → /#/RESULTS
       </p>
     </div>

@@ -90,41 +90,41 @@ export default function VerdictCards({ active }: VerdictCardsProps) {
         ref={headerRef}
         className="mb-[3vh] flex flex-col items-center text-center"
       >
-        <div className="inline-flex items-center gap-2 px-3 py-1 border border-edge/60 bg-surface/40 font-code text-[9.5px] tracking-[0.3em] text-[#E8A020] uppercase mb-1.5">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#E8A020] animate-pulse" />
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 border border-edge/60 bg-surface/40 font-code text-xs tracking-[0.25em] text-[#E8A020] uppercase font-semibold mb-2">
+          <span className="w-2 h-2 rounded-full bg-[#E8A020] animate-pulse" />
           <span>SUB-BAB 3.2 · PRESKRIPSI & REKOMENDASI AKADEMIK</span>
         </div>
-        <h2 className="font-display italic text-[clamp(1.8rem,2.7vw,3rem)] text-paper leading-tight">
+        <h2 className="font-display italic font-semibold text-[clamp(2rem,3vw,3.4rem)] text-paper leading-tight">
           Putusan Akhir: Dua Rekomendasi Ilmiah
         </h2>
-        <p className="mt-1 font-code text-[11px] tracking-[0.2em] text-mute/80 uppercase">
+        <p className="mt-1.5 font-code text-xs sm:text-sm tracking-[0.2em] text-mute/90 uppercase font-medium">
           Vonis strategis bagi subjek peneliti dan ekosistem keilmuan kampus
         </p>
       </div>
 
       {/* Grid Dua Kartu Rekomendasi Berdampingan */}
-      <div className="grid grid-cols-2 gap-[2.4vw] max-w-[84vw] mx-auto w-full">
+      <div className="grid grid-cols-2 gap-[2.6vw] max-w-[86vw] mx-auto w-full">
         {/* Kartu 1 — Untuk Mahasiswa Peneliti */}
         <div
           ref={card1Ref}
-          className="relative flex flex-col justify-between rounded-xl border border-[#E8A020]/40 bg-[#111118]/90 p-[2.6vh] px-[2.2vw] shadow-[0_0_35px_rgba(232,160,32,0.08)] backdrop-blur-md"
+          className="relative flex flex-col justify-between rounded-xl border border-[#E8A020]/40 bg-[#111118]/95 p-[2.6vh] px-[2.4vw] shadow-[0_0_35px_rgba(232,160,32,0.1)] backdrop-blur-md"
         >
           {/* Aksen Emas Sudut */}
           <div className="absolute top-0 left-0 h-8 w-[2px] bg-[#E8A020]" />
           <div className="absolute top-0 left-0 h-[2px] w-8 bg-[#E8A020]" />
 
           <div>
-            <div className="flex items-center justify-between border-b border-edge pb-2 mb-3">
-              <span className="font-code text-[9.5px] uppercase tracking-[0.25em] text-[#E8A020]">
+            <div className="flex items-center justify-between border-b border-edge pb-2.5 mb-3.5">
+              <span className="font-code text-xs uppercase tracking-[0.25em] text-[#E8A020] font-semibold">
                 PRESKRIPSI I · PRAKTISI RISET
               </span>
-              <span className="font-code text-[10px] text-mute/60 tracking-wider">
+              <span className="font-code text-xs text-mute/80 tracking-wider font-medium">
                 AKTOR PENELITI
               </span>
             </div>
 
             <div className="flex items-start gap-4 my-2">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-[#E8A020]/30 bg-[#E8A020]/10 text-[#E8A020]">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-[#E8A020]/30 bg-[#E8A020]/10 text-[#E8A020]">
                 {/* SVG Segitiga Emas Koherensi */}
                 <svg
                   className="h-6 w-6"
@@ -155,47 +155,47 @@ export default function VerdictCards({ active }: VerdictCardsProps) {
               </div>
 
               <div>
-                <span className="font-code text-[10px] uppercase tracking-wider text-mute block">
+                <span className="font-code text-xs uppercase tracking-wider text-mute/90 font-semibold block">
                   SASARAN: MAHASISWA
                 </span>
-                <h3 className="font-display italic text-[clamp(1.25rem,1.75vw,1.85rem)] text-paper leading-snug mt-0.5">
+                <h3 className="font-display italic font-medium text-[clamp(1.4rem,2vw,2.15rem)] text-paper leading-snug mt-1">
                   &ldquo;Kawal Koherensi Segitiga Emas: Masalah, Pembahasan, dan Simpulan.&rdquo;
                 </h3>
               </div>
             </div>
 
-            <p className="font-body text-[clamp(0.9rem,1.1vw,1.15rem)] leading-relaxed text-paper/80 mt-2.5 pl-1 border-l-2 border-[#E8A020]/40">
+            <p className="font-body text-sm sm:text-base md:text-[1.25vw] leading-relaxed text-paper/90 mt-3 pl-2 border-l-2 border-[#E8A020]/50">
               Mahasiswa wajib memastikan rumusan fenomena di Bab I terjawab tuntas pada analisis dialektika Bab IV, serta ditarik menjadi simpulan substantif di Bab V tanpa bias opini pribadi.
             </p>
           </div>
 
-          <div className="mt-4 pt-2.5 border-t border-edge/60 flex items-center justify-between font-code text-[9px] text-mute/70 tracking-wider">
+          <div className="mt-4 pt-3 border-t border-edge/60 flex items-center justify-between font-code text-xs text-mute/80 tracking-wider">
             <span>PEDOMAN // SUB-BAB 3.2 BUTIR 1</span>
-            <span className="text-[#E8A020]">KOHERENSI LOGIKA</span>
+            <span className="text-[#E8A020] font-semibold">KOHERENSI LOGIKA</span>
           </div>
         </div>
 
         {/* Kartu 2 — Untuk Institusi & Pengampu MKWU */}
         <div
           ref={card2Ref}
-          className="relative flex flex-col justify-between rounded-xl border border-edge/90 bg-[#111118]/90 p-[2.6vh] px-[2.2vw] shadow-[0_0_35px_rgba(255,255,255,0.03)] backdrop-blur-md"
+          className="relative flex flex-col justify-between rounded-xl border border-edge/90 bg-[#111118]/95 p-[2.6vh] px-[2.4vw] shadow-[0_0_35px_rgba(255,255,255,0.03)] backdrop-blur-md"
         >
           {/* Aksen Putih Sudut */}
           <div className="absolute top-0 right-0 h-8 w-[2px] bg-white/40" />
           <div className="absolute top-0 right-0 h-[2px] w-8 bg-white/40" />
 
           <div>
-            <div className="flex items-center justify-between border-b border-edge pb-2 mb-3">
-              <span className="font-code text-[9.5px] uppercase tracking-[0.25em] text-paper/80">
+            <div className="flex items-center justify-between border-b border-edge pb-2.5 mb-3.5">
+              <span className="font-code text-xs uppercase tracking-[0.25em] text-paper/85 font-semibold">
                 PRESKRIPSI II · KURIKULUM AKADEMIK
               </span>
-              <span className="font-code text-[10px] text-mute/60 tracking-wider">
+              <span className="font-code text-xs text-mute/80 tracking-wider font-medium">
                 EKOSISTEM KAMPUS
               </span>
             </div>
 
             <div className="flex items-start gap-4 my-2">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-white/20 bg-white/5 text-paper">
+              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-white/20 bg-white/5 text-paper">
                 {/* SVG Blueprint Pilar Institusi */}
                 <svg
                   className="h-6 w-6"
@@ -216,29 +216,29 @@ export default function VerdictCards({ active }: VerdictCardsProps) {
               </div>
 
               <div>
-                <span className="font-code text-[10px] uppercase tracking-wider text-mute block">
+                <span className="font-code text-xs uppercase tracking-wider text-mute/90 font-semibold block">
                   SASARAN: INSTITUSI & MKWU
                 </span>
-                <h3 className="font-display italic text-[clamp(1.25rem,1.75vw,1.85rem)] text-paper leading-snug mt-0.5">
+                <h3 className="font-display italic font-medium text-[clamp(1.4rem,2vw,2.15rem)] text-paper leading-snug mt-1">
                   &ldquo;Perluas Praktikum Penulisan Jurnal IMRaD dan Proposal Riset Baku.&rdquo;
                 </h3>
               </div>
             </div>
 
-            <p className="font-body text-[clamp(0.9rem,1.1vw,1.15rem)] leading-relaxed text-paper/80 mt-2.5 pl-1 border-l-2 border-white/30">
+            <p className="font-body text-sm sm:text-base md:text-[1.25vw] leading-relaxed text-paper/90 mt-3 pl-2 border-l-2 border-white/40">
               Pembelajaran MKWU Bahasa Indonesia di perguruan tinggi didorong memperbanyak porsi latihan praktis aplikatif dalam mengonstruksi artikel ilmiah jurnal bereputasi dan proposal PKM sesuai standar pedoman resmi.
             </p>
           </div>
 
-          <div className="mt-4 pt-2.5 border-t border-edge/60 flex items-center justify-between font-code text-[9px] text-mute/70 tracking-wider">
+          <div className="mt-4 pt-3 border-t border-edge/60 flex items-center justify-between font-code text-xs text-mute/80 tracking-wider">
             <span>PEDOMAN // SUB-BAB 3.2 BUTIR 2</span>
-            <span className="text-paper/90">STANDARISASI KURIKULUM</span>
+            <span className="text-paper/95 font-semibold">STANDARISASI KURIKULUM</span>
           </div>
         </div>
       </div>
 
       {/* Label Kategori */}
-      <p className="mt-[3vh] text-center font-code text-[9.5px] tracking-[0.25em] text-mute/50 uppercase">
+      <p className="mt-[3vh] text-center font-code text-xs tracking-[0.25em] text-mute/60 uppercase font-medium">
         PUTUSAN AKADEMIK · REKOMENDASI &amp; SARAN (SUB-BAB 3.2)
       </p>
     </div>

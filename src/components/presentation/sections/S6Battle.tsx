@@ -42,7 +42,7 @@ export default function S6Battle({ step }: { step: number }) {
       <BigNumeral>06</BigNumeral>
 
       {compare && (
-        <p className="fade-slide-in absolute top-[5vh] right-[6vw] z-10 font-code text-[10px] tracking-[0.3em] text-mute">
+        <p className="fade-slide-in absolute top-[5vh] right-[6vw] z-10 font-code text-xs sm:text-sm tracking-[0.3em] text-mute/85 font-medium">
           MODE KOMPARASI — PERBEDAAN KUNCI DI-TANDAI
         </p>
       )}

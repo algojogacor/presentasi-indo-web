@@ -166,40 +166,40 @@ export default function FilmCreditRoll({
       }`}
     >
       {/* Baris Dosen Pengampu */}
-      <span className="credit-item credit-dosen-label font-code text-[10px] md:text-[11px] uppercase tracking-[0.35em] text-[#6B6B7A]">
+      <span className="credit-item credit-dosen-label font-code text-xs md:text-sm uppercase tracking-[0.35em] text-[#8A8A9A] font-medium">
         {DOSEN_PENGAMPU.label}
       </span>
 
-      <div className="credit-item credit-dosen-box mt-[0.5vh] flex flex-col items-center">
-        <span className="credit-dosen-name credit-shimmer-dosen font-display italic font-medium text-[clamp(1.15rem,1.8vw,1.85rem)]">
+      <div className="credit-item credit-dosen-box mt-[0.6vh] flex flex-col items-center">
+        <span className="credit-dosen-name credit-shimmer-dosen font-display italic font-medium text-[clamp(1.4rem,2.2vw,2.4rem)]">
           {DOSEN_PENGAMPU.name}
         </span>
-        <span className="font-code text-[10px] sm:text-[11px] tracking-wider text-[#4A4A5A] mt-[0.2vh]">
+        <span className="font-code text-xs md:text-sm tracking-wider text-[#8A8A9A] mt-[0.3vh]">
           {DOSEN_PENGAMPU.nip}
         </span>
       </div>
 
       {/* Garis Separator */}
-      <div className="credit-item credit-separator my-3 md:my-[1.8vh] h-[1px] w-[160px] md:w-[200px] bg-[rgba(232,160,32,0.2)] origin-center" />
+      <div className="credit-item credit-separator my-3 md:my-[2vh] h-[1px] w-[220px] md:w-[280px] bg-[rgba(232,160,32,0.3)] origin-center" />
 
       {/* Label Tim Penyusun */}
-      <span className="credit-item credit-team-label font-code text-[10px] md:text-[11px] uppercase tracking-[0.35em] text-[#6B6B7A]">
+      <span className="credit-item credit-team-label font-code text-xs md:text-sm uppercase tracking-[0.35em] text-[#8A8A9A] font-medium">
         {TEAM_CREDIT_LABEL}
       </span>
 
       {/* 6 Anggota dalam Dua Kolom */}
-      <div className="mt-3 md:mt-[1.3vh] grid grid-cols-1 sm:grid-cols-2 gap-x-[5vw] gap-y-2.5 sm:gap-y-[1.1vh] text-center sm:text-left w-full max-w-[500px]">
+      <div className="mt-3 md:mt-[1.6vh] grid grid-cols-1 sm:grid-cols-2 gap-x-[6vw] gap-y-3 sm:gap-y-[1.4vh] text-center sm:text-left w-full max-w-[720px] md:max-w-[780px]">
         {/* Kolom Kiri */}
-        <div className="flex flex-col gap-2.5 sm:gap-[1.1vh]">
+        <div className="flex flex-col gap-3 sm:gap-[1.3vh]">
           {MEMBERS_LEFT.map((m) => (
             <div
               key={m.nim}
               className="credit-item credit-member-item flex flex-col"
             >
-              <span className="credit-member-name credit-shimmer-member font-display text-[clamp(1rem,1.4vw,1.45rem)]">
+              <span className="credit-member-name credit-shimmer-member font-display text-[clamp(1.15rem,1.65vw,1.8rem)]">
                 {m.name}
               </span>
-              <span className="font-code text-[10px] tracking-wider text-[#4A4A5A]">
+              <span className="font-code text-xs md:text-sm tracking-wider text-[#8A8A9A]">
                 {m.nim}
               </span>
             </div>
@@ -207,16 +207,16 @@ export default function FilmCreditRoll({
         </div>
 
         {/* Kolom Kanan */}
-        <div className="flex flex-col gap-2.5 sm:gap-[1.1vh]">
+        <div className="flex flex-col gap-3 sm:gap-[1.3vh]">
           {MEMBERS_RIGHT.map((m) => (
             <div
               key={m.nim}
               className="credit-item credit-member-item flex flex-col"
             >
-              <span className="credit-member-name credit-shimmer-member font-display text-[clamp(1rem,1.4vw,1.45rem)]">
+              <span className="credit-member-name credit-shimmer-member font-display text-[clamp(1.15rem,1.65vw,1.8rem)]">
                 {m.name}
               </span>
-              <span className="font-code text-[10px] tracking-wider text-[#4A4A5A]">
+              <span className="font-code text-xs md:text-sm tracking-wider text-[#8A8A9A]">
                 {m.nim}
               </span>
             </div>
@@ -225,7 +225,7 @@ export default function FilmCreditRoll({
       </div>
 
       {/* Program Studi Footer */}
-      <p className="credit-item credit-prodi mt-4 md:mt-[2.6vh] font-code text-[9px] md:text-[10px] tracking-[0.25em] md:tracking-[0.32em] text-[#4A4A5A] uppercase text-center max-w-[90vw]">
+      <p className="credit-item credit-prodi mt-5 md:mt-[3vh] font-code text-xs md:text-sm tracking-[0.25em] md:tracking-[0.32em] text-[#8A8A9A] uppercase text-center max-w-[92vw]">
         {PRODI_LABEL}
       </p>
     </div>

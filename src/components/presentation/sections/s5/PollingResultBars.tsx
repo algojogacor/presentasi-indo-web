@@ -34,35 +34,35 @@ export default function PollingResultBars({
   };
 
   return (
-    <div className="w-[32vw]">
-      <div className="mb-3 flex items-center gap-2.5">
+    <div className="w-[36vw]">
+      <div className="mb-3.5 flex flex-wrap items-center gap-2.5">
         <LiveDot />
-        <span className="font-code text-[10px] tracking-[0.2em] text-mute">
+        <span className="font-code text-xs sm:text-sm tracking-[0.2em] text-mute/90 font-medium">
           {live ? "LIVE" : "FINAL"} ·{" "}
-          <span key={total} className="count-flash">
+          <span key={total} className="count-flash text-ember font-bold">
             {total}
           </span>{" "}
           RESPONDEN
         </span>
         {live && devices > 0 && (
-          <span className="font-code text-[9px] tracking-[0.25em] text-paper/60">
+          <span className="font-code text-xs tracking-[0.2em] text-paper/70 font-medium">
             · {devices} PERANGKAT
           </span>
         )}
         {synced && live && (
-          <span className="font-code text-[9px] tracking-[0.25em] text-ember/80">
+          <span className="font-code text-xs tracking-[0.2em] text-ember font-medium">
             · SYNC
           </span>
         )}
         {fallback && (
-          <span className="font-code text-[9px] tracking-[0.2em] text-ember">
+          <span className="font-code text-xs tracking-[0.2em] text-ember font-medium">
             FALLBACK MANUAL
           </span>
         )}
       </div>
 
       {live && total === 0 && !fallback && (
-        <p className="mb-3 font-code text-[10px] tracking-[0.22em] text-mute/70 animate-pulse">
+        <p className="mb-3.5 font-code text-xs sm:text-sm tracking-[0.22em] text-mute/80 animate-pulse">
           MENUNGGU SUARA PERTAMA…
         </p>
       )}
@@ -71,30 +71,30 @@ export default function PollingResultBars({
         const isWinner = revealed && winners.includes(o.key);
         const isCorrect = revealed && o.correct;
         return (
-          <div key={o.key} className="mb-[0.9vh] flex items-center gap-3">
+          <div key={o.key} className="mb-[1.1vh] flex items-center gap-3">
             <span
-              className={`w-4 font-code text-[10px] ${
-                isWinner && !isCorrect ? "text-paper/75" : "text-mute"
+              className={`w-5 font-code text-xs sm:text-sm font-bold ${
+                isWinner && !isCorrect ? "text-paper" : isCorrect ? "text-ember" : "text-mute"
               }`}
             >
               {o.key}
             </span>
-            <div className="h-[10px] flex-1 bg-white/6">
+            <div className="h-[14px] flex-1 bg-white/10 rounded-sm overflow-hidden">
               <div
                 className={`pollbar h-full ${
                   isWinner
                     ? "pollbar-winner"
                     : isCorrect
                       ? "pollbar-correct"
-                      : "bg-ember/45"
+                      : "bg-ember/50"
                 }`}
                 style={{ width: `${pct(o.key)}%` }}
                 data-testid={`pollbar-${o.key}`}
               />
             </div>
             <span
-              className={`w-[4.5vw] text-right font-code text-[10px] ${
-                isWinner ? "text-paper/85" : "text-paper/70"
+              className={`w-[6vw] text-right font-code text-xs sm:text-sm font-semibold ${
+                isWinner ? "text-paper" : "text-paper/80"
               }`}
             >
               {counts[o.key] ?? 0} · {pct(o.key)}%

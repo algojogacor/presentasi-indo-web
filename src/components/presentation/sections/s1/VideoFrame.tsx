@@ -257,7 +257,7 @@ export default function VideoFrame({ step }: VideoFrameProps) {
   return (
     <div className="absolute inset-0 flex items-center justify-center px-4 sm:px-6">
       <div className="s1-frame relative w-[92vw] sm:w-[85vw] md:w-[min(62vw,148vh)]">
-        <div className="absolute -top-7 left-0 flex items-center gap-2 font-code text-[10px] tracking-[0.35em] text-mute">
+        <div className="absolute -top-8 left-0 flex items-center gap-2 font-code text-xs sm:text-sm tracking-[0.35em] text-mute/85 font-medium">
           <LiveDot />
           <span>GUEST LECTURER</span>
         </div>
@@ -283,16 +283,16 @@ export default function VideoFrame({ step }: VideoFrameProps) {
           )}
         </div>
 
-        <div className="mt-3 md:mt-4 flex flex-col sm:flex-row sm:items-end justify-between gap-2 sm:gap-6">
+        <div className="mt-3.5 md:mt-4 flex flex-col sm:flex-row sm:items-end justify-between gap-2.5 sm:gap-6">
           <div>
-            <p className="font-body text-[clamp(0.85rem,1.05vw,1.15rem)] leading-snug text-paper">
+            <p className="font-body text-base sm:text-lg md:text-xl font-medium leading-snug text-paper">
               Prof. Wisnu Jatmiko — Guru Besar Fasilkom UI
             </p>
-            <p className="mt-1 font-code text-[9px] sm:text-[10px] tracking-[0.18em] sm:tracking-[0.22em] text-mute">
+            <p className="mt-1 font-code text-xs sm:text-sm tracking-[0.18em] sm:tracking-[0.22em] text-mute/85">
               SERI METODOLOGI PENELITIAN &amp; PENULISAN ARTIKEL ILMIAH
             </p>
           </div>
-          <div className="text-left sm:text-right font-code text-[9px] sm:text-[10px] leading-[1.6] sm:leading-[1.8] tracking-[0.12em] text-mute">
+          <div className="text-left sm:text-right font-code text-xs sm:text-sm leading-[1.6] sm:leading-[1.8] tracking-[0.12em] text-mute/85">
             <p>BAB 5 · PART 1 — PENTINGNYA MENULIS</p>
             <p>LAB1231 FASILKOM UI · 04:41 · 1080p</p>
           </div>

@@ -23,21 +23,21 @@ export default function BattleCard({ card: c, index: i, compare }: BattleCardPro
       <header className="flex items-start justify-between gap-2">
         <div>
           <div className="flex items-center gap-2">
-            <p className="font-code text-[9px] tracking-[0.3em] text-ember">
+            <p className="font-code text-xs tracking-[0.25em] text-ember font-semibold">
               {c.sub}
             </p>
-            <span className="font-code text-[8px] text-mute/60 tracking-wider">
+            <span className="font-code text-xs text-mute/80 tracking-wider">
               0{i + 1}/04
             </span>
           </div>
-          <h3 className="mt-2 font-display text-[1.95vw] leading-none text-paper">
+          <h3 className="mt-2 font-display text-[clamp(1.35rem,2.1vw,2.4rem)] leading-tight text-paper font-semibold">
             {c.title}
           </h3>
         </div>
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded border border-white/5 bg-white/[0.02]">
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded border border-white/10 bg-white/[0.04]">
           <IconComp
-            className="h-[1.4vw] w-[1.4vw] text-ember/80"
-            strokeWidth={1.5}
+            className="h-5 w-5 md:h-[1.4vw] md:w-[1.4vw] text-ember"
+            strokeWidth={1.6}
             aria-hidden
           />
         </div>
@@ -57,13 +57,13 @@ export default function BattleCard({ card: c, index: i, compare }: BattleCardPro
               {r.hot && compare && (
                 <span className="h-1.5 w-1.5 rounded-full bg-ember animate-pulse shrink-0" />
               )}
-              <p className="font-code text-[8px] tracking-[0.28em] text-mute">
+              <p className="font-code text-[10.5px] md:text-xs tracking-[0.2em] font-semibold text-mute/90">
                 {r.k}
               </p>
             </div>
             <p
-              className={`mt-1 font-body text-[0.98vw] leading-snug ${
-                r.hot && compare ? "text-ember font-medium" : "text-paper/80"
+              className={`mt-1 font-body text-xs md:text-[1.12vw] leading-relaxed ${
+                r.hot && compare ? "text-ember font-semibold" : "text-paper/90"
               }`}
             >
               {r.v}
@@ -72,7 +72,7 @@ export default function BattleCard({ card: c, index: i, compare }: BattleCardPro
         ))}
       </div>
 
-      <p className="card-note absolute right-[1.3vw] bottom-[1.2vw] left-[1.3vw] border-t border-edge pt-3 font-display text-[1.05vw] italic text-paper/70 opacity-0">
+      <p className="card-note absolute right-[1.3vw] bottom-[1.2vw] left-[1.3vw] border-t border-edge pt-3 font-display text-xs md:text-[1.18vw] leading-snug italic text-paper/85 opacity-0">
         {c.note}
       </p>
     </article>

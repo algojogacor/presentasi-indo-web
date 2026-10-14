@@ -10,37 +10,37 @@ export default function ConclusionStepper({ step }: ConclusionStepperProps) {
   return (
     <div className="absolute inset-0 flex flex-col items-center justify-center px-[10vw] select-none z-10">
       {/* Stepper Indikator 4 Poin Simpulan */}
-      <div className="mb-[4.5vh] flex flex-wrap items-center justify-center gap-2.5">
+      <div className="mb-[4.5vh] flex flex-wrap items-center justify-center gap-3">
         {SIMPULAN_METAS.map((m, i) => {
           const isActive = step === i;
           const isPast = step > i;
           return (
             <div
               key={m.num}
-              className={`flex items-center gap-2 px-3.5 py-1.5 border transition-all duration-300 ${
+              className={`flex items-center gap-2.5 px-4 py-2 rounded border transition-all duration-300 ${
                 isActive
-                  ? "border-ember/80 bg-ember/10 text-ember shadow-[0_0_15px_rgba(232,160,32,0.15)]"
+                  ? "border-ember/90 bg-ember/15 text-ember shadow-[0_0_20px_rgba(232,160,32,0.2)]"
                   : isPast
-                    ? "border-edge/90 bg-surface/70 text-paper/70"
-                    : "border-edge/30 bg-transparent text-mute/35"
+                    ? "border-edge/90 bg-surface/80 text-paper/80"
+                    : "border-edge/30 bg-transparent text-mute/40"
               }`}
             >
               <span
-                className={`font-code text-[10px] font-bold ${
+                className={`font-code text-xs sm:text-sm font-bold ${
                   isActive
                     ? "text-ember"
                     : isPast
-                      ? "text-paper/70"
+                      ? "text-paper/80"
                       : "text-mute/40"
                 }`}
               >
                 {m.num}
               </span>
-              <span className="font-code text-[9.5px] tracking-[0.16em] uppercase">
+              <span className="font-code text-xs sm:text-sm tracking-[0.16em] uppercase font-semibold">
                 {m.tag}
               </span>
               {isActive && (
-                <span className="inline-block w-1.5 h-1.5 rounded-full bg-ember animate-pulse ml-0.5" />
+                <span className="inline-block w-2 h-2 rounded-full bg-ember animate-pulse ml-0.5" />
               )}
             </div>
           );
@@ -50,27 +50,27 @@ export default function ConclusionStepper({ step }: ConclusionStepperProps) {
       {/* Kotak Simpulan Aktif */}
       <div
         key={step}
-        className="fade-slide-in flex flex-col items-center text-center max-w-[72vw]"
+        className="fade-slide-in flex flex-col items-center text-center max-w-[78vw]"
       >
-        <div className="mb-4 inline-flex items-center gap-2 px-3 py-1 border border-edge/60 bg-surface/40 font-code text-[9px] tracking-[0.3em] text-ember uppercase">
+        <div className="mb-4 inline-flex items-center gap-2 px-3.5 py-1.5 border border-edge/60 bg-surface/60 font-code text-xs tracking-[0.25em] text-ember uppercase font-semibold">
           <span>SIMPULAN EKSEKUTIF</span>
           <span>·</span>
           <span>POIN {SIMPULAN_METAS[step]?.num ?? "01"} / 04</span>
         </div>
 
-        <p className="font-display italic text-[2.2vw] leading-[1.38] text-paper max-w-[68vw]">
+        <p className="font-display italic text-[clamp(1.6rem,2.8vw,3.2rem)] leading-[1.38] text-paper max-w-[74vw]">
           &ldquo;{SIMPULAN[step]}&rdquo;
         </p>
 
-        <div className="mt-[3.5vh] flex items-center gap-3 font-code text-[10px] tracking-[0.22em] text-mute/80">
-          <span className="w-8 h-[1px] bg-ember/40" />
+        <div className="mt-[3.5vh] flex items-center gap-3.5 font-code text-xs sm:text-sm tracking-[0.25em] text-mute/90 font-medium">
+          <span className="w-10 h-[1px] bg-ember/50" />
           <span>{SIMPULAN_METAS[step]?.sub.toUpperCase()}</span>
-          <span className="w-8 h-[1px] bg-ember/40" />
+          <span className="w-10 h-[1px] bg-ember/50" />
         </div>
       </div>
 
       {/* Label Sub-bab Bawah */}
-      <p className="absolute bottom-[6vh] font-code text-[9.5px] tracking-[0.25em] text-mute/40 uppercase">
+      <p className="absolute bottom-[6vh] font-code text-xs tracking-[0.25em] text-mute/60 uppercase font-medium">
         {`SIMPULAN 0${step + 1} / 04 · INTISARI AKADEMIK`}
       </p>
     </div>

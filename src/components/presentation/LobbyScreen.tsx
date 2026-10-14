@@ -56,17 +56,17 @@ export default function LobbyScreen({
         <div>
           <div className="flex items-center gap-2 mb-1">
             <span className="h-2 w-2 rounded-full bg-[#E8A020] animate-pulse" />
-            <span className="font-code text-[10px] sm:text-[11px] uppercase tracking-[0.3em] text-[#E8A020]">
+            <span className="font-code text-xs sm:text-sm uppercase tracking-[0.3em] text-[#E8A020] font-semibold">
               LOBI SESI PRESENTASI · UNIVERSITAS AIRLANGGA
             </span>
           </div>
-          <h1 className="font-display text-xl sm:text-2xl md:text-3xl font-bold text-[#F0EDE8]">
+          <h1 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-[#F0EDE8]">
             Anatomi Karya Tulis Ilmiah
           </h1>
         </div>
 
-        <div className="flex items-center gap-2.5 rounded-full border border-emerald-500/30 bg-emerald-950/20 px-3.5 py-1.5 font-code text-xs text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.15)]">
-          <Users className="w-3.5 h-3.5 text-emerald-400" />
+        <div className="flex items-center gap-2.5 rounded-full border border-emerald-500/40 bg-emerald-950/30 px-4 py-2 font-code text-xs sm:text-sm text-emerald-400 font-medium shadow-[0_0_20px_rgba(16,185,129,0.15)]">
+          <Users className="w-4 h-4 text-emerald-400" />
           <span>{audienceCount} Audiens Terhubung</span>
         </div>
       </div>
@@ -80,10 +80,10 @@ export default function LobbyScreen({
               <img
                 src={qrSrc}
                 alt={`QR code untuk bergabung ke sesi ${sessionCode}`}
-                className="h-52 w-52 sm:h-64 sm:w-64 md:h-72 md:w-72 object-contain rounded-lg"
+                className="h-56 w-56 sm:h-64 sm:w-64 md:h-80 md:w-80 object-contain rounded-lg"
               />
             ) : (
-              <div className="h-52 w-52 sm:h-64 sm:w-64 md:h-72 md:w-72 bg-white/5 animate-pulse rounded-lg flex items-center justify-center font-code text-xs text-mute">
+              <div className="h-56 w-56 sm:h-64 sm:w-64 md:h-80 md:w-80 bg-white/5 animate-pulse rounded-lg flex items-center justify-center font-code text-sm text-mute">
                 Menyiapkan QR...
               </div>
             )}
@@ -95,7 +95,7 @@ export default function LobbyScreen({
             <span className="absolute -bottom-2 -right-2 h-6 w-6 border-b-4 border-r-4 border-[#E8A020] rounded-br" />
           </div>
 
-          <p className="mt-3.5 font-code text-[11px] sm:text-xs font-semibold tracking-[0.25em] text-[#E8A020] uppercase text-center">
+          <p className="mt-4 font-code text-xs sm:text-sm md:text-base font-bold tracking-[0.25em] text-[#E8A020] uppercase text-center">
             Pindai dari Layar dengan Kamera HP
           </p>
         </div>
@@ -103,33 +103,33 @@ export default function LobbyScreen({
         {/* Kolom Kanan: Panduan Akses Manual & Kode Sesi */}
         <div className="space-y-5">
           <div>
-            <div className="inline-flex items-center gap-2 rounded bg-ember/15 px-2.5 py-1 font-code text-[10px] text-ember mb-2 border border-ember/30 uppercase tracking-widest">
-              <Sparkles className="w-3 h-3 text-ember" />
+            <div className="inline-flex items-center gap-2 rounded bg-ember/15 px-3 py-1 font-code text-xs text-ember mb-2 border border-ember/30 uppercase tracking-widest font-semibold">
+              <Sparkles className="w-3.5 h-3.5 text-ember" />
               <span>Sinkronisasi Real-Time</span>
             </div>
-            <h2 className="font-display text-2xl sm:text-3xl font-bold text-paper leading-snug">
+            <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold text-paper leading-snug">
               Ikuti Setiap Slide dari Smartphone Anda
             </h2>
-            <p className="mt-1.5 font-body text-xs sm:text-sm text-paper/75 leading-relaxed">
+            <p className="mt-2 font-body text-sm sm:text-base md:text-lg text-paper/85 leading-relaxed">
               Slide di ponsel Anda akan berpindah otomatis mengikuti layar proyektor secara real-time tanpa delay dan tanpa login.
             </p>
           </div>
 
           {/* Kotak Kode Sesi */}
-          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 sm:p-5 space-y-3">
-            <span className="font-code text-[10px] uppercase tracking-wider text-mute block">
+          <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 sm:p-5 space-y-3.5">
+            <span className="font-code text-xs uppercase tracking-wider text-mute/90 font-medium block">
               Atau Buka Tautan Manual
             </span>
 
             {/* URL Input Box */}
-            <div className="flex items-center gap-2 rounded-lg border border-edge bg-black/60 px-3 py-2 font-code text-xs sm:text-sm text-paper">
-              <span className="truncate flex-1 text-ember/90 select-all">
+            <div className="flex items-center gap-2 rounded-lg border border-edge bg-black/60 px-3.5 py-2.5 font-code text-sm text-paper">
+              <span className="truncate flex-1 text-ember font-medium select-all">
                 {fullAudienceUrl || "Memuat tautan..."}
               </span>
               <button
                 type="button"
                 onClick={copyUrl}
-                className="flex items-center gap-1.5 rounded bg-white/10 px-2.5 py-1 text-xs text-paper hover:bg-white/20 active:scale-95 transition-all shrink-0"
+                className="flex items-center gap-1.5 rounded bg-white/10 px-3 py-1.5 text-xs text-paper hover:bg-white/20 active:scale-95 transition-all shrink-0 font-medium"
               >
                 {copiedUrl ? (
                   <>
@@ -148,10 +148,10 @@ export default function LobbyScreen({
             {/* Kode Sesi Besar */}
             <div className="flex items-center justify-between pt-1">
               <div>
-                <span className="font-code text-[10px] text-mute uppercase tracking-widest block">
+                <span className="font-code text-xs text-mute/90 uppercase tracking-widest font-medium block">
                   Kode Sesi Unik
                 </span>
-                <span className="font-display text-2xl sm:text-3xl font-extrabold text-[#E8A020] tracking-widest">
+                <span className="font-display text-3xl sm:text-4xl md:text-5xl font-extrabold text-[#E8A020] tracking-widest">
                   {sessionCode}
                 </span>
               </div>
@@ -159,9 +159,9 @@ export default function LobbyScreen({
               <button
                 type="button"
                 onClick={copyCode}
-                className="inline-flex items-center gap-1.5 rounded-lg border border-[#E8A020]/40 bg-[#E8A020]/10 px-3 py-1.5 font-code text-xs text-[#E8A020] hover:bg-[#E8A020]/20 active:scale-95 transition-all"
+                className="inline-flex items-center gap-2 rounded-lg border border-[#E8A020]/40 bg-[#E8A020]/10 px-3.5 py-2 font-code text-xs sm:text-sm font-semibold text-[#E8A020] hover:bg-[#E8A020]/20 active:scale-95 transition-all"
               >
-                {copiedCode ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                {copiedCode ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 <span>{copiedCode ? "Kode Tersalin" : "Salin Kode"}</span>
               </button>
             </div>

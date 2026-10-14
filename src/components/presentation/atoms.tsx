@@ -21,7 +21,7 @@ export function Kicker({
       )}
     >
       <span aria-hidden className="h-px w-8 bg-ember/70" />
-      <span className="font-code text-[10px] tracking-[0.35em] text-mute">
+      <span className="font-code text-xs md:text-sm tracking-[0.35em] text-mute/85 font-medium">
         ACT {act} · {children}
       </span>
     </div>

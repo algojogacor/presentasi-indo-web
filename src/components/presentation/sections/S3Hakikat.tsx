@@ -48,18 +48,18 @@ export default function S3Hakikat({ step }: { step: number }) {
             key={d.by}
             data-step={i}
             data-exclusive
-            className="relative max-w-[92vw] md:max-w-[62vw]"
+            className="relative max-w-[94vw] md:max-w-[70vw]"
           >
             <span
               aria-hidden
-              className="absolute -top-6 sm:-top-[4.2vw] -left-2 sm:-left-[1.4vw] font-display text-[clamp(3rem,7vw,7rem)] leading-none text-ember/60 select-none"
+              className="absolute -top-6 sm:-top-[4.2vw] -left-2 sm:-left-[1.4vw] font-display text-[clamp(3.5rem,8vw,8rem)] leading-none text-ember/60 select-none"
             >
               &ldquo;
             </span>
-            <blockquote className="pl-5 sm:pl-[3.4vw] font-display italic text-[clamp(1.2rem,2.65vw,2.65rem)] leading-[1.3] text-paper">
+            <blockquote className="pl-5 sm:pl-[3.4vw] font-display italic text-[clamp(1.55rem,3.1vw,3.3rem)] leading-[1.35] text-paper">
               {d.text}
             </blockquote>
-            <figcaption className="mt-3 sm:mt-[1.8vw] pl-5 sm:pl-[3.4vw] font-code text-[10px] sm:text-[11px] tracking-[0.25em] sm:tracking-[0.32em] text-ember">
+            <figcaption className="mt-3.5 sm:mt-[2vw] pl-5 sm:pl-[3.4vw] font-code text-xs sm:text-sm md:text-base tracking-[0.25em] sm:tracking-[0.32em] text-ember font-semibold">
               — {d.by}
             </figcaption>
           </figure>
@@ -71,7 +71,7 @@ export default function S3Hakikat({ step }: { step: number }) {
         <div className="absolute inset-0 flex flex-col justify-center px-[9vw]">
           <p
             data-step="3"
-            className="mb-[1.2vw] border-t border-edge pt-4 font-code text-[10px] tracking-[0.32em] text-mute"
+            className="mb-[1.4vw] border-t border-edge pt-4 font-code text-xs sm:text-sm tracking-[0.32em] text-mute/90 font-medium"
           >
             LIMA KARAKTERISTIK KARYA TULIS ILMIAH
           </p>
@@ -79,15 +79,15 @@ export default function S3Hakikat({ step }: { step: number }) {
             <div
               key={c[0]}
               data-step={i + 3}
-              className="grid grid-cols-[5.5vw_15vw_1fr] items-baseline gap-[2vw] border-t border-edge py-[1.05vw]"
+              className="grid grid-cols-[5.5vw_16vw_1fr] items-baseline gap-[2vw] border-t border-edge py-[1.1vw]"
             >
-              <span className="font-display text-[2.7vw] leading-none text-ember/85">
+              <span className="font-display text-[clamp(1.8rem,2.8vw,3rem)] leading-none text-ember/85">
                 {c[0]}
               </span>
-              <span className="font-body text-[1.25vw] font-semibold uppercase tracking-[0.13em] text-paper">
+              <span className="font-body text-sm sm:text-base md:text-[1.4vw] font-semibold uppercase tracking-[0.12em] text-paper">
                 {c[1]}
               </span>
-              <span className="font-body text-[1.12vw] leading-snug text-mute">
+              <span className="font-body text-xs sm:text-sm md:text-[1.25vw] leading-relaxed text-paper/85">
                 {c[2]}
               </span>
             </div>

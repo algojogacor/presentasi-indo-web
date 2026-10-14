@@ -175,7 +175,7 @@ export default function DocumentSheet({ sheetRef }: DocumentSheetProps) {
           </div>
         </div>
       </div>
-      <div className="mt-3 flex items-center gap-3 font-code text-[9px] tracking-[0.25em] text-mute">
+      <div className="mt-3.5 flex items-center gap-3 font-code text-xs tracking-[0.25em] text-mute/85 font-medium">
         <span>SPECIMEN 01 — KTI/AKADEMIK</span>
         <span className="text-white/20">·</span>
         <span>PDB 93 UNAIR</span>

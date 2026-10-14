@@ -196,8 +196,8 @@ export default function S0Opening({ step }: { step: number }) {
             OUVERTURE
           </h1>
           {!isAudience && !ouStarted && (
-            <div className="ou-prompt mt-[4vh] flex items-center gap-2 rounded-full border border-[#E8A020]/30 bg-[#111118]/90 px-4 py-2 font-code text-xs tracking-wider text-[#E8A020] shadow-lg">
-              <span className="h-1.5 w-1.5 rounded-full bg-[#E8A020] animate-pulse" />
+            <div className="ou-prompt mt-[4vh] flex items-center gap-2 rounded-full border border-[#E8A020]/30 bg-[#111118]/90 px-5 py-2.5 font-code text-xs sm:text-sm font-semibold tracking-wider text-[#E8A020] shadow-lg">
+              <span className="h-2 w-2 rounded-full bg-[#E8A020] animate-pulse" />
               <span>KETUK ATAU TEKAN SPASI UNTUK MEMULAI</span>
             </div>
           )}
@@ -206,14 +206,14 @@ export default function S0Opening({ step }: { step: number }) {
 
       <p
         aria-label={SENTENCE}
-        className="s0-sentence absolute top-[38%] left-1/2 w-[88vw] md:w-[72vw] -translate-x-1/2 text-center font-display text-[clamp(1.15rem,2.5vw,2.5rem)] italic leading-snug text-paper/90 opacity-0"
+        className="s0-sentence absolute top-[38%] left-1/2 w-[90vw] md:w-[76vw] -translate-x-1/2 text-center font-display text-[clamp(1.5rem,3vw,3.2rem)] italic leading-snug text-paper/95 opacity-0"
       />
 
       <h1 ref={titleRef} className={`text-center leading-[0.95] transition-transform ${step === 2 ? "mt-4 md:mt-0" : ""}`}>
         <span className="block font-display font-semibold text-[clamp(2.6rem,7.5vw,7.8rem)] tracking-[0.02em] text-paper">
           <SplitChars text="ANATOMI" />
         </span>
-        <span className="mt-[0.5vw] block font-display italic font-medium text-[clamp(1.3rem,2.7vw,2.9rem)] text-paper/85">
+        <span className="mt-[0.6vw] block font-display italic font-medium text-[clamp(1.5rem,3.2vw,3.4rem)] text-paper/90">
           <SplitChars text="Karya Tulis Ilmiah" />
         </span>
       </h1>

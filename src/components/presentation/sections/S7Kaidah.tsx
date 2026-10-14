@@ -30,7 +30,7 @@ const POINTS: Point[] = [
         <>
           Data penelitian diolah secara online menggunakan metode deep learning
           dan data mining.
-          <span className="mt-3 block border-l-2 border-wrong pl-2 font-code text-[10px] tracking-[0.2em] text-wrong">
+          <span className="mt-3 block border-l-2 border-wrong pl-2 font-code text-xs tracking-[0.18em] text-wrong font-semibold">
             ISTILAH ASING TIDAK TERCETAK MIRING
           </span>
         </>
@@ -59,7 +59,7 @@ const POINTS: Point[] = [
         <>
           Di dalam penelitian ini adalah bertujuan untuk membahas daripada pengaruh
           struktur terhadap kualitas karya tulis ilmiah.
-          <span className="mt-3 block border-l-2 border-wrong pl-2 font-code text-[10px] tracking-[0.2em] text-wrong">
+          <span className="mt-3 block border-l-2 border-wrong pl-2 font-code text-xs tracking-[0.18em] text-wrong font-semibold">
             SUBJEK KABUR · KATA BERLEBIHAN
           </span>
         </>
@@ -86,7 +86,7 @@ const POINTS: Point[] = [
         <>
           Karya ilmiah adalah produk komunikasi akademik tertulis yang menyajikan
           gagasan rasional atau hasil investigasi empiris dengan metode ilmiah.
-          <span className="mt-3 block border-l-2 border-wrong pl-2 font-code text-[10px] tracking-[0.2em] text-wrong">
+          <span className="mt-3 block border-l-2 border-wrong pl-2 font-code text-xs tracking-[0.18em] text-wrong font-semibold">
             TANPA SITASI — KLAIM SEPIHAK (PLAGIARISME)
           </span>
         </>
@@ -125,38 +125,38 @@ export default function S7Kaidah({ step }: { step: number }) {
           data-exclusive
           className="absolute inset-0 flex flex-col justify-center pt-[6vh]"
         >
-          <p className="font-code text-[10px] tracking-[0.3em] text-ember">
+          <p className="font-code text-xs sm:text-sm tracking-[0.3em] text-ember font-medium">
             {p.idx} — {p.tag}
           </p>
-          <h2 className="mt-3 font-display text-[3.8vw] leading-[1.02] text-paper">
+          <h2 className="mt-3 font-display text-[clamp(2.2rem,3.8vw,4.2rem)] leading-[1.05] text-paper font-semibold">
             {p.title}
           </h2>
-          <p className="mt-4 max-w-[44vw] font-body text-[1.2vw] leading-relaxed text-mute">
+          <p className="mt-3.5 max-w-[90vw] md:max-w-[62vw] font-body text-sm sm:text-base md:text-[1.35vw] leading-relaxed text-paper/85">
             {p.desc}
           </p>
 
-          <div className="mt-[4vh] grid max-w-[76vw] grid-cols-2 gap-[2vw]">
-            <div className="rounded-r border-t-2 border-wrong/60 bg-wrong/[0.03] p-4 pt-3">
-              <div className="inline-flex items-center gap-1.5 rounded bg-wrong/15 px-2 py-0.5 font-code text-[8.5px] text-wrong mb-2 border border-wrong/30">
+          <div className="mt-[3.8vh] grid max-w-[82vw] grid-cols-2 gap-[2.4vw]">
+            <div className="rounded-r border-t-2 border-wrong/60 bg-wrong/[0.03] p-4 sm:p-5 pt-3.5">
+              <div className="inline-flex items-center gap-1.5 rounded bg-wrong/15 px-2.5 py-0.5 font-code text-xs text-wrong mb-2.5 border border-wrong/30 font-semibold">
                 <span className="h-1.5 w-1.5 rounded-full bg-wrong" />
                 <span>KETIDAKBAKUAN TEKS</span>
               </div>
-              <p className="font-code text-[10px] tracking-[0.25em] text-wrong">
+              <p className="font-code text-xs sm:text-sm tracking-[0.2em] text-wrong font-semibold">
                 {p.before.label}
               </p>
-              <p className="mt-3 font-body text-[1.3vw] leading-relaxed text-paper/75">
+              <p className="mt-3 font-body text-sm sm:text-base md:text-[1.45vw] leading-relaxed text-paper/80">
                 {p.before.body}
               </p>
             </div>
-            <div className="rounded-r border-t-2 border-ember bg-ember/[0.03] p-4 pt-3 shadow-[0_4px_25px_rgba(232,160,32,0.05)]">
-              <div className="inline-flex items-center gap-1.5 rounded bg-ember/15 px-2 py-0.5 font-code text-[8.5px] text-ember mb-2 border border-ember/30">
+            <div className="rounded-r border-t-2 border-ember bg-ember/[0.04] p-4 sm:p-5 pt-3.5 shadow-[0_4px_25px_rgba(232,160,32,0.06)]">
+              <div className="inline-flex items-center gap-1.5 rounded bg-ember/15 px-2.5 py-0.5 font-code text-xs text-ember mb-2.5 border border-ember/30 font-semibold">
                 <span className="h-1.5 w-1.5 rounded-full bg-ember animate-pulse" />
                 <span>STANDAR BAKU EYD V</span>
               </div>
-              <p className="font-code text-[10px] tracking-[0.25em] text-ember">
+              <p className="font-code text-xs sm:text-sm tracking-[0.2em] text-ember font-semibold">
                 {p.after.label}
               </p>
-              <p className="mt-3 font-body text-[1.3vw] leading-relaxed text-paper/95 font-medium">
+              <p className="mt-3 font-body text-sm sm:text-base md:text-[1.45vw] leading-relaxed text-paper/95 font-medium">
                 {p.after.body}
               </p>
             </div>
