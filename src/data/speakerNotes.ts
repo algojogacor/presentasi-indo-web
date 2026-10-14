@@ -108,12 +108,12 @@ export const SPEAKER_NOTES: Record<string, SpeakerNoteItem> = {
     section: 1,
     step: 3,
     actTitle: "BABAK 01 · KULIAH TAMU",
-    stepTitle: "Sintesis Pesan Guru Besar",
+    stepTitle: "Pondasi Struktur KTI (Sub-bab 1.1)",
     durationHint: "30-45 detik",
-    keyMessage: "Menyimpulkan video: gagasan ilmiah membutuhkan tubuh tulisan baku.",
-    visualContext: "Kutipan penutup: 'Gagasan ilmiah tidak akan pernah hidup tanpa sebuah tubuh tulisan yang baku' — Prof. Wisnu Jatmiko.",
-    spokenScript: `Kutipan ini menjadi fondasi seluruh presentasi kita hari ini: "Gagasan ilmiah tidak akan pernah hidup tanpa sebuah tubuh tulisan yang baku." Tanpa anatomi yang tepat, ide cemerlang hanya akan berhenti sebagai wacana, bukan karya ilmiah yang diakui komunitas akademik.`,
-    deliveryTips: ["Tegaskan kalimat ini sebagai jembatan menuju Babak Latar Belakang."],
+    keyMessage: "Menyimpulkan video: publikasi ilmiah memerlukan struktur anatomi yang kokoh.",
+    visualContext: "Pernyataan kunci Makalah Sub-bab 1.1: 'Memahami struktur sebuah karya ilmiah tidak hanya berkaitan dengan cara menulisnya secara teknis, tetapi sangat penting dalam membentuk argumen dan menyampaikan informasi ilmiah dengan baik dan benar.'",
+    spokenScript: `Sebagaimana ditekankan oleh Prof. Wisnu Jatmiko mengenai urgensi publikasi ilmiah, riset yang bermakna memerlukan wadah komunikasi yang tepat. Inilah yang menjadi landasan makalah kami di Sub-bab 1.1: memahami struktur karya ilmiah bukan sekadar persoalan teknis administratif, melainkan fondasi esensial dalam membentuk argumen logis dan menyampaikan kebenaran ilmiah secara sahih kepada masyarakat akademik.`,
+    deliveryTips: ["Tegaskan kalimat ini sebagai jembatan langsung menuju Babak Latar Belakang."],
   },
 
   // ========================================================

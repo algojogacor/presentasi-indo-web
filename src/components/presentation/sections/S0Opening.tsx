@@ -13,7 +13,7 @@ const SENTENCE =
   "Setiap karya ilmiah punya tubuh. Hari ini kita bedah anatominya.";
 
 export default function S0Opening({ step }: { step: number }) {
-  const { settled, registerTimeline, setStep } = usePres();
+  const { settled, registerTimeline, setStep, isAudience } = usePres();
   const root = useRef<HTMLDivElement>(null);
   const titleRef = useRef<HTMLHeadingElement>(null);
   const ouvertureRef = useRef<HTMLDivElement>(null);
@@ -183,8 +183,10 @@ export default function S0Opening({ step }: { step: number }) {
       {step === 0 && (
         <div
           ref={ouvertureRef}
-          onClick={startOuverture}
-          className="fixed inset-0 z-[75] flex cursor-pointer flex-col items-center justify-center bg-[#0A0A0F] px-4 select-none"
+          onClick={isAudience ? undefined : startOuverture}
+          className={`fixed inset-0 z-[75] flex flex-col items-center justify-center bg-[#0A0A0F] px-4 select-none ${
+            isAudience ? "cursor-default" : "cursor-pointer"
+          }`}
         >
           <span className="ou-kicker font-code text-xs md:text-sm uppercase tracking-[0.5em] text-[#E8A020] text-center">
             ANATOMI KARYA TULIS ILMIAH
@@ -193,7 +195,7 @@ export default function S0Opening({ step }: { step: number }) {
           <h1 className="ou-title font-display text-[clamp(3.5rem,15vw,12rem)] font-normal leading-[0.88] tracking-wide text-[#F0EDE8] text-center">
             OUVERTURE
           </h1>
-          {!ouStarted && (
+          {!isAudience && !ouStarted && (
             <div className="ou-prompt mt-[4vh] flex items-center gap-2 rounded-full border border-[#E8A020]/30 bg-[#111118]/90 px-4 py-2 font-code text-xs tracking-wider text-[#E8A020] shadow-lg">
               <span className="h-1.5 w-1.5 rounded-full bg-[#E8A020] animate-pulse" />
               <span>KETUK ATAU TEKAN SPASI UNTUK MEMULAI</span>
