@@ -155,4 +155,53 @@ describe("Unit: Presenter Workspace Isolation & Navigation", () => {
       expect(incomingMasterUpdate.section).toBe(3);
     });
   });
+
+  describe("Speaker Notes Fidelity with Makalah Kelompok 6", () => {
+    it("tidak memuat entitas asing seperti UNESCO, Brotowidjoyo, Jones, atau Kertas Kerja", () => {
+      const { SPEAKER_NOTES } = require("../../src/data/speakerNotes");
+      Object.values(SPEAKER_NOTES).forEach((note: any) => {
+        const fullContent = `${note.stepTitle} ${note.keyMessage} ${note.spokenScript}`.toLowerCase();
+        expect(fullContent).not.toContain("unesco");
+        expect(fullContent).not.toContain("brotowidjoyo");
+        expect(fullContent).not.toContain("jones (1960)");
+        expect(fullContent).not.toContain("kertas kerja");
+      });
+    });
+
+    it("menyelaraskan kutipan Babak 2 dengan Musdalifah et al. (2025) dan Baharuddin et al. (2025)", () => {
+      const { getSpeakerNote } = require("../../src/data/speakerNotes");
+      const s2_1 = getSpeakerNote(2, 1);
+      expect(s2_1).not.toBeNull();
+      expect(s2_1?.keyMessage).toContain("Musdalifah");
+      expect(s2_1?.spokenScript).toContain("Musdalifah");
+      expect(s2_1?.spokenScript).not.toContain("UNESCO");
+
+      const s2_2 = getSpeakerNote(2, 2);
+      expect(s2_2).not.toBeNull();
+      expect(s2_2?.spokenScript).toContain("Baharuddin");
+    });
+
+    it("menyelaraskan definisi Babak 3 dengan KBBI, Wulandari et al., dan Samal & Ardianto", () => {
+      const { getSpeakerNote } = require("../../src/data/speakerNotes");
+      const s3_0 = getSpeakerNote(3, 0);
+      expect(s3_0?.stepTitle).toContain("KBBI Daring");
+      expect(s3_0?.spokenScript).toContain("Badan Bahasa");
+
+      const s3_1 = getSpeakerNote(3, 1);
+      expect(s3_1?.stepTitle).toContain("Wulandari et al.");
+      expect(s3_1?.spokenScript).toContain("Wulandari");
+
+      const s3_2 = getSpeakerNote(3, 2);
+      expect(s3_2?.stepTitle).toContain("Samal & Ardianto");
+      expect(s3_2?.spokenScript).toContain("Samal");
+    });
+
+    it("menyelaraskan Babak 6 dengan variasi Proposal PKM Ditbelmawa Dikti 2023", () => {
+      const { getSpeakerNote } = require("../../src/data/speakerNotes");
+      const s6_4 = getSpeakerNote(6, 4);
+      expect(s6_4?.stepTitle).toContain("Proposal PKM");
+      expect(s6_4?.spokenScript).toContain("Pedoman");
+      expect(s6_4?.spokenScript).toContain("10 halaman");
+    });
+  });
 });
