@@ -201,7 +201,7 @@ describe("Unit: Presenter Workspace Isolation & Navigation", () => {
       const s6_4 = getSpeakerNote(6, 4);
       expect(s6_4?.stepTitle).toContain("Proposal PKM");
       expect(s6_4?.spokenScript).toContain("Pedoman");
-      expect(s6_4?.spokenScript).toContain("10 halaman");
+      expect(s6_4?.spokenScript).toContain("sepuluh halaman");
     });
   });
 });
