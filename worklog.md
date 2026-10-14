@@ -1723,3 +1723,37 @@ Work Log:
 
 Stage Summary:
 - Status: SELESAI & TERVERIFIKASI LIVE.
+
+---
+Task ID: 45
+Agent: main (Antigravity — Senior Full-Stack Engineer)
+Task: Multi-Session Isolation across Devices & Browser Tabs, Socket Room Scoping, and Audience Join Widget
+
+Work Log:
+1. Multi-Session Isolation (Tab & Device Scoped):
+   - `src/components/presentation/Experience.tsx`:
+     * Mengubah strategi penyimpanan `presentation_session_code` dan `presentation_presenter_token` ke `sessionStorage` (tab-scoped).
+     * Mencegah beberapa tab di satu browser menggunakan dan menimpa kode sesi yang sama. Setiap tab baru otomatis mendapatkan kode sesi dan token baru.
+     * Mendukung pembersihan parameter `?new` secara otomatis dari URL.
+   - `mini-services/live-notify/index.ts`:
+     * Memastikan event real-time `vote:new` dan `votes:reset` hanya dipancarkan ke ruangan sesi terkait via `io.to("session:" + code)`.
+     * Menghapus loop penghapusan sesi global di event legacy `notify:reset` sehingga reset sesi pada sesi A tidak pernah menghapus sesi B.
+     * Mengamankan `session:poll_reset` agar hanya membersihkan `votes` dan `idempotency` untuk sesi presenter yang berwenang.
+   - `src/components/presentation/sections/S5Polling.tsx` & `usePollingData.ts`:
+     * Melewatkan `sessionCode` aktif ke dalam `usePollingData`.
+     * Menonaktifkan polling interval HTTP global `/api/results` (SQLite) ketika berada dalam sesi aktif, sehingga hasil suara polling 100% menggunakan data terisolasi dari socket room `session:poll_results`.
+     * `resetPoll` presenter menggunakan event `session:poll_reset` yang terlingkup per sesi.
+2. Audience Join Widget on Lobby:
+   - `src/components/presentation/LobbyScreen.tsx`:
+     * Menambahkan widget "Bukan Pemateri? Masuk ke Sesi Audiens" dengan input kode sesi 4 karakter dan tombol "Ikuti Sesi".
+     * Memudahkan peserta yang membuka domain utama `/` pada ponsel untuk langsung melompat ke `/audience/[sessionCode]`.
+3. Verifikasi & Deployment:
+   - Menambahkan unit/integration test baru di `tests/integration/voting-api.test.ts` untuk memverifikasi isolasi reset polling antar sesi.
+   - Seluruh 62 automated tests lulus (100% pass, 0 fail).
+   - Build produksi Next.js (Turbopack) sukses tanpa error.
+   - Deployment ke Azure VM `forfh`, restart PM2 `presentasi` (id 2) dan `presentasi-notify` (id 5).
+   - HTTP 200 OK dan health check verified.
+
+Stage Summary:
+- Status: SELESAI & TERVERIFIKASI LIVE.
+
