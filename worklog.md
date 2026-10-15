@@ -1757,3 +1757,27 @@ Work Log:
 Stage Summary:
 - Status: SELESAI & TERVERIFIKASI LIVE.
 
+---
+Task ID: 46
+Agent: main (Antigravity — Senior Full-Stack Engineer)
+Task: Audit Konsistensi Materi & Tampilan Seluruh Mode Presentasi (Makalah as Single Source of Truth), Unifikasi Kanvas 1280x720, dan Deployment VM
+
+Work Log:
+1. Audit Materi & Penyelarasan Naskah Pembicara:
+   - Menyelaraskan seluruh 55 langkah presentasi terhadap naskah akademik `MAKALAH STRUKTUR KARYA ILMIAH KELOMPOK 6 PDB 93.md`.
+   - Mengoreksi `src/data/speakerNotes.ts` pada `s5_3` dan `s5_4` yang sebelumnya memuat naskah lama tentang integritas sitasi menjadi naskah Pertanyaan 2 Proposal PKM dan aturan ketat 10 halaman Simbelmawa (Dikti, 2023 & Tabel 2 Makalah).
+   - Memverifikasi steril dari entitas asing (UNESCO, Brotowidjoyo, Jones 1960, Kertas Kerja).
+2. Unifikasi Presentation Engine & Pencegahan Layout Distortion:
+   - `src/app/slide-embed/page.tsx`: Mendukung parameter dinamis `settled`, `isAudience`, `sessionCode`, dan `<div key={section}>` untuk remount bersih.
+   - `src/components/presentation/SlidePreviewBox.tsx`: Mengunci kanvas virtual pada 1280x720 standar proyektor. Mode simulator "9:16 HP" menampilkan frame smartphone proporsional dengan letterboxing yang merefleksikan tampilan asli audiens tanpa menggepengkan slide.
+   - `src/app/audience/[sessionCode]/page.tsx`: Me-render slide melalui iframe 1280x720 terisolasi sehingga unit `vw`/`vh` tidak terdistorsi oleh lebar layar HP (390px).
+   - Menambahkan floating mode switcher `[📺 Layar Slide Live]` vs `[🗳️ Lembar Voting]` di layar audiens saat polling aktif, mencegah hilangnya akses audiens terhadap slide proyektor dan grafik hasil voting live.
+3. Automated Tests & Build:
+   - Menambahkan test suite komprehensif `tests/unit/presentation-consistency.test.ts` (15 pengujian konsistensi makalah, naskah, dimensi kanvas, dan integritas sitasi).
+   - Seluruh 100 automated tests di repositori lulus 100% (0 fail).
+   - `bun run build` sukses 100% (Turbopack, exit code 0).
+
+Stage Summary:
+- Status: SELESAI & TERVERIFIKASI LOKAL & SIAP DEPLOY.
+
+

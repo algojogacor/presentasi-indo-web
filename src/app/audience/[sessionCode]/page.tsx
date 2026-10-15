@@ -5,20 +5,15 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import {
   Users,
-  Wifi,
   WifiOff,
   Sparkles,
-  Layers,
-  Clock,
-  ArrowRight,
-  BookOpen,
-  Info,
   CheckCircle2,
   AlertTriangle,
   Smartphone,
+  Tv,
+  Vote,
 } from "lucide-react";
-import { SECTIONS, PresCtx, type PresApi } from "@/components/presentation/context";
-import { SECTION_COMPONENTS } from "@/components/presentation/sections";
+import { SECTIONS } from "@/components/presentation/context";
 import {
   calculateCanvasScale,
   BASE_CANVAS_WIDTH,
@@ -86,7 +81,11 @@ export default function AudienceViewPage() {
     msg: string;
   } | null>(null);
 
+  // Tab audiens saat sesi polling aktif: "voting" (lembar suara) atau "slide" (layar proyektor live)
+  const [audienceTab, setAudienceTab] = useState<"slide" | "voting">("voting");
+
   const isMountedRef = useRef(true);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   // Sambungkan ke gateway sinkronisasi WebSocket
   useEffect(() => {
@@ -254,6 +253,60 @@ export default function AudienceViewPage() {
     setVoteNotice(null);
   }, [sessionData.polling?.questionId]);
 
+  // Dynamic settled state: Beri kesempatan timeline GSAP berjalan saat ganti slide/step
+  const [settled, setSettled] = useState(true);
+  const prevSlidePosRef = useRef({
+    section: sessionData.section,
+    step: sessionData.step,
+  });
+
+  useEffect(() => {
+    if (
+      sessionData.section !== prevSlidePosRef.current.section ||
+      sessionData.step !== prevSlidePosRef.current.step
+    ) {
+      prevSlidePosRef.current = {
+        section: sessionData.section,
+        step: sessionData.step,
+      };
+      setSettled(false);
+      const timer = setTimeout(() => {
+        setSettled(true);
+      }, 1600);
+      return () => clearTimeout(timer);
+    }
+  }, [sessionData.section, sessionData.step]);
+
+  // Sinkronisasi frame slide live (iframe) dengan state sesi terkini
+  const syncIframe = useCallback(() => {
+    if (!iframeRef.current || !iframeRef.current.contentWindow) return;
+    iframeRef.current.contentWindow.postMessage(
+      {
+        type: "SLIDE_CHANGE",
+        section: sessionData.section,
+        step: sessionData.step,
+        settled,
+        isAudience: true,
+        sessionCode,
+      },
+      "*",
+    );
+  }, [sessionData.section, sessionData.step, settled, sessionCode]);
+
+  useEffect(() => {
+    syncIframe();
+  }, [syncIframe]);
+
+  useEffect(() => {
+    const onMessage = (e: MessageEvent) => {
+      if (e.data && e.data.type === "PREVIEW_EMBED_READY") {
+        syncIframe();
+      }
+    };
+    window.addEventListener("message", onMessage);
+    return () => window.removeEventListener("message", onMessage);
+  }, [syncIframe]);
+
   // Pantau ukuran viewport untuk perhitungan contain scale kanvas 16:9
   const [viewport, setViewport] = useState({
     width: typeof window !== "undefined" ? window.innerWidth : BASE_CANVAS_WIDTH,
@@ -285,63 +338,22 @@ export default function AudienceViewPage() {
     [viewport],
   );
 
-  // Dynamic settled state: Beri kesempatan timeline GSAP berjalan saat ganti slide/step
-  const [settled, setSettled] = useState(true);
-  const prevSlidePosRef = useRef({
-    section: sessionData.section,
-    step: sessionData.step,
-  });
-
-  useEffect(() => {
-    if (
-      sessionData.section !== prevSlidePosRef.current.section ||
-      sessionData.step !== prevSlidePosRef.current.step
-    ) {
-      prevSlidePosRef.current = {
-        section: sessionData.section,
-        step: sessionData.step,
-      };
-      // Masuk langkah/babak baru: aktifkan animasi entrance
-      setSettled(false);
-      const timer = setTimeout(() => {
-        setSettled(true);
-      }, 1600);
-      return () => clearTimeout(timer);
-    }
-  }, [sessionData.section, sessionData.step]);
-
-  // Read-only PresApi untuk slide mirror normal (identik dengan master, tapi read-only)
-  const readOnlyPresApi = useMemo<PresApi>(
-    () => ({
-      section: sessionData.section,
-      step: sessionData.step,
-      settled,
-      setStep: () => {},
-      goto: () => {},
-      registerKeyHandler: () => {},
-      registerTimeline: (tl) => {
-        if (tl) {
-          tl.eventCallback("onComplete", () => {
-            setSettled(true);
-          });
-        }
-      },
-      hud: () => {},
-      sessionCode,
-      isAudience: true,
-    }),
-    [sessionData.section, sessionData.step, settled, sessionCode],
-  );
-
-  const CurrentSectionComp =
-    SECTION_COMPONENTS[sessionData.section] ?? SECTION_COMPONENTS[0];
-
   // Cek apakah mode polling aktif (open atau closed)
   const isPollingActive =
     sessionData.stage === "live" &&
     sessionData.polling &&
     sessionData.polling.status !== "inactive" &&
     sessionData.polling.questionId !== null;
+
+  // Saat polling aktif dan pengguna belum memilih, arahkan ke tab voting secara otomatis
+  useEffect(() => {
+    if (isPollingActive && sessionData.polling?.questionId) {
+      const qid = sessionData.polling.questionId;
+      if (!myVotes[qid]) {
+        setAudienceTab("voting");
+      }
+    }
+  }, [isPollingActive, sessionData.polling?.questionId, myVotes]);
 
   // 1. Tampilan Error / Kode Tidak Valid
   if (connectionStatus === "error") {
@@ -448,7 +460,7 @@ export default function AudienceViewPage() {
               </span>
             </div>
             <p className="font-body text-xs text-paper/70 leading-relaxed">
-              Layar ponsel Anda akan otomatis berpindah slide secara real-time mengikuti kendali pemateri di layar proyektor. Saat sesi polling tiba, lembar voting interaktif akan muncul otomatis di ponsel Anda tanpa perlu scan ulang.
+              Layar ponsel Anda akan otomatis menampilkan slide presentasi yang sama persis dengan layar proyektor secara real-time. Saat polling interaktif dibuka, lembar voting interaktif akan muncul langsung di ponsel Anda.
             </p>
           </div>
 
@@ -478,7 +490,7 @@ export default function AudienceViewPage() {
     );
   }
 
-  // 4. Tampilan Live (Slide Mirroring ATAU Live Polling Otomatis)
+  // 4. Tampilan Live (Slide Mirroring + Live Polling Terintegrasi)
   return (
     <div className="fixed inset-0 overflow-hidden bg-base text-paper select-none flex flex-col">
       <Grain />
@@ -527,9 +539,9 @@ export default function AudienceViewPage() {
         </div>
       </header>
 
-      {/* Konten Utama: Live Polling ATAU Slide Mirroring Biasa */}
-      {isPollingActive && sessionData.polling?.questionId ? (
-        <div className="relative flex-1 w-full h-full overflow-y-auto px-4 pt-16 sm:pt-20 pb-12 z-20">
+      {/* Konten Polling Sheet (Tampil saat mode polling aktif dan tab voting dipilih) */}
+      {isPollingActive && sessionData.polling?.questionId && audienceTab === "voting" && (
+        <div className="relative flex-1 w-full h-full overflow-y-auto px-4 pt-16 sm:pt-20 pb-20 z-20">
           <AudienceVotingCard
             sessionCode={sessionCode}
             questionId={sessionData.polling.questionId}
@@ -540,35 +552,83 @@ export default function AudienceViewPage() {
             onVote={handleVote}
           />
         </div>
-      ) : (
-        <div className="relative flex-1 w-full h-full flex items-center justify-center overflow-hidden bg-[#0A0A0F]">
-          {/* Proportional Scaling Canvas: 16:9 BASE_CANVAS_WIDTH x BASE_CANVAS_HEIGHT centered and letterboxed */}
-          <div
-            style={{
-              width: `${BASE_CANVAS_WIDTH}px`,
-              height: `${BASE_CANVAS_HEIGHT}px`,
-              transform: `scale(${scaleResult.scale})`,
-              transformOrigin: "center center",
-              flexShrink: 0,
-            }}
-            className="relative overflow-hidden bg-base text-paper select-none shadow-2xl"
-          >
-            <div key={sessionData.section} className="absolute inset-0">
-              <PresCtx.Provider value={readOnlyPresApi}>
-                <CurrentSectionComp step={sessionData.step} />
-              </PresCtx.Provider>
+      )}
+
+      {/* Konten Slide Canvas Mirror (Selalu dipertahankan, hidden jika sedang di tab voting) */}
+      <div
+        className={`relative flex-1 w-full h-full flex items-center justify-center overflow-hidden bg-[#0A0A0F] ${
+          isPollingActive && sessionData.polling?.questionId && audienceTab === "voting"
+            ? "hidden"
+            : "flex"
+        }`}
+      >
+        {/* Proportional Scaling Canvas: 16:9 BASE_CANVAS_WIDTH x BASE_CANVAS_HEIGHT centered and letterboxed */}
+        <div
+          style={{
+            width: `${BASE_CANVAS_WIDTH}px`,
+            height: `${BASE_CANVAS_HEIGHT}px`,
+            transform: `scale(${scaleResult.scale})`,
+            transformOrigin: "center center",
+            flexShrink: 0,
+          }}
+          className="relative overflow-hidden bg-base text-paper select-none shadow-2xl"
+        >
+          <iframe
+            ref={iframeRef}
+            src={`/slide-embed?section=${sessionData.section}&step=${sessionData.step}&audience=1&sessionCode=${sessionCode}`}
+            title="Layar Presentasi Utama"
+            className="w-full h-full border-0 select-none bg-[#0A0A0F] pointer-events-none"
+            onLoad={() => syncIframe()}
+          />
+        </div>
+
+        {/* Orientation Hint on Portrait Devices */}
+        {scaleResult.isPortrait && !isPollingActive && (
+          <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
+            <div className="flex items-center gap-2 rounded-full border border-amber-500/40 bg-black/90 backdrop-blur px-3.5 py-1.5 font-code text-[10.5px] text-paper shadow-2xl">
+              <Smartphone className="w-3.5 h-3.5 text-[#E8A020] animate-pulse" />
+              <span>Putar layar ke landscape untuk tampilan penuh</span>
             </div>
           </div>
+        )}
+      </div>
 
-          {/* Orientation Hint on Portrait Devices */}
-          {scaleResult.isPortrait && (
-            <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
-              <div className="flex items-center gap-2 rounded-full border border-amber-500/40 bg-black/90 backdrop-blur px-3.5 py-1.5 font-code text-[10.5px] text-paper shadow-2xl">
-                <Smartphone className="w-3.5 h-3.5 text-[#E8A020] animate-pulse" />
-                <span>Putar layar ke landscape untuk tampilan penuh</span>
-              </div>
-            </div>
-          )}
+      {/* Floating Mode Switcher saat Sesi Polling Berlangsung: Audiens bebas melihat Slide Live vs Lembar Voting */}
+      {isPollingActive && sessionData.polling?.questionId && (
+        <div className="fixed bottom-3 left-1/2 -translate-x-1/2 z-50 pointer-events-auto">
+          <div className="flex items-center gap-1 p-1 rounded-full border border-white/20 bg-black/90 backdrop-blur-md shadow-2xl">
+            <button
+              type="button"
+              onClick={() => setAudienceTab("slide")}
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-code text-[11px] sm:text-xs font-semibold transition-all ${
+                audienceTab === "slide"
+                  ? "bg-[#E8A020] text-black shadow-md font-bold"
+                  : "text-mute hover:text-paper"
+              }`}
+            >
+              <Tv className="w-3.5 h-3.5" />
+              <span>Layar Slide Live</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setAudienceTab("voting")}
+              className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full font-code text-[11px] sm:text-xs font-semibold transition-all ${
+                audienceTab === "voting"
+                  ? "bg-[#E8A020] text-black shadow-md font-bold"
+                  : "text-mute hover:text-paper"
+              }`}
+            >
+              <Vote className="w-3.5 h-3.5" />
+              <span>Lembar Voting</span>
+              {sessionData.polling.status === "open" &&
+                !myVotes[sessionData.polling.questionId] && (
+                  <span className="absolute -top-0.5 -right-0.5 flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
+                  </span>
+                )}
+            </button>
+          </div>
         </div>
       )}
 
