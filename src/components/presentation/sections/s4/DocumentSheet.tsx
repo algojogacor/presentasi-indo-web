@@ -10,7 +10,7 @@ export default function DocumentSheet({ sheetRef }: DocumentSheetProps) {
     <div className="relative flex flex-col items-center">
       <div
         ref={sheetRef}
-        className="relative h-[min(46vh,54vw)] sm:h-[min(58vh,58vw)] md:h-[min(70vh,44vw)] lg:h-[min(74vh,38vw)] xl:h-[min(76vh,36vw)] border border-white/20 bg-[#090910] opacity-0 shadow-[0_0_50px_rgba(232,160,32,0.1),0_20px_50px_rgba(0,0,0,0.95)] shrink-0"
+        className="relative h-[min(52vh,85vw)] sm:h-[min(65vh,70vw)] md:h-[80vh] lg:h-[82vh] xl:h-[84vh] border border-white/20 bg-[#090910] opacity-0 shadow-[0_0_60px_rgba(232,160,32,0.12),0_25px_60px_rgba(0,0,0,0.95)] shrink-0"
         style={{ aspectRatio: "1 / 1.414" }}
       >
         {/* Tanda pojok bidang rontgen (crosshair kalibrasi) */}
@@ -27,7 +27,7 @@ export default function DocumentSheet({ sheetRef }: DocumentSheetProps) {
         )}
 
         {/* Header Metadata Kalibrasi Spesimen */}
-        <div className="absolute top-2.5 inset-x-3.5 sm:inset-x-4 flex items-center justify-between border-b border-white/10 pb-1.5 select-none">
+        <div className="absolute top-2 sm:top-2.5 inset-x-3 sm:inset-x-4 flex items-center justify-between border-b border-white/10 pb-1 select-none">
           <span className="font-code text-[8.5px] sm:text-[9.5px] tracking-[0.25em] text-mute/90 font-medium">
             DOKUMEN · KTI — RONTGEN STRUKTURAL
           </span>
@@ -38,42 +38,54 @@ export default function DocumentSheet({ sheetRef }: DocumentSheetProps) {
 
         <div className="scanline" aria-hidden />
 
-        <div className="absolute inset-x-3 sm:inset-x-3.5 top-9 sm:top-10 bottom-3 sm:bottom-3.5 flex flex-col gap-1.5">
+        <div className="absolute inset-x-3 sm:inset-x-3.5 top-8 sm:top-9 bottom-2.5 sm:bottom-3 flex flex-col gap-1.5 sm:gap-2">
           {/* --- ZONE 1: PRELIMINARIES --- */}
           <div
             data-part="1"
-            className="zone relative flex h-[21%] flex-col rounded-[2px] border border-edge px-2 opacity-35"
+            className="zone relative flex h-[28%] flex-col justify-between rounded-[2px] border border-edge p-2 sm:p-2.5 opacity-35 overflow-hidden"
           >
-            <div className="flex items-center justify-between pt-0.5">
-              <span className="z-label font-code text-[9px] sm:text-[10px] tracking-[0.28em] text-mute font-semibold">
+            <div className="flex items-center justify-between pb-1 border-b border-white/5 shrink-0">
+              <span className="z-label font-code text-[8.5px] sm:text-[9.5px] tracking-[0.25em] text-mute font-semibold">
                 PRELIMINARIES
               </span>
-              <span className="font-code text-[7.5px] sm:text-[8.5px] text-mute/70 tracking-wider">
+              <span className="font-code text-[7px] sm:text-[8px] text-mute/70 tracking-wider">
                 MARGIN 4-4-3-3 CM
               </span>
             </div>
-            <div className="flex flex-1 flex-col gap-[5px] pt-1">
-              <div className="z-line h-[8px] w-[58%] self-center bg-ember/65 rounded-full" />
-              <div className="z-line h-[3px] w-[28%] self-center bg-white/22 rounded-full" />
-              <div className="z-line h-[3px] w-[72%] self-center bg-white/22 rounded-full" />
-              <div className="z-block flex flex-col gap-[3px] border border-white/20 bg-white/[0.02] p-1 sm:p-1.5 rounded-[1px]">
-                <div className="z-line h-[2.5px] w-[88%] bg-white/25 rounded-full" />
-                <div className="z-line h-[2.5px] w-[94%] bg-white/25 rounded-full" />
-                <div className="z-line h-[2.5px] w-[62%] bg-white/25 rounded-full" />
-                <span className="z-tag font-code text-[8px] sm:text-[9px] tracking-[0.2em] text-ember font-bold opacity-0 pt-0.5">
-                  ABSTRAK & KATA KUNCI
-                </span>
+
+            <div className="flex flex-1 flex-col justify-between pt-1 overflow-hidden">
+              {/* Header bars: Judul KTI & Penulis */}
+              <div className="flex flex-col items-center gap-1 shrink-0">
+                <div className="z-line h-[5px] sm:h-[6px] w-[62%] bg-ember/65 rounded-full" />
+                <div className="z-line h-[2px] sm:h-[2.5px] w-[32%] bg-white/22 rounded-full" />
               </div>
-              <div className="flex flex-col gap-[3px]">
-                {[0, 1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center gap-1.5">
-                    <div className="z-line h-[2.5px] flex-1 bg-white/22 rounded-full" />
-                    <div className="z-line h-[2.5px] w-[8px] bg-white/35 rounded-full" />
+
+              {/* Box Abstrak & Kata Kunci */}
+              <div className="z-block flex flex-col gap-1 border border-white/15 bg-white/[0.02] p-1.5 rounded-[1px] shrink-0">
+                <div className="flex items-center justify-between">
+                  <span className="z-tag font-code text-[7.5px] sm:text-[8px] tracking-[0.18em] text-ember font-bold opacity-0">
+                    ABSTRAK & KATA KUNCI
+                  </span>
+                  <div className="z-line h-[1.5px] w-8 bg-white/18 rounded-full" />
+                </div>
+                <div className="z-line h-[2px] w-[94%] bg-white/20 rounded-full" />
+                <div className="z-line h-[2px] w-[82%] bg-white/20 rounded-full" />
+              </div>
+
+              {/* Daftar Isi & Tabel */}
+              <div className="flex flex-col gap-1 shrink-0 pb-0.5">
+                <div className="flex items-center justify-between">
+                  <span className="z-tag font-code text-[7.5px] sm:text-[8px] tracking-[0.18em] text-ember font-bold opacity-0">
+                    DAFTAR ISI & TABEL
+                  </span>
+                  <div className="z-line h-[1.5px] w-6 bg-white/18 rounded-full" />
+                </div>
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <div className="z-line h-[1.5px] flex-1 bg-white/20 rounded-full" />
+                    <div className="z-line h-[1.5px] w-3 bg-white/35 rounded-full" />
                   </div>
                 ))}
-                <span className="z-tag font-code text-[8px] sm:text-[9px] tracking-[0.2em] text-ember font-bold opacity-0 pt-0.5">
-                  DAFTAR ISI & TABEL
-                </span>
               </div>
             </div>
           </div>
@@ -81,19 +93,19 @@ export default function DocumentSheet({ sheetRef }: DocumentSheetProps) {
           {/* --- ZONE 2: BODY TEXT (DENGAN TULANG PUNGGUNG KOHERENSI) --- */}
           <div
             data-part="2"
-            className="zone relative flex h-[55%] flex-col rounded-[2px] border border-edge px-2 opacity-35"
+            className="zone relative flex h-[48%] flex-col rounded-[2px] border border-edge px-2 py-1.5 opacity-35 overflow-hidden"
           >
-            <div className="flex items-center justify-between pt-0.5">
-              <span className="z-label font-code text-[9px] sm:text-[10px] tracking-[0.28em] text-mute font-semibold">
+            <div className="flex items-center justify-between pb-1 border-b border-white/5 shrink-0">
+              <span className="z-label font-code text-[8.5px] sm:text-[9.5px] tracking-[0.25em] text-mute font-semibold">
                 BODY TEXT
               </span>
-              <span className="font-code text-[7.5px] sm:text-[8.5px] text-ember/85 tracking-wider font-medium">
+              <span className="font-code text-[7px] sm:text-[8px] text-ember/85 tracking-wider font-medium">
                 RONGGA ARGUMEN UTAMA
               </span>
             </div>
 
             {/* Tulang Punggung Koherensi Riset (Spine of Coherence) */}
-            <div className="flex flex-1 gap-2 pt-1">
+            <div className="flex flex-1 gap-2 pt-1 overflow-hidden">
               {/* Garis Konektor Tulang Punggung Vertikal */}
               <div className="relative w-[3.5px] shrink-0 flex flex-col items-center justify-around py-1">
                 <div className="absolute inset-y-1 w-[1.5px] bg-white/20" />
@@ -111,12 +123,12 @@ export default function DocumentSheet({ sheetRef }: DocumentSheetProps) {
               </div>
 
               {/* 5 Segmen Bab */}
-              <div className="flex flex-1 flex-col gap-1">
+              <div className="flex flex-1 flex-col gap-1 overflow-hidden">
                 {ROMAN.map((r, i) => (
                   <div
                     key={r}
                     data-bab={i}
-                    className="bab relative flex flex-1 flex-col justify-center rounded-[2px] border border-white/8 px-2"
+                    className="bab relative flex flex-1 flex-col justify-center rounded-[2px] border border-white/8 px-2 overflow-hidden"
                   >
                     <div className="flex items-center gap-2">
                       <span className="bab-num font-code text-[8px] sm:text-[9px] font-semibold text-mute">
@@ -130,10 +142,10 @@ export default function DocumentSheet({ sheetRef }: DocumentSheetProps) {
                     <span className="bab-title absolute right-2.5 top-0.5 sm:top-1 font-code text-[8px] sm:text-[9px] tracking-[0.16em] text-paper/85 font-medium opacity-0">
                       BAB {r} — {["PENDAHULUAN", "TINJAUAN PUSTAKA", "METODE", "HASIL & PEMBAHASAN", "SIMPULAN & SARAN"][i]}
                     </span>
-                    <div className="bab-sub hidden flex-col gap-[2.5px] overflow-hidden pt-1 opacity-0">
-                      <div className="h-[2.5px] w-[92%] bg-white/30 rounded-full" />
-                      <div className="h-[2.5px] w-[86%] bg-white/30 rounded-full" />
-                      <div className="h-[2.5px] w-[90%] bg-white/30 rounded-full" />
+                    <div className="bab-sub hidden flex-col gap-[2px] overflow-hidden pt-1 opacity-0">
+                      <div className="h-[2px] w-[92%] bg-white/30 rounded-full" />
+                      <div className="h-[2px] w-[86%] bg-white/30 rounded-full" />
+                      <div className="h-[2px] w-[90%] bg-white/30 rounded-full" />
                     </div>
                   </div>
                 ))}
@@ -144,30 +156,32 @@ export default function DocumentSheet({ sheetRef }: DocumentSheetProps) {
           {/* --- ZONE 3: POSTLIMINARIES --- */}
           <div
             data-part="3"
-            className="zone relative flex h-[24%] flex-col rounded-[2px] border border-edge px-2 opacity-35"
+            className="zone relative flex h-[24%] flex-col justify-between rounded-[2px] border border-edge p-2 sm:p-2.5 opacity-35 overflow-hidden"
           >
-            <div className="flex items-center justify-between pt-0.5">
-              <span className="z-label font-code text-[9px] sm:text-[10px] tracking-[0.28em] text-mute font-semibold">
+            <div className="flex items-center justify-between pb-1 border-b border-white/5 shrink-0">
+              <span className="z-label font-code text-[8.5px] sm:text-[9.5px] tracking-[0.25em] text-mute font-semibold">
                 POSTLIMINARIES
               </span>
-              <span className="font-code text-[7.5px] sm:text-[8.5px] text-mute/70 tracking-wider">
+              <span className="font-code text-[7px] sm:text-[8px] text-mute/70 tracking-wider">
                 BUKTI JEJAK & INTEGRITAS
               </span>
             </div>
-            <div className="flex flex-1 flex-col gap-[5px] pt-1">
-              <div className="flex flex-col gap-[3px] pl-1.5">
-                {[0, 1, 2, 3].map((i) => (
-                  <div key={i} className="z-line h-[2.5px] bg-white/22 rounded-full" style={{ width: `${88 - i * 8}%` }} />
+            <div className="flex flex-1 flex-col justify-around pt-1 overflow-hidden">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center justify-between">
+                  <span className="z-tag font-code text-[7.5px] sm:text-[8px] tracking-[0.18em] text-ember font-bold opacity-0">
+                    DAFTAR PUSTAKA (APA 7TH)
+                  </span>
+                  <div className="z-line h-[1.5px] w-6 bg-white/18 rounded-full" />
+                </div>
+                {[0, 1, 2].map((i) => (
+                  <div key={i} className="z-line h-[2px] bg-white/20 rounded-full" style={{ width: `${88 - i * 8}%` }} />
                 ))}
-                <span className="z-tag font-code text-[8px] sm:text-[9px] tracking-[0.2em] text-ember font-bold opacity-0 pt-0.5">
-                  DAFTAR PUSTAKA (APA 7TH)
-                </span>
               </div>
-              <div className="flex items-center gap-2 pl-1.5">
-                <div className="z-line h-[10px] w-[10px] border border-white/25 rounded-[1px]" />
-                <div className="z-line h-[10px] w-[10px] border border-white/25 rounded-[1px]" />
-                <div className="z-line h-[3px] w-[40%] bg-white/22 rounded-full" />
-                <span className="z-tag font-code text-[8px] sm:text-[9px] tracking-[0.2em] text-ember font-bold opacity-0 pt-0.5">
+              <div className="flex items-center gap-2.5 pt-0.5">
+                <div className="z-line h-[12px] w-[12px] border border-white/25 rounded-[1px] shrink-0" />
+                <div className="z-line h-[12px] w-[12px] border border-white/25 rounded-[1px] shrink-0" />
+                <span className="z-tag font-code text-[7.5px] sm:text-[8px] tracking-[0.18em] text-ember font-bold opacity-0">
                   LAMPIRAN RESMI
                 </span>
               </div>
@@ -175,7 +189,7 @@ export default function DocumentSheet({ sheetRef }: DocumentSheetProps) {
           </div>
         </div>
       </div>
-      <div className="mt-2.5 sm:mt-3 flex items-center gap-2.5 sm:gap-3 font-code text-[11px] sm:text-xs tracking-[0.25em] text-mute/85 font-medium select-none">
+      <div className="mt-2 flex items-center gap-2.5 font-code text-[11px] sm:text-xs tracking-[0.25em] text-mute/85 font-medium select-none">
         <span>SPECIMEN 01 — KTI/AKADEMIK</span>
         <span className="text-white/20">·</span>
         <span>PDB 93 UNAIR</span>

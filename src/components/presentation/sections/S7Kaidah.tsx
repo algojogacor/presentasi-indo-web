@@ -123,7 +123,7 @@ export default function S7Kaidah({ step }: { step: number }) {
           key={p.idx}
           data-step={i}
           data-exclusive
-          className="absolute inset-0 flex flex-col justify-center pt-[6vh]"
+          className="absolute inset-0 flex flex-col justify-center px-6 sm:px-[8vw] md:px-[9vw] pt-[6vh]"
         >
           <p className="font-code text-xs sm:text-sm tracking-[0.3em] text-ember font-medium">
             {p.idx} — {p.tag}
