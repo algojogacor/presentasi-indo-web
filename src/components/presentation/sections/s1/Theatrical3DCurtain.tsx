@@ -92,117 +92,83 @@ const VELVET_VERTEX_SHADER = /* glsl */ `
     float u = uv.x; // 0 di dinding samping, 1 di garis belahan tengah
     float v = uv.y; // 0 di lantai bawah, 1 di gantungan atas
 
-    // Ketinggian tali pengikat emas (tieback) di sekitar 36% dari bawah
-    float tiebackV = 0.36;
-    float distToTie = v - tiebackV;
+    // Profil bukaan mulus dan anggun di sepanjang tinggi panggung
+    // Rel atas (track), tengah (waist), dan bawah (hem) bergerak dengan inersia harmonis
+    float verticalOpenProfile = mix(uHemOpen, uTrackOpen, v);
+    // Kelenturan organik kain di bagian tengah saat ditarik
+    verticalOpenProfile = mix(verticalOpenProfile, uWaistOpen, sin(v * 3.14159265) * 0.3);
 
-    // Interpolasi profil bukaan vertikal:
-    // Bagian pinggang (tieback) ditarik paling jauh ke samping, membentuk lekukan opera
-    float verticalOpenProfile;
-    if (v >= tiebackV) {
-      float tTop = (v - tiebackV) / (1.0 - tiebackV);
-      // Kurva catenary anggun dari tali pengikat menuju rel atas
-      float catenary = pow(tTop, 1.35);
-      verticalOpenProfile = mix(uWaistOpen, uTrackOpen * 0.94, catenary);
-      // Lekukan gorden mewah (swag scoop) di paruh atas saat terbuka
-      verticalOpenProfile += sin(tTop * 3.14159265) * 0.065 * uWaistOpen;
-    } else {
-      float tBot = v / tiebackV;
-      // Bagian bawah mengembang membentuk rok lonceng (bell skirt) di bawah tali emas
-      float skirtCurve = 1.0 - pow(1.0 - tBot, 1.65);
-      verticalOpenProfile = mix(uHemOpen * 0.89, uWaistOpen, skirtCurve);
-    }
+    float openAmount = clamp(verticalOpenProfile, 0.0, 1.0);
+    outGather = openAmount;
 
-    float openAmount = clamp(verticalOpenProfile, 0.0, 1.08);
-    outGather = clamp(openAmount, 0.0, 1.0);
+    // Batas luar tirai (terkunci di luar frame panggung)
+    float outerEdgeX = 0.54 * uStageWidth;
 
-    // Batas luar tirai (terkunci di luar bingkai layar agar tidak pernah bocor)
-    float outerEdgeX = 0.545 * uStageWidth;
-
-    // Saat tertutup (open = 0), tepi dalam sedikit melewati titik 0.0 (-0.018)
-    // agar kedua tirai saling bertumpuk rapat di tengah tanpa celah.
-    // Saat terbuka penuh (open = 1), tepi dalam ditarik ke 0.425 * uStageWidth
-    // sehingga 85% area tengah layar bersih total untuk video YouTube.
+    // Saat tertutup (open = 0), kedua tirai saling tumpuk rapat di tengah (-0.016)
+    // Saat terbuka penuh (open = 1), tirai terkumpul anggun di tepi panggung (0.442 * uStageWidth)
+    // menyisakan 88% area tengah panggung bersih total tanpa menghalangi video YouTube
     float closedInnerX = -0.016 * uStageWidth;
-    float openInnerTargetX = 0.432 * uStageWidth;
+    float openInnerTargetX = 0.442 * uStageWidth;
 
-    // Tambahan cekungan khusus di titik pinggang tali emas
-    float waistPinchEnv = exp(-pow(distToTie / 0.19, 2.0));
-    float innerEdgeX = mix(closedInnerX, openInnerTargetX, openAmount)
-                     + waistPinchEnv * 0.032 * uStageWidth * uWaistOpen;
+    float innerEdgeX = mix(closedInnerX, openInnerTargetX, openAmount);
 
-    // Distribusi non-linear sepanjang u: saat tirai ditarik, kain menumpuk lebih rapat
-    // di dekat tepi dalam & ikatan tali emas
-    float bunchPower = mix(1.0, 0.76, outGather * (0.6 + 0.4 * waistPinchEnv));
+    // Saat tirai membuka ke tepi, kain terkumpul padat (accordion pleat bunching)
+    float bunchPower = mix(1.0, 0.82, outGather);
     float uShaped = pow(u, bunchPower);
 
     float baseX = mix(outerEdgeX, innerEdgeX, uShaped);
 
     // ---- LIPATAN KAIN (MULTI-HARMONIC PLEATS) ----
-    // Sedikit perbedaan fase antara tirai kiri & kanan agar terlihat organik
     float sideSeed = uSide * 0.45;
-    // Gravitasi membuat lipatan di bagian atas lebih rapat & bagian bawah lebih lebar
-    float gravitySpread = mix(1.06, 0.94, v);
+    float gravitySpread = mix(1.04, 0.96, v);
     float theta = (u * uPleatCount * gravitySpread * 6.2831853) + sideSeed;
 
-    // Gelombang lipatan utama + harmonik ke-2 (membentuk lipatan pipa khas beludru berat)
-    // + harmonik ke-3 untuk detail mikro-lipatan
+    // Gelombang lipatan utama + harmonik ke-2 (lipatan pipa beludru tebal) + mikro-lipatan
     float primaryWave = sin(theta);
-    float pipeWave = -0.26 * sin(2.0 * theta + 0.7);
-    float microCrease = 0.09 * cos(3.0 * theta - v * 2.5);
+    float pipeWave = -0.25 * sin(2.0 * theta + 0.7);
+    float microCrease = 0.08 * cos(3.0 * theta - v * 2.5);
 
-    // Kerutan diagonal yang memancar dari titik ikatan tali emas (Tieback Tension Creases)
-    float distFromTiebackSpot = length(vec2((u - 0.72) * 1.3, distToTie * 1.8));
-    float pinchCreaseEnv = exp(-distFromTiebackSpot * 3.2) * uWaistOpen;
-    float radialAngle = atan(distToTie, (u - 0.72) + 0.001);
-    float tensionFolds = sin(radialAngle * 14.0) * pinchCreaseEnv * 0.35;
-    outPinch = pinchCreaseEnv;
-
-    float combinedWave = primaryWave + pipeWave + microCrease + tensionFolds;
+    outPinch = 0.0;
+    float combinedWave = primaryWave + pipeWave + microCrease;
     outFoldPhase = theta;
     outCrest = clamp(combinedWave * 0.5 + 0.5, 0.0, 1.0);
 
     // Konservasi kain: saat tirai menyempit ke samping, lipatan Z semakin dalam!
     float foldDepth = mix(uBaseFoldDepth, uGatheredFoldDepth, pow(outGather, 0.85));
-    // Di bagian gantungan paling atas, lipatan sedikit dijepit oleh pelmet
-    float verticalFoldScale = mix(0.65, 1.18, pow(1.0 - v, 0.65));
+    float verticalFoldScale = mix(0.72, 1.12, pow(1.0 - v, 0.65));
     float zPleat = combinedWave * foldDepth * verticalFoldScale;
 
-    // Self-bunching X offset: puncak lipatan bergeser sedikit membentuk siluet S-curve
-    float xPleatOffset = cos(theta) * foldDepth * 0.24 * (0.4 + 0.6 * outGather);
+    // Siluet S-curve pada puncak lipatan
+    float xPleatOffset = cos(theta) * foldDepth * 0.22 * (0.4 + 0.6 * outGather);
 
-    // ---- EFEK DINAMIKA UDARA & AYUNAN (AIR BILLOW + IDLE SWAY) ----
-    // Gelembung udara (billow) paling terasa di bagian perut & tepi tengah tirai saat bergerak
+    // ---- DINAMIKA UDARA & AYUNAN (AIR BILLOW + IDLE SWAY) ----
     float billowMask = sin(u * 3.14159265) * sin(v * 3.14159265);
-    float zBillow = -uVelocity * uAirBillow * billowMask * 1.4;
+    float zBillow = -uVelocity * uAirBillow * billowMask * 1.3;
 
-    // Gelombang riak vertikal saat tirai berhenti / mengendap
-    float zSettleRipple = sin(v * 12.0 - uTime * 7.5) * uSettleWave * 0.14 * (1.0 - v * 0.6) * u;
+    // Riak vertikal saat mengendap
+    float zSettleRipple = sin(v * 12.0 - uTime * 7.5) * uSettleWave * 0.12 * (1.0 - v * 0.6) * u;
 
-    // Ayunan napas halus saat diam (idle theatrical draft)
+    // Ayunan napas halus
     float idleBreath = (
-      sin(uTime * 1.15 + u * 2.4 + uSide) * 0.028 +
-      cos(uTime * 0.78 - v * 3.1) * 0.018
+      sin(uTime * 1.15 + u * 2.4 + uSide) * 0.024 +
+      cos(uTime * 0.78 - v * 3.1) * 0.015
     ) * (1.0 - v * 0.75);
 
-    // ---- KETINGGIAN Y & ANGKATAN CATENARY SWAG ----
+    // ---- KETINGGIAN Y & HEM TEATER ----
     float topY = 0.525 * uStageHeight;
     float bottomY = -0.515 * uStageHeight;
     float baseY = mix(bottomY, topY, v);
 
-    // Saat tali emas menarik tirai ke samping, ujung bawah bagian dalam terangkat anggun
-    // membentuk lekukan diagonal khas gedung opera Eropa
-    float swagLift = pow(u, 1.6) * (1.0 - v) * uWaistOpen * 0.115 * uStageHeight;
-    // Sedikit ayunan vertikal pada lipatan bawah
-    float pleatHemDrop = (1.0 - outCrest) * 0.012 * uStageHeight * (1.0 - v);
+    // Sedikit ayunan dinamis pada ujung lipatan bawah
+    float pleatHemDrop = (1.0 - outCrest) * 0.01 * uStageHeight * (1.0 - v);
 
     float finalX = uSide * (baseX + xPleatOffset);
-    float finalY = baseY + swagLift - pleatHemDrop;
+    float finalY = baseY - pleatHemDrop;
     float finalZ = zPleat + zBillow + zSettleRipple + idleBreath;
 
-    // Ambient occlusion alami di dasar lembah lipatan (semakin rapat tirai, semakin gelap celahnya)
+    // Ambient occlusion alami di dasar lembah lipatan
     outCavity = clamp(
-      (1.0 - outCrest) * mix(0.62, 0.95, outGather) + pinchCreaseEnv * 0.25,
+      (1.0 - outCrest) * mix(0.62, 0.95, outGather),
       0.0,
       1.0
     );
@@ -626,59 +592,7 @@ const PELMET_FRAGMENT_SHADER = /* glsl */ `
 `;
 
 // ============================================================================
-// SHADER 3: TALI PENGIKAT & RUMBAI MAHKOTA EMAS 3D (TIEBACK GOLD SHADER)
-// ============================================================================
-
-const GOLD_ORNAMENT_VERTEX_SHADER = /* glsl */ `
-  varying vec2 vUv;
-  varying vec3 vNormal;
-  varying vec3 vWorldPos;
-
-  void main() {
-    vUv = uv;
-    vec4 worldPosition = modelMatrix * vec4(position, 1.0);
-    vWorldPos = worldPosition.xyz;
-    vNormal = normalize(mat3(modelMatrix) * normal);
-    gl_Position = projectionMatrix * viewMatrix * worldPosition;
-  }
-`;
-
-const GOLD_ORNAMENT_FRAGMENT_SHADER = /* glsl */ `
-  precision highp float;
-
-  uniform float uTime;
-  uniform vec3 uGoldPrimary;
-  uniform vec3 uGoldHighlight;
-  uniform vec3 uGoldShadow;
-
-  varying vec2 vUv;
-  varying vec3 vNormal;
-  varying vec3 vWorldPos;
-
-  void main() {
-    vec3 N = normalize(vNormal);
-    vec3 V = normalize(cameraPosition - vWorldPos);
-    vec3 L = normalize(vec3(0.0, 4.0, 7.0) - vWorldPos);
-    vec3 H = normalize(L + V);
-
-    // Efek pilinan tambang emas (braided rope twist) + serat benang rumbai
-    float braidTwist = sin(vUv.x * 75.0 + vUv.y * 42.0);
-    float fineThread = cos(vUv.x * 220.0);
-    float surfaceDetail = 0.5 + 0.35 * braidTwist + 0.15 * fineThread;
-
-    float diff = max(0.0, dot(N, L) * 0.65 + 0.35);
-    float spec = pow(max(0.0, dot(N, H)), 32.0) * (0.6 + 0.4 * surfaceDetail);
-    float rim = pow(1.0 - clamp(abs(dot(N, V)), 0.0, 1.0), 2.5);
-
-    vec3 col = mix(uGoldShadow, uGoldPrimary, diff * surfaceDetail);
-    col = mix(col, uGoldHighlight, clamp(spec * 1.15 + rim * 0.45, 0.0, 1.0));
-
-    gl_FragColor = vec4(col, 1.0);
-  }
-`;
-
-// ============================================================================
-// SHADER 4: PARTIKEL DEBU PANGGUNG DI BERKAS CAHAYA (STAGE DUST MOTES)
+// SHADER 3: PARTIKEL DEBU PANGGUNG DI BERKAS CAHAYA (STAGE DUST MOTES)
 // ============================================================================
 
 const DUST_VERTEX_SHADER = /* glsl */ `
@@ -939,63 +853,7 @@ export default function Theatrical3DCurtain({
     pelmetMesh.renderOrder = 2;
     scene.add(pelmetMesh);
 
-    // ---- 5. MEMBANGUN TALI PENGIKAT EMAS & RUMBAI 3D (LEFT & RIGHT TIEBACKS) ----
-    const goldOrnamentMaterial = new THREE.ShaderMaterial({
-      vertexShader: GOLD_ORNAMENT_VERTEX_SHADER,
-      fragmentShader: GOLD_ORNAMENT_FRAGMENT_SHADER,
-      uniforms: {
-        uTime: { value: 0 },
-        uGoldPrimary: { value: colors.goldPrimary },
-        uGoldHighlight: { value: colors.goldHighlight },
-        uGoldShadow: { value: colors.goldShadow },
-      },
-    });
-    disposableMaterials.push(goldOrnamentMaterial);
-
-    // Buat profil LatheGeometry untuk Mahkota & Rumbai Emas (Baroque Tassel)
-    const tasselPoints: THREE.Vector2[] = [
-      new THREE.Vector2(0.0, 0.42),
-      new THREE.Vector2(0.06, 0.39), // Simpul atas
-      new THREE.Vector2(0.04, 0.32), // Leher simpul
-      new THREE.Vector2(0.11, 0.22), // Mahkota lonceng (Crown bell)
-      new THREE.Vector2(0.09, 0.14), // Cincin bawah mahkota
-      new THREE.Vector2(0.135, -0.18), // Rok rumbai mengembang
-      new THREE.Vector2(0.11, -0.45), // Ujung bawah rumbai
-      new THREE.Vector2(0.0, -0.48),
-    ];
-    const tasselGeometry = new THREE.LatheGeometry(tasselPoints, 28);
-    disposableGeometries.push(tasselGeometry);
-
-    // Buat kurva lengkung tali tambang emas yang memeluk pinggang tirai
-    const createTiebackAssembly = (side: -1 | 1) => {
-      const group = new THREE.Group();
-
-      const curvePoints = [
-        new THREE.Vector3(side * 0.55, 0.32, -0.25), // Jangkar dinding luar
-        new THREE.Vector3(side * 0.28, 0.08, 0.36), // Perut depan tirai
-        new THREE.Vector3(0.0, -0.05, 0.42), // Titik ikat terdalam (tempat rumbai menggantung)
-        new THREE.Vector3(side * 0.26, -0.12, 0.12), // Lingkar balik belakang
-        new THREE.Vector3(side * 0.55, 0.24, -0.28), // Kembali ke jangkar dinding
-      ];
-      const ropeCurve = new THREE.CatmullRomCurve3(curvePoints);
-      const ropeGeo = new THREE.TubeGeometry(ropeCurve, 44, 0.042, 14, false);
-      disposableGeometries.push(ropeGeo);
-
-      const ropeMesh = new THREE.Mesh(ropeGeo, goldOrnamentMaterial);
-      group.add(ropeMesh);
-
-      const tasselMesh = new THREE.Mesh(tasselGeometry, goldOrnamentMaterial);
-      tasselMesh.position.set(0.0, -0.34, 0.42);
-      group.add(tasselMesh);
-
-      scene.add(group);
-      return { group, tasselMesh };
-    };
-
-    const leftTieback = createTiebackAssembly(-1);
-    const rightTieback = createTiebackAssembly(1);
-
-    // ---- 6. CELAH CAHAYA PEMBUKA (CENTER SEAM LIGHT SPILL) ----
+    // ---- 5. CELAH CAHAYA PEMBUKA (CENTER SEAM LIGHT SPILL) ----
     const seamPlaneGeo = new THREE.PlaneGeometry(1.1, 1.0);
     disposableGeometries.push(seamPlaneGeo);
 
@@ -1233,27 +1091,6 @@ export default function Theatrical3DCurtain({
         1
       );
       pelmetMaterial.uniforms.uVelocity.value = avgVel;
-
-      goldOrnamentMaterial.uniforms.uTime.value = now;
-
-      // Update posisi & ayunan 3D Tieback Emas Kiri dan Kanan
-      const tiebackY = -0.135 * stageDims.height;
-      // Saat tirai tertutup, tali emas menunggu agak di tepi panggung;
-      // saat tirai terbuka, tali emas memeluk bundel kain dengan erat.
-      const tiebackXOffset =
-        THREE.MathUtils.lerp(0.475, 0.422, THREE.MathUtils.clamp(waistSpring.pos, 0, 1)) *
-        stageDims.width;
-      const tiebackScale = Math.min(stageDims.width, stageDims.height) * 0.14;
-
-      leftTieback.group.position.set(-tiebackXOffset, tiebackY, 0.18);
-      leftTieback.group.scale.setScalar(tiebackScale);
-      leftTieback.tasselMesh.rotation.z =
-        Math.sin(now * 2.1) * 0.05 - avgVel * 0.28;
-
-      rightTieback.group.position.set(tiebackXOffset, tiebackY, 0.18);
-      rightTieback.group.scale.setScalar(tiebackScale);
-      rightTieback.tasselMesh.rotation.z =
-        Math.sin(now * 2.1 + 1.2) * 0.05 + avgVel * 0.28;
 
       // Update celah cahaya tengah (menyala dramatis saat baru menyibak 1% - 35%)
       const openClamped = THREE.MathUtils.clamp(waistSpring.pos, 0, 1);
