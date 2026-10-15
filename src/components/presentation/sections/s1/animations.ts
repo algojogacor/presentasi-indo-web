@@ -15,12 +15,12 @@ export interface S1DOMElements {
   blackLayer: HTMLElement | null;
   searchlights: HTMLElement[];
   quote: HTMLElement | null;
-  l: HTMLElement | null;
-  r: HTMLElement | null;
+  l?: HTMLElement | null;
+  r?: HTMLElement | null;
   closing: HTMLElement | null;
   frame: HTMLElement | null;
-  dispL: SVGElement | null;
-  dispR: SVGElement | null;
+  dispL?: SVGElement | null;
+  dispR?: SVGElement | null;
 }
 
 export function queryS1Elements(root: HTMLElement): S1DOMElements {
@@ -38,8 +38,8 @@ export function queryS1Elements(root: HTMLElement): S1DOMElements {
 }
 
 export function setWaveScale(
-  dispL: SVGElement | null,
-  dispR: SVGElement | null,
+  dispL: SVGElement | null | undefined,
+  dispR: SVGElement | null | undefined,
   val: number,
 ) {
   dispL?.setAttribute("scale", String(val));
@@ -59,13 +59,15 @@ export function initS1State(
     gsap.set(blackLayer, { y: 0, autoAlpha: 1 });
     initSearchlights(searchlights);
     gsap.set(quote, { autoAlpha: settled ? 1 : 0 });
-    gsap.set([l, r], { xPercent: 0, autoAlpha: 0 });
+    if (l && r) gsap.set([l, r], { xPercent: 0, autoAlpha: 0 });
   } else {
     gsap.set(blackLayer, { y: "110vh", autoAlpha: 0 });
-    gsap.set([l, r], {
-      xPercent: (i: number) => (step === 2 ? (i === 0 ? -100 : 100) : 0),
-      autoAlpha: 1,
-    });
+    if (l && r) {
+      gsap.set([l, r], {
+        xPercent: (i: number) => (step === 2 ? (i === 0 ? -100 : 100) : 0),
+        autoAlpha: 1,
+      });
+    }
     gsap.set(quote, { autoAlpha: 0 });
   }
   gsap.set(closing, { autoAlpha: step === 3 ? 1 : 0 });
@@ -91,7 +93,7 @@ export function animateS1Step(
     dispR,
   } = queryS1Elements(root);
 
-  if (!blackLayer || !searchlights.length || !quote || !l || !r || !closing || !frame) {
+  if (!blackLayer || !searchlights.length || !quote || !closing || !frame) {
     return;
   }
 
@@ -109,7 +111,7 @@ export function animateS1Step(
         gsap.set(el, { autoAlpha: 1, rotation: midRot, y: 0 });
       });
       gsap.set(quote, { autoAlpha: 1 });
-      gsap.set([l, r], { xPercent: 0, autoAlpha: 0 });
+      if (l && r) gsap.set([l, r], { xPercent: 0, autoAlpha: 0 });
       gsap.set(closing, { autoAlpha: 0 });
       gsap.set(frame, { autoAlpha: 1, scale: 1 });
       updateWave(REST_WAVE_SCALE);
@@ -121,7 +123,7 @@ export function animateS1Step(
         if (!cfg) return;
         gsap.set(el, { rotation: cfg.rotFrom, autoAlpha: 0, y: 20 });
       });
-      gsap.set([l, r], { xPercent: 0, autoAlpha: 0 });
+      if (l && r) gsap.set([l, r], { xPercent: 0, autoAlpha: 0 });
       gsap.set(closing, { autoAlpha: 0 });
       gsap.set(frame, { autoAlpha: 1, scale: 1 });
       updateWave(REST_WAVE_SCALE);
@@ -148,32 +150,34 @@ export function animateS1Step(
       registerTimeline(tl);
     }
   }
-  // Step 1: Layer hitam "runtuh" ke bawah (y: 110vh, 0.9s, power3.in) → tirai merah tertutup terlihat
+  // Step 1: Layer hitam "runtuh" ke bawah (y: 110vh, 0.9s, power3.in) → tirai beludru tertutup terlihat
   else if (step === 1) {
     killSearchlights(searchlights);
     if (settled) {
       gsap.set(blackLayer, { y: "110vh", autoAlpha: 0 });
-      gsap.set([l, r], { xPercent: 0, autoAlpha: 1 });
+      if (l && r) gsap.set([l, r], { xPercent: 0, autoAlpha: 1 });
       gsap.set(closing, { autoAlpha: 0 });
       gsap.set(frame, { autoAlpha: 1, scale: 1 });
       updateWave(REST_WAVE_SCALE);
     } else {
       const tl = gsap.timeline();
-      tl.set([l, r], { xPercent: 0, autoAlpha: 0 });
+      if (l && r) tl.set([l, r], { xPercent: 0, autoAlpha: 0 });
       tl.to(blackLayer, {
         y: "110vh",
         duration: 0.9,
         ease: "power3.in",
       });
-      tl.to(
-        [l, r],
-        {
-          autoAlpha: 1,
-          duration: 0.45,
-          ease: "power1.out",
-        },
-        "0.1",
-      );
+      if (l && r) {
+        tl.to(
+          [l, r],
+          {
+            autoAlpha: 1,
+            duration: 0.45,
+            ease: "power1.out",
+          },
+          "0.1",
+        );
+      }
       tl.set(blackLayer, { autoAlpha: 0 });
       registerTimeline(tl);
     }
@@ -183,17 +187,28 @@ export function animateS1Step(
     killSearchlights(searchlights);
     if (settled) {
       gsap.set(blackLayer, { y: "110vh", autoAlpha: 0 });
-      gsap.set(l, { xPercent: -100, autoAlpha: 1 });
-      gsap.set(r, { xPercent: 100, autoAlpha: 1 });
+      if (l && r) {
+        gsap.set(l, { xPercent: -100, autoAlpha: 1 });
+        gsap.set(r, { xPercent: 100, autoAlpha: 1 });
+      }
       gsap.set(closing, { autoAlpha: 0 });
       gsap.set(frame, { autoAlpha: 1, scale: 1 });
       updateWave(REST_WAVE_SCALE);
     } else {
       const tl = gsap.timeline();
       tl.set(blackLayer, { y: "110vh", autoAlpha: 0 });
-      tl.set([l, r], { autoAlpha: 1 });
+      if (l && r) tl.set([l, r], { autoAlpha: 1 });
       tl.add(() => audioManager.playCurtain(), 0);
-      animateCurtainOpen(tl, l, r, frame, updateWave);
+      if (l && r) {
+        animateCurtainOpen(tl, l, r, frame, updateWave);
+      } else {
+        tl.fromTo(
+          frame,
+          { autoAlpha: 0.85, scale: 0.96 },
+          { autoAlpha: 1, scale: 1, duration: 1.2, ease: "power2.out" },
+          0.4,
+        );
+      }
       registerTimeline(tl);
     }
   }
@@ -202,13 +217,23 @@ export function animateS1Step(
     killSearchlights(searchlights);
     if (settled) {
       gsap.set(blackLayer, { y: "110vh", autoAlpha: 0 });
-      gsap.set([l, r], { xPercent: 0, autoAlpha: 1 });
+      if (l && r) gsap.set([l, r], { xPercent: 0, autoAlpha: 1 });
       gsap.set(closing, { autoAlpha: 1, y: 0 });
-      gsap.set(frame, { autoAlpha: 1, scale: 1 });
+      gsap.set(frame, { autoAlpha: 0.25, scale: 0.975 });
       updateWave(REST_WAVE_SCALE);
     } else {
       const tl = gsap.timeline();
-      animateCurtainClose(tl, l, r, frame, closing, updateWave);
+      if (l && r) {
+        animateCurtainClose(tl, l, r, frame, closing, updateWave);
+      } else {
+        tl.to(frame, { autoAlpha: 0.25, scale: 0.975, duration: 0.8, ease: "power1.in" });
+        tl.fromTo(
+          closing,
+          { autoAlpha: 0, y: 14 },
+          { autoAlpha: 1, y: 0, duration: 0.9, ease: "power2.out" },
+          "-=0.2",
+        );
+      }
       registerTimeline(tl);
     }
   }

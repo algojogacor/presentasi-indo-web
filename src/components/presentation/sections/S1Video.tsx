@@ -4,8 +4,7 @@ import { useEffect, useRef } from "react";
 import { gsap } from "@/lib/gsap";
 import { usePres } from "../context";
 import { useIsoLayoutEffect } from "../hooks";
-import CurtainFilterSvg from "./s1/CurtainFilterSvg";
-import Curtains from "./s1/Curtains";
+import Theatrical3DCurtain from "./s1/Theatrical3DCurtain";
 import VideoFrame from "./s1/VideoFrame";
 import { OpeningQuote, ClosingQuote } from "./s1/QuoteLayers";
 import { initS1State, animateS1Step } from "./s1/animations";
@@ -13,9 +12,9 @@ import { initS1State, animateS1Step } from "./s1/animations";
 /**
  * Section 1 — Guest Lecturer (embed YouTube teatrikal dengan 20th Century Fox searchlight beams).
  * Step 0: Layar hitam penuh (#0A0A0F) + quote presenter; setelah delay 1s searchlight otomatis menyala (y: 20->0, stagger 0.15s).
- * Step 1: Layer hitam "runtuh" ke bawah (y: 0 -> 110vh, power3.in, 0.9s) → tirai merah beludru tertutup tersingkap (delay 0.1s).
- * Step 2: Tirai beludru membuka (2.4s, power3.inOut, asimetris 0.1s) → frame siaran YouTube aktif.
- * Step 3: Tirai menutup kembali (2.4s, power3.inOut) + kalimat penutup Prof. Wisnu Jatmiko.
+ * Step 1: Layer hitam "runtuh" ke bawah (y: 0 -> 110vh, power3.in, 0.9s) → tirai beludru 3D tertutup tersingkap.
+ * Step 2: Tirai 3D Grand Opera House membuka (Spring-Damper Verlet + Charlie Sheen BRDF) → frame siaran YouTube aktif.
+ * Step 3: Tirai 3D menutup kembali + kalimat penutup Prof. Wisnu Jatmiko.
  * Shortcut Shift+S melewati section ini.
  */
 export default function S1Video({ step }: { step: number }) {
@@ -51,19 +50,16 @@ export default function S1Video({ step }: { step: number }) {
 
   return (
     <div ref={root} className="absolute inset-0 overflow-hidden select-none">
-      {/* SVG Filters untuk gelombang & tekstur lipatan kain beludru dramatis */}
-      <CurtainFilterSvg />
-
       {/* Frame siaran langsung (YouTube) */}
       <VideoFrame step={step} />
 
-      {/* Tirai Panel Kiri & Kanan */}
-      <Curtains />
+      {/* Grand Opera House 3D Velvet Curtain (Three.js WebGL + Custom GLSL Velvet BRDF) */}
+      <Theatrical3DCurtain isOpen={step === 2} />
 
       {/* Layer Hitam Panggung & 7 Searchlight Beams */}
       <OpeningQuote step={step} />
 
-      {/* Penutup (setelah video selesai, Step 4) */}
+      {/* Penutup (setelah video selesai, Step 3) */}
       <ClosingQuote />
     </div>
   );
