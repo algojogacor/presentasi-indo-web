@@ -152,6 +152,13 @@ describe("Unit: Makalah & Presentation Consistency Audit", () => {
       const s5_4 = SPEAKER_NOTES["s5_4"];
       expect(s5_4.spokenScript).toContain("Opsi C");
       expect(s5_4.spokenScript).toContain("EYD");
+
+      // Cues ringkas di NOTE_PLAN[5] (NotesPanel shortcut [N]) juga sinkron
+      const note5 = NOTE_PLAN[5];
+      expect(note5[1].c).toContain("Mitos ketebalan halaman");
+      expect(note5[2].c).toContain("Opsi B");
+      expect(note5[3].c).toContain("Kesalahan fatal");
+      expect(note5[4].c).toContain("Opsi C");
     });
 
     it("Act 06: Data 4 kartu battle memuat variasi KTI sesuai Tabel 2 Makalah", () => {

@@ -158,19 +158,19 @@ export const NOTE_PLAN: StepNote[][] = [
     },
     {
       t: "Q1 — voting live",
-      c: "Perubahan makalah ke jurnal: transformasikan ke IMRaD & novelty (Tabel 2 Fitriani et al., 2023).",
+      c: "Mitos ketebalan halaman: uji anggapan apakah karya tebal lebih berbobot (jembatan ke Babak 6: PKM batas 10 hlm vs Jurnal).",
     },
     {
       t: "Q1 — reveal",
-      c: "Bahas hasil voting dan kuatkan konsep pemadatan struktur IMRaD tanpa bab Romawi.",
+      c: "Bahas hasil voting Opsi B: tebal bukan jaminan, batas ketat PKM 10 hlm & model IMRaD jurnal; sambungkan ke 4 ragam KTI Babak 6.",
     },
     {
       t: "Q2 — voting live",
-      c: "Format paling ketat & risiko gugur batas halaman: uji insting audiens sebelum masuk variasi genre.",
+      c: "Kesalahan fatal penyebab KTI ditolak: uji insting audiens faktor non-struktural yang menggugurkan karya.",
     },
     {
       t: "Q2 — reveal & ekspor",
-      c: "Tegaskan batas mutlak 10 halaman PKM di Simbelmawa (Dikti, 2023) sebagai jembatan langsung ke Battle Cards.",
+      c: "Bahas hasil voting Opsi C: pelanggaran kaidah EYD V dan plagiarisme/sitasi manipulatif; jembatan langsung ke Babak 7 (Kaidah & Etika).",
     },
   ],
   [
