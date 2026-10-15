@@ -12,6 +12,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import { QUESTIONS, type PollOption } from "@/lib/questions";
+import { audio } from "@/lib/audio";
 
 interface AudienceVotingCardProps {
   sessionCode: string;
@@ -108,7 +109,11 @@ export default function AudienceVotingCard({
               key={opt.key}
               type="button"
               disabled={status !== "open" || isSubmitting}
-              onClick={() => onVote(opt.key)}
+              onClick={() => {
+                audio.init();
+                audio.tick();
+                onVote(opt.key);
+              }}
               className={`relative flex items-start gap-3.5 p-3.5 sm:p-4 rounded-xl border text-left transition-all active:scale-[0.99] disabled:active:scale-100 ${cardStyle}`}
             >
               {/* Huruf Opsi (A, B, C, D) */}

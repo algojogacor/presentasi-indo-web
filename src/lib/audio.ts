@@ -33,7 +33,7 @@ class AudioEngine {
         if (!Ctor) return;
         this.ctx = new Ctor();
         this.master = this.ctx.createGain();
-        this.master.gain.value = this._muted ? 0 : 0.9;
+        this.master.gain.value = this._muted ? 0 : 1.0;
         this.master.connect(this.ctx.destination);
       }
       if (this.ctx.state === "suspended") void this.ctx.resume();
@@ -126,7 +126,7 @@ class AudioEngine {
       const t = ctx.currentTime;
       master.gain.cancelScheduledValues(t);
       master.gain.setValueAtTime(Math.max(master.gain.value, 0.0001), t);
-      master.gain.linearRampToValueAtTime(this._muted ? 0 : 0.9, t + 0.15);
+      master.gain.linearRampToValueAtTime(this._muted ? 0 : 1.0, t + 0.15);
     }
     return this._muted;
   }

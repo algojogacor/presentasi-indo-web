@@ -12,6 +12,8 @@ import {
   Smartphone,
   Tv,
   Vote,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import { SECTIONS } from "@/components/presentation/context";
 import {
@@ -27,6 +29,8 @@ import {
   type SessionJoinResponse,
   type SessionVoteResponse,
 } from "@/lib/syncSocket";
+import { audio } from "@/lib/audio";
+import { audioManager } from "@/lib/audioManager";
 import { Grain } from "@/components/presentation/atoms";
 import AudienceVotingCard from "@/components/presentation/audience/AudienceVotingCard";
 
@@ -83,9 +87,43 @@ export default function AudienceViewPage() {
 
   // Tab audiens saat sesi polling aktif: "voting" (lembar suara) atau "slide" (layar proyektor live)
   const [audienceTab, setAudienceTab] = useState<"slide" | "voting">("voting");
+  const [isMuted, setIsMuted] = useState(false);
 
   const isMountedRef = useRef(true);
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const prevPosRef = useRef<{
+    stage?: string;
+    section?: number;
+    step?: number;
+    pollingStatus?: string;
+  } | null>(null);
+
+  // Buka blokir Web Audio API pada sentuhan/tap pertama pengguna di HP
+  useEffect(() => {
+    const unlockAudio = () => {
+      audio.init();
+      audioManager.init();
+      const ctx = audio.getContext();
+      if (ctx && ctx.state === "suspended") {
+        void ctx.resume();
+      }
+    };
+
+    window.addEventListener("pointerdown", unlockAudio, { passive: true });
+    window.addEventListener("touchstart", unlockAudio, { passive: true });
+    window.addEventListener("click", unlockAudio, { passive: true });
+
+    return () => {
+      window.removeEventListener("pointerdown", unlockAudio);
+      window.removeEventListener("touchstart", unlockAudio);
+      window.removeEventListener("click", unlockAudio);
+    };
+  }, []);
+
+  const toggleMute = useCallback(() => {
+    const nextMuted = audio.toggleMute();
+    setIsMuted(nextMuted);
+  }, []);
 
   // Sambungkan ke gateway sinkronisasi WebSocket
   useEffect(() => {
@@ -159,6 +197,39 @@ export default function AudienceViewPage() {
     const onSync = (snapshot: PublicSessionSnapshot) => {
       if (!isMountedRef.current) return;
       if (snapshot && snapshot.code === sessionCode) {
+        // Mainkan SFX teatrikal panggung jika posisi slide presenter berubah
+        const prev = prevPosRef.current;
+        if (prev) {
+          if (prev.stage !== snapshot.stage || prev.section !== snapshot.section) {
+            audioManager.playWhoosh();
+            audio.thump();
+          } else if (prev.step !== snapshot.step) {
+            if (snapshot.section === 1 && snapshot.step === 2) {
+              audioManager.playCurtain();
+            } else if (snapshot.section === 1 && snapshot.step === 1) {
+              audioManager.playSearchlight();
+            } else {
+              audio.tick();
+            }
+          }
+
+          // Deteksi pembukaan lembar kuis polling (chime)
+          if (
+            snapshot.polling &&
+            snapshot.polling.status === "open" &&
+            prev.pollingStatus !== "open"
+          ) {
+            audio.chime();
+          }
+        }
+
+        prevPosRef.current = {
+          stage: snapshot.stage,
+          section: snapshot.section,
+          step: snapshot.step,
+          pollingStatus: snapshot.polling?.status,
+        };
+
         setSessionData(snapshot);
         setConnectionStatus("connected");
       }
@@ -226,6 +297,7 @@ export default function AudienceViewPage() {
 
         if (res.ok) {
           setMyVotes((prev) => ({ ...prev, [qid]: optionKey }));
+          audio.chime();
           setVoteNotice({
             type: "success",
             msg: `Pilihan Anda (Opsi ${optionKey}) berhasil tercatat di server!`,
@@ -514,8 +586,29 @@ export default function AudienceViewPage() {
           </span>
         </div>
 
-        {/* Indikator Status Koneksi */}
+        {/* Indikator Status Koneksi & Audio */}
         <div className="pointer-events-auto flex items-center gap-2">
+          {/* Audio Mute/Unmute Toggle */}
+          <button
+            type="button"
+            onClick={toggleMute}
+            className={`rounded-full border px-2.5 py-1 font-code text-[10px] flex items-center gap-1.5 backdrop-blur shadow-lg transition-colors ${
+              isMuted
+                ? "border-rose-500/40 bg-rose-950/80 text-rose-300"
+                : "border-[#E8A020]/40 bg-black/80 text-[#E8A020]"
+            }`}
+            title={isMuted ? "Aktifkan Audio Panggung" : "Bisukan Audio Panggung"}
+          >
+            {isMuted ? (
+              <VolumeX className="w-3 h-3 text-rose-400" />
+            ) : (
+              <Volume2 className="w-3 h-3 text-[#E8A020] animate-pulse" />
+            )}
+            <span className="hidden sm:inline">
+              {isMuted ? "Audio Mati" : "Audio ON"}
+            </span>
+          </button>
+
           {connectionStatus === "connected" && (
             <div className="rounded-full border border-emerald-500/30 bg-emerald-950/80 backdrop-blur px-2.5 py-1 font-code text-[10px] text-emerald-400 flex items-center gap-1.5 shadow-lg">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -577,6 +670,7 @@ export default function AudienceViewPage() {
             ref={iframeRef}
             src={`/slide-embed?section=${sessionData.section}&step=${sessionData.step}&audience=1&sessionCode=${sessionCode}`}
             title="Layar Presentasi Utama"
+            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
             className="w-full h-full border-0 select-none bg-[#0A0A0F] pointer-events-none"
             onLoad={() => syncIframe()}
           />
