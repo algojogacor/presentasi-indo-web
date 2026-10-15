@@ -110,7 +110,7 @@ export function BodyDissection({ bab }: { bab: number }) {
                 }`}
               >
                 <div className="overflow-hidden">
-                  <p className="max-w-full md:max-w-[40vw] font-body text-xs md:text-[1.2vw] leading-relaxed text-paper/90 pt-1.5 pb-0.5">
+                  <p className="max-w-full md:max-w-[44vw] font-body text-xs md:text-[1.2vw] leading-relaxed text-paper/90 pt-1.5 pb-0.5">
                     {c.detail}
                   </p>
                 </div>

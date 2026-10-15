@@ -34,8 +34,8 @@ export default function PollingResultBars({
   };
 
   return (
-    <div className="w-[36vw]">
-      <div className="mb-3.5 flex flex-wrap items-center gap-2.5">
+    <div className="w-full">
+      <div className="mb-2.5 sm:mb-3 flex flex-wrap items-center gap-2.5">
         <LiveDot />
         <span className="font-code text-xs sm:text-sm tracking-[0.2em] text-mute/90 font-medium">
           {live ? "LIVE" : "FINAL"} ·{" "}
@@ -62,7 +62,7 @@ export default function PollingResultBars({
       </div>
 
       {live && total === 0 && !fallback && (
-        <p className="mb-3.5 font-code text-xs sm:text-sm tracking-[0.22em] text-mute/80 animate-pulse">
+        <p className="mb-2.5 sm:mb-3 font-code text-xs sm:text-sm tracking-[0.22em] text-mute/80 animate-pulse">
           MENUNGGU SUARA PERTAMA…
         </p>
       )}
@@ -71,7 +71,7 @@ export default function PollingResultBars({
         const isWinner = revealed && winners.includes(o.key);
         const isCorrect = revealed && o.correct;
         return (
-          <div key={o.key} className="mb-[1.1vh] flex items-center gap-3">
+          <div key={o.key} className="mb-1.5 sm:mb-[0.9vh] flex items-center gap-2.5 sm:gap-3">
             <span
               className={`w-5 font-code text-xs sm:text-sm font-bold ${
                 isWinner && !isCorrect ? "text-paper" : isCorrect ? "text-ember" : "text-mute"

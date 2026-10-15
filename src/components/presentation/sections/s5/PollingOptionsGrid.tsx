@@ -20,7 +20,7 @@ export default function PollingOptionsGrid({
   onChoose,
 }: PollingOptionsGridProps) {
   return (
-    <div className="mt-3.5 md:mt-[3.2vh] grid w-full max-w-full md:max-w-[62vw] grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-[1.2vw]">
+    <div className="mt-2.5 md:mt-[2vh] grid w-full max-w-full md:max-w-[64vw] grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-[1vw]">
       {question.options.map((o) => {
         const isCorrect = revealed && o.correct;
         const isWinner = revealed && winners.includes(o.key);
@@ -39,7 +39,7 @@ export default function PollingOptionsGrid({
             type="button"
             onClick={() => onChoose(o.key)}
             disabled={!live || !fallback || !!manualChoice}
-            className={`group flex items-start gap-2.5 sm:gap-[1vw] border p-3.5 sm:p-[1.2vw] text-left transition-all duration-300 ${
+            className={`group flex items-start gap-2.5 sm:gap-[0.8vw] border p-3 sm:p-[0.9vw] text-left transition-all duration-300 ${
               isCorrect
                 ? "border-ember bg-ember/15"
                 : isWinner

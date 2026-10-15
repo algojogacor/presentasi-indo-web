@@ -67,10 +67,10 @@ export function animateZonesAndBab(
     if (!meta) return;
     const isSel = p === part && part !== 0;
     gsap.to(z, {
-      opacity: part === 0 ? 0.35 : isSel ? 1 : 0.18,
-      y: part === 0 || isSel ? 0 : p === 1 ? -10 : p === 3 ? 10 : 0,
-      scaleY: part === 0 || isSel ? 1 : 0.88,
-      borderColor: isSel ? meta.rgba(0.55) : "rgba(255,255,255,0.07)",
+      opacity: part === 0 ? 0.55 : isSel ? 1 : 0.28,
+      y: part === 0 || isSel ? 0 : p === 1 ? -8 : p === 3 ? 8 : 0,
+      scaleY: part === 0 || isSel ? 1 : 0.92,
+      borderColor: isSel ? meta.rgba(0.7) : "rgba(255,255,255,0.12)",
       duration: settled ? 0 : 0.65,
       ease: "power3.inOut",
       transformOrigin:
@@ -79,16 +79,16 @@ export function animateZonesAndBab(
     const label = z.querySelector<HTMLElement>(".z-label");
     if (label) {
       gsap.to(label, {
-        color: isSel ? meta.hex : "#6B6B7A",
-        opacity: part === 0 ? 0.75 : 1,
+        color: isSel ? meta.hex : "#8A8A99",
+        opacity: part === 0 ? 0.85 : 1,
         duration: settled ? 0 : 0.5,
       });
     }
     z.querySelectorAll<HTMLElement>(".z-tag").forEach((t) =>
-      gsap.to(t, { opacity: isSel ? 0.85 : 0, duration: settled ? 0 : 0.45 }),
+      gsap.to(t, { opacity: isSel ? 0.95 : 0, duration: settled ? 0 : 0.45 }),
     );
     z.querySelectorAll<HTMLElement>(".z-line, .z-block").forEach((b) =>
-      gsap.to(b, { opacity: isSel ? 1 : 0.4, duration: settled ? 0 : 0.5 }),
+      gsap.to(b, { opacity: isSel ? 1 : 0.45, duration: settled ? 0 : 0.5 }),
     );
   });
 
@@ -96,9 +96,9 @@ export function animateZonesAndBab(
   root.querySelectorAll<HTMLElement>(".bab").forEach((b, i) => {
     const sel = part === 2 && bab === i;
     gsap.to(b, {
-      flexGrow: sel ? 2.4 : 1,
-      borderColor: sel ? "rgba(240,237,232,0.4)" : "rgba(255,255,255,0.05)",
-      backgroundColor: sel ? "rgba(240,237,232,0.045)" : "rgba(240,237,232,0)",
+      flexGrow: sel ? 2.5 : 1,
+      borderColor: sel ? "rgba(240,237,232,0.5)" : "rgba(255,255,255,0.08)",
+      backgroundColor: sel ? "rgba(240,237,232,0.06)" : "rgba(240,237,232,0)",
       duration: settled ? 0 : 0.55,
       ease: "power2.inOut",
     });
@@ -123,14 +123,14 @@ export function animateZonesAndBab(
     const ttl = b.querySelector<HTMLElement>(".bab-title");
     if (ttl) {
       gsap.to(ttl, {
-        autoAlpha: part === 2 ? (sel ? 1 : 0.6) : 0,
+        autoAlpha: part === 2 ? (sel ? 1 : 0.65) : 0,
         duration: settled ? 0 : 0.4,
       });
     }
     const num = b.querySelector<HTMLElement>(".bab-num");
     if (num) {
       gsap.to(num, {
-        color: sel ? "#FFB740" : "#6B6B7A",
+        color: sel ? "#FFB740" : "#8A8A99",
         duration: settled ? 0 : 0.4,
       });
     }

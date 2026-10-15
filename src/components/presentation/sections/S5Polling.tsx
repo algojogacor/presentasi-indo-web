@@ -155,83 +155,91 @@ export default function S5Polling({ step }: { step: number }) {
 
       {/* ---- Pertanyaan live / reveal (tampilan standar) ---- */}
       {qid > 0 && !scoreOpen && (
-        <div className="absolute inset-0 flex flex-col justify-start px-6 sm:px-[8vw] pt-14 md:pt-[12vh] pb-24 md:pb-[8vh] overflow-y-auto">
-          <div className="flex items-baseline gap-4">
-            <span className="font-code text-xs sm:text-sm tracking-[0.3em] text-ember font-medium">
-              PERTANYAAN 0{qid}
-            </span>
-            <span className="font-code text-xs sm:text-sm tracking-[0.2em] text-mute/85">
-              {live ? "VOTING OTOMATIS AKTIF DI HP ANDA" : "HASIL & PEMBAHASAN"}
-            </span>
-          </div>
-          <h2 className="mt-2.5 sm:mt-3 max-w-full md:max-w-[68vw] font-display text-[clamp(1.65rem,2.8vw,3.2rem)] leading-[1.2] text-paper">
-            {question.prompt}
-          </h2>
-
-          <PollingOptionsGrid
-            question={question}
-            revealed={revealed}
-            winners={winners}
-            manualChoice={manualChoice}
-            live={live}
-            fallback={fallback}
-            onChoose={choose}
-          />
-
-          {/* Statistik benar — angka besar momen reveal */}
-          {revealed && total > 0 && (
-            <div
-              key={`stat-${qid}-${total}`}
-              className="reveal-stat mt-4 sm:mt-[2.4vh] flex flex-col sm:flex-row items-start sm:items-baseline gap-2 sm:gap-[1.6vw]"
-            >
-              <span
-                className="font-display text-[clamp(3rem,5vw,5rem)] leading-none text-ember font-bold"
-                aria-label={`${correctPct} persen kelas menjawab benar`}
-              >
-                {correctPct}%
+        <div className="absolute inset-0 flex flex-col justify-between px-6 sm:px-[8vw] pt-12 md:pt-[10vh] pb-8 md:pb-[5vh] overflow-y-auto">
+          {/* Bagian Atas: Header, Prompt Pertanyaan, dan Grid 4 Opsi */}
+          <div className="flex flex-col">
+            <div className="flex items-baseline gap-4">
+              <span className="font-code text-xs sm:text-sm tracking-[0.3em] text-ember font-medium">
+                PERTANYAAN 0{qid}
               </span>
-              <div className="flex flex-col gap-0.5 sm:gap-1">
-                <span className="font-code text-xs sm:text-sm tracking-[0.2em] sm:tracking-[0.25em] text-mute/85 font-medium">
-                  KELAS MENJAWAB BENAR · {correctCount}/{total} SUARA
-                </span>
-                <span className="font-display italic text-sm sm:text-base md:text-[1.4vw] leading-snug text-paper/90">
-                  {verdict}
-                </span>
-              </div>
+              <span className="font-code text-xs sm:text-sm tracking-[0.2em] text-mute/85">
+                {live ? "VOTING OTOMATIS AKTIF DI HP ANDA" : "HASIL & PEMBAHASAN"}
+              </span>
             </div>
-          )}
+            <h2 className="mt-2 sm:mt-2.5 max-w-full md:max-w-[70vw] font-display text-[clamp(1.5rem,2.5vw,2.9rem)] leading-[1.2] text-paper">
+              {question.prompt}
+            </h2>
 
-          {/* Pembahasan saat reveal */}
-          {revealed && (
-            <div
-              key={`expl-${qid}`}
-              className="fade-slide-in mt-4 sm:mt-[2.6vh] max-w-full md:max-w-[62vw] border-l-2 border-ember pl-3 sm:pl-[1.4vw]"
-            >
-              <p className="font-code text-xs sm:text-sm tracking-[0.3em] text-ember font-medium">
-                MENGAPA —
-              </p>
-              <p className="mt-1.5 sm:mt-2 font-body text-sm sm:text-base md:text-[1.3vw] leading-relaxed text-paper/90">
-                {question.answerNote}
-              </p>
-            </div>
-          )}
-
-          {/* Baris bawah: QR + hasil live */}
-          <div className="mt-6 md:mt-auto flex flex-col sm:flex-row items-center sm:items-end justify-between gap-6">
-            <PollingQrBox qid={qid} revealed={revealed} />
-
-            <PollingResultBars
+            <PollingOptionsGrid
               question={question}
-              counts={counts}
-              total={total}
               revealed={revealed}
               winners={winners}
+              manualChoice={manualChoice}
               live={live}
-              devices={devices}
-              synced={synced}
               fallback={fallback}
-              spark={spark}
+              onChoose={choose}
             />
+          </div>
+
+          {/* Bagian Bawah: QR Code (saat Live) / Pembahasan Akademik (saat Reveal) di Kiri + Chart Hasil di Kanan */}
+          <div className="mt-4 md:mt-auto flex flex-col md:flex-row items-stretch md:items-end justify-between gap-6 pt-2 pb-1">
+            {/* Sisi Kiri Bawah: QR Code saat Live, atau Pembahasan & Stat saat Reveal */}
+            <div className="w-full md:max-w-[46vw] shrink-0">
+              {live && <PollingQrBox qid={qid} revealed={false} />}
+
+              {revealed && (
+                <div key={`expl-${qid}`} className="fade-slide-in flex flex-col gap-2">
+                  {/* Statistik benar — angka besar momen reveal jika ada responden */}
+                  {total > 0 && (
+                    <div
+                      key={`stat-${qid}-${total}`}
+                      className="reveal-stat flex items-baseline gap-3 mb-0.5"
+                    >
+                      <span
+                        className="font-display text-[clamp(2.2rem,3.4vw,3.6rem)] leading-none text-ember font-bold"
+                        aria-label={`${correctPct} persen kelas menjawab benar`}
+                      >
+                        {correctPct}%
+                      </span>
+                      <div className="flex flex-col gap-0.5">
+                        <span className="font-code text-[10.5px] sm:text-xs tracking-[0.2em] text-mute/85 font-medium">
+                          KELAS MENJAWAB BENAR · {correctCount}/{total} SUARA
+                        </span>
+                        <span className="font-display italic text-xs sm:text-sm leading-snug text-paper/90">
+                          {verdict}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Uraian Pembahasan Akademik Makalah */}
+                  <div className="border-l-2 border-ember pl-3.5 sm:pl-4 py-0.5">
+                    <p className="font-code text-xs sm:text-sm tracking-[0.3em] text-ember font-medium">
+                      MENGAPA —
+                    </p>
+                    <p className="mt-1 font-body text-xs sm:text-sm md:text-[1.12vw] leading-relaxed text-paper/90">
+                      {question.answerNote}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Sisi Kanan Bawah: Chart Hasil Suara (Live / Final) */}
+            <div className="w-full md:w-[36vw] shrink-0">
+              <PollingResultBars
+                question={question}
+                counts={counts}
+                total={total}
+                revealed={revealed}
+                winners={winners}
+                live={live}
+                devices={devices}
+                synced={synced}
+                fallback={fallback}
+                spark={spark}
+              />
+            </div>
           </div>
         </div>
       )}

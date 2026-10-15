@@ -14,28 +14,36 @@ export default function LatarFacts({ step }: LatarFactsProps) {
   const statementRef = useRef<HTMLDivElement>(null);
   useStepReveal(containerRef, step);
 
-  // Responsivitas posisi pernyataan saat fakta muncul
+  // Responsivitas posisi pernyataan saat fakta muncul (mencegah tabrakan saat F11 fullscreen)
   useIsoLayoutEffect(() => {
     const el = statementRef.current;
     if (!el) return;
 
-    if (step >= 1 && step < 4) {
-      gsap.to(el, {
-        y: "-14vh",
-        scale: 0.82,
-        autoAlpha: 0.6,
-        duration: 0.7,
-        ease: "power3.inOut",
-      });
-    } else if (step === 0) {
-      gsap.to(el, {
-        y: 0,
-        scale: 1,
-        autoAlpha: 1,
-        duration: 0.65,
-        ease: "power2.out",
-      });
-    }
+    const updatePosition = () => {
+      if (step >= 1 && step < 4) {
+        gsap.to(el, {
+          y: "-25vh",
+          scale: 0.78,
+          autoAlpha: 0.65,
+          duration: 0.6,
+          ease: "power3.inOut",
+          transformOrigin: "center center",
+        });
+      } else if (step === 0) {
+        gsap.to(el, {
+          y: 0,
+          scale: 1,
+          autoAlpha: 1,
+          duration: 0.65,
+          ease: "power2.out",
+          transformOrigin: "center center",
+        });
+      }
+    };
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    return () => window.removeEventListener("resize", updatePosition);
   }, [step]);
 
   // Transisi keluar saat berpindah ke The Docket (step >= 4)
@@ -68,18 +76,18 @@ export default function LatarFacts({ step }: LatarFactsProps) {
       <div
         ref={statementRef}
         data-step="0"
-        className="absolute top-[44%] sm:top-[46%] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center text-center w-[92vw] md:w-[74vw] pointer-events-none px-2"
+        className="absolute top-[44%] sm:top-[46%] left-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col items-center text-center w-[92vw] md:w-[76vw] pointer-events-none px-2"
       >
-        <p className="s2-statement font-display italic text-[clamp(1.6rem,3.2vw,3.6rem)] leading-[1.3] text-paper">
+        <p className="s2-statement font-display italic text-[clamp(1.5rem,2.9vw,3.3rem)] leading-[1.28] text-paper">
           &ldquo;{STATEMENT}&rdquo;
         </p>
-        <span className="mt-3 sm:mt-4 font-code text-xs sm:text-sm tracking-[0.25em] text-ember/85 uppercase font-medium">
+        <span className="mt-2.5 sm:mt-3 font-code text-xs sm:text-sm tracking-[0.22em] text-ember/85 uppercase font-medium">
           — SUB-BAB 1.1 · LATAR BELAKANG MASALAH
         </span>
       </div>
 
       {/* Tiga fakta urgensi sekuensial */}
-      <div className="absolute top-[48vh] sm:top-[50vh] left-1/2 -translate-x-1/2 w-[92vw] md:w-[68vw] space-y-2.5 sm:space-y-[1.4vw]">
+      <div className="absolute top-[49vh] sm:top-[51vh] left-1/2 -translate-x-1/2 w-[92vw] md:w-[68vw] space-y-2.5 sm:space-y-[1.3vw]">
         {FACTS.map((f, i) => (
           <div
             key={f.tag}

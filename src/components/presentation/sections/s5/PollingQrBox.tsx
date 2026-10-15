@@ -21,12 +21,12 @@ export default function PollingQrBox({ qid, revealed }: PollingQrBoxProps) {
   }, [qid, sessionCode]);
 
   return (
-    <div className={`flex flex-col items-center sm:items-start ${revealed ? "invisible" : ""}`}>
+    <div className={`flex flex-col items-center sm:items-start ${revealed ? "hidden" : ""}`}>
       <div className="relative p-1.5 rounded-lg border border-ember/30 bg-[#0A0A0F]/90 shadow-[0_0_25px_rgba(232,160,32,0.12)]">
         <img
           ref={qrImgRef}
           alt={`QR code untuk bergabung ke sesi voting ${sessionCode || ""}`}
-          className="h-44 w-44 sm:h-52 sm:w-52 md:h-[23vh] md:w-[23vh] md:min-h-[190px] md:min-w-[190px] object-contain rounded"
+          className="h-40 w-40 sm:h-48 sm:w-48 md:h-[21vh] md:w-[21vh] md:min-h-[175px] md:min-w-[175px] object-contain rounded"
           width={240}
           height={240}
           data-testid="poll-qr"

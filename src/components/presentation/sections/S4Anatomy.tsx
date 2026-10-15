@@ -76,20 +76,20 @@ export default function S4Anatomy({ step }: { step: number }) {
   return (
     <div
       ref={root}
-      className="absolute inset-0 px-[6vw] pt-[11vh] pb-[7vh] overflow-hidden"
+      className="absolute inset-0 px-[4.5vw] lg:px-[5.5vw] pt-[9.5vh] pb-[5.5vh] overflow-hidden"
       data-testid="anatomy-theater"
     >
       <Kicker act="04">ANATOMY THEATER</Kicker>
       <BigNumeral>04</BigNumeral>
 
-      <div className="grid h-full grid-cols-[45%_55%] items-center gap-[2.5vw]">
-        {/* ============ KIRI — lembar rontgen ============ */}
+      <div className="grid h-full grid-cols-1 md:grid-cols-[46%_54%] lg:grid-cols-[47%_53%] items-center gap-[2vw] lg:gap-[3vw]">
+        {/* ============ KIRI — lembar rontgen (spesimen diperbesar untuk projector) ============ */}
         <DocumentSheet sheetRef={sheetRef} />
 
         {/* ============ KANAN — panel bedah ============ */}
         <div
           ref={panelRef}
-          className="max-h-[70vh] overflow-y-auto pr-1"
+          className="max-h-[75vh] overflow-y-auto pr-1.5"
           data-part={part}
         >
           {part === 0 && <OverviewDissection />}
