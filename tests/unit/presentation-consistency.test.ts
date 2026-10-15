@@ -125,33 +125,33 @@ describe("Unit: Makalah & Presentation Consistency Audit", () => {
     it("Act 05: Pertanyaan 1 & 2 sinkron 1:1 antara questions.ts, slide, dan naskah pembicara", () => {
       expect(QUESTIONS.length).toBe(2);
 
-      // Pertanyaan 1: Makalah -> IMRaD & Novelty
+      // Pertanyaan 1: Mitos Tebal vs PKM / Jurnal
       const q1 = QUESTIONS[0];
-      expect(q1.prompt).toContain("makalah tersebut ingin diterbitkan menjadi artikel jurnal");
+      expect(q1.prompt).toContain("halamannya tebal");
       const q1Correct = q1.options.find((o) => o.correct);
-      expect(q1Correct?.key).toBe("C");
-      expect(q1Correct?.label).toContain("IMRaD");
+      expect(q1Correct?.key).toBe("B");
+      expect(q1Correct?.label).toContain("PKM");
 
       const s5_1 = SPEAKER_NOTES["s5_1"];
       expect(s5_1.keyMessage).toContain("pertanyaan 1");
 
       const s5_2 = SPEAKER_NOTES["s5_2"];
-      expect(s5_2.spokenScript).toContain("IMRaD");
-      expect(s5_2.spokenScript).toContain("novelty");
+      expect(s5_2.spokenScript).toContain("Opsi B");
+      expect(s5_2.spokenScript).toContain("PKM");
 
-      // Pertanyaan 2: Proposal PKM & 10 Halaman
+      // Pertanyaan 2: Kesalahan Fatal Ditolak Dosen / EYD & Plagiarisme
       const q2 = QUESTIONS[1];
-      expect(q2.prompt).toContain("aturan format administratif paling ketat");
+      expect(q2.prompt).toContain("kesalahan fatal");
       const q2Correct = q2.options.find((o) => o.correct);
-      expect(q2Correct?.key).toBe("D");
-      expect(q2Correct?.label).toContain("Proposal PKM");
+      expect(q2Correct?.key).toBe("C");
+      expect(q2Correct?.label).toContain("EYD");
 
       const s5_3 = SPEAKER_NOTES["s5_3"];
-      expect(s5_3.spokenScript).toContain("Proposal PKM");
+      expect(s5_3.spokenScript).toContain("kesalahan fatal");
 
       const s5_4 = SPEAKER_NOTES["s5_4"];
-      expect(s5_4.spokenScript).toContain("Dikti");
-      expect(s5_4.spokenScript).toContain("sepuluh halaman");
+      expect(s5_4.spokenScript).toContain("Opsi C");
+      expect(s5_4.spokenScript).toContain("EYD");
     });
 
     it("Act 06: Data 4 kartu battle memuat variasi KTI sesuai Tabel 2 Makalah", () => {

@@ -92,36 +92,36 @@ export const QUESTIONS_MAP: Record<
   1: {
     id: 1,
     prompt:
-      "Kalian sering membuat makalah tugas kuliah. Jika makalah tersebut ingin diterbitkan menjadi artikel jurnal ilmiah bereputasi, perubahan apa yang paling mendasar?",
+      "Di kalangan mahasiswa sering beredar anggapan: 'Karya ilmiah yang bagus itu yang halamannya tebal berjilid-jilid.' Benarkah anggapan ini ketika karya kalian diikutsertakan dalam kompetisi Proposal PKM atau publikasi Jurnal Ilmiah?",
     options: [
-      { key: "A", label: "Mempertebal tinjauan pustaka dan menambah jumlah bab" },
-      { key: "B", label: "Mengganti istilah Indonesia ke bahasa asing agar terlihat lebih teknis" },
+      { key: "A", label: "Benar, semakin tebal jumlah halamannya, reviewer menganggap risetnya semakin berbobot" },
       {
-        key: "C",
-        label: "Mengubahnya ke format IMRaD (tanpa bab Romawi) dan berorientasi pada novelty",
+        key: "B",
+        label: "Salah, setiap KTI punya batas ketat—di PKM bahkan kelebihan 1 halaman langsung gugur!",
         correct: true,
       },
-      { key: "D", label: "Menghapus pendahuluan dan langsung menyajikan data mentah" },
+      { key: "C", label: "Benar, asalkan 70% isinya dipenuhi bab kajian teori dari buku-buku tebal" },
+      { key: "D", label: "Format ketebalan halaman bebas dan tidak pernah menjadi kriteria penilaian" },
     ],
     answerNote:
-      "Berdasarkan Tabel 2 makalah (Fitriani et al., 2023), artikel jurnal memadatkan struktur menjadi format IMRaD (Introduction, Methods, Results, Discussion) tanpa bab berangka Romawi dan sangat memprioritaskan keterbaruan (novelty) untuk publikasi bereputasi, berbeda dengan makalah kuliah yang menggunakan format 3 bab ringkas untuk kajian konseptual tugas.",
+      "Berdasarkan pedoman Ditbelmawa Dikti (2023) dan Tabel 2 makalah, karya ilmiah tidak dinilai dari ketebalannya. Proposal PKM memiliki batas maksimal mutlak 10 halaman isi inti dan langsung gugur jika melebihi batas. Artikel jurnal pun menuntut format IMRaD yang ringkas dan padat kebaruan (novelty), bukan ketebalan halaman.",
   },
   2: {
     id: 2,
     prompt:
-      "Di antara jenis karya ilmiah berikut, mana yang memiliki aturan format administratif paling ketat dan langsung gugur jika melanggar batas halaman?",
+      "Bayangkan struktur anatomi KTI kalian sudah lengkap dari Bab I sampai V. Namun, kesalahan fatal apa yang paling sering membuat karya ilmiah mahasiswa langsung DITOLAK atau dicoret dosen penguji?",
     options: [
-      { key: "A", label: "Skripsi / Tesis tugas akhir" },
-      { key: "B", label: "Makalah kajian konseptual tugas kuliah" },
-      { key: "C", label: "Artikel jurnal ilmiah nasional" },
+      { key: "A", label: "Jumlah halaman kurang tebal dibanding kelompok mahasiswa lain" },
+      { key: "B", label: "Tidak mencantumkan lampiran dokumentasi foto kegiatan" },
       {
-        key: "D",
-        label: "Proposal PKM (Program Kreativitas Mahasiswa)",
+        key: "C",
+        label: "Kalimat bertele-tele melanggar EYD serta sitasi yang tidak jujur (indikasi plagiarisme)",
         correct: true,
       },
+      { key: "D", label: "Menggunakan diagram batang alih-alih menyajikan tabel angka mentah" },
     ],
     answerNote:
-      "Berdasarkan pedoman Dikti (2023) dan Tabel 2 makalah, Proposal PKM memiliki seleksi administratif awal yang sangat ketat di Simbelmawa dengan batasan maksimal 10 halaman isi inti. Pelanggaran format atau batas halaman akan langsung menggugurkan proposal pada tahap seleksi administrasi sebelum sempat dinilai substansinya.",
+      "Berdasarkan Kepmendikbudristek No. 0424/P/2022 (EYD V) dan etika penulisan ilmiah, struktur anatomi yang lengkap akan runtuh jika bahasa yang digunakan rancu, bertele-tele, melanggar kaidah baku, atau terindikasi plagiarisme akibat sitasi dan parafrase yang manipulatif. Inilah jembatan menuju Babak 7.",
   },
 };
 
